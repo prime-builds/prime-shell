@@ -3,18 +3,30 @@ use super::error::{AppError, AppResult};
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BackendOperation {
     SpikeEcho,
+    SpikeCount,
+    SpikeCrash,
+    SpikeHang,
+    SpikeLargeRejected,
 }
 
 impl BackendOperation {
     pub const fn name(self) -> &'static str {
         match self {
             Self::SpikeEcho => "spike.echo",
+            Self::SpikeCount => "spike.count",
+            Self::SpikeCrash => "spike.crash",
+            Self::SpikeHang => "spike.hang",
+            Self::SpikeLargeRejected => "spike.largeRejected",
         }
     }
 
     pub fn authorize(name: &str, trace_id: &str) -> AppResult<Self> {
         match name {
             "spike.echo" => Ok(Self::SpikeEcho),
+            "spike.count" => Ok(Self::SpikeCount),
+            "spike.crash" => Ok(Self::SpikeCrash),
+            "spike.hang" => Ok(Self::SpikeHang),
+            "spike.largeRejected" => Ok(Self::SpikeLargeRejected),
             _ => Err(AppError::validation(
                 "The requested operation is not authorized.",
                 trace_id,
@@ -35,13 +47,18 @@ mod tests {
     }
 
     #[test]
-    fn echo_is_the_only_authorized_operation() {
-        assert_eq!(
-            BackendOperation::authorize("spike.echo", "trace-registry")
-                .expect("echo must be authorized")
-                .name(),
-            "spike.echo"
-        );
+    fn all_five_operations_are_authorized() {
+        for name in [
+            "spike.echo",
+            "spike.count",
+            "spike.crash",
+            "spike.hang",
+            "spike.largeRejected",
+        ] {
+            let op = BackendOperation::authorize(name, "trace-registry")
+                .expect("operation must be authorized");
+            assert_eq!(op.name(), name);
+        }
     }
 
     #[test]

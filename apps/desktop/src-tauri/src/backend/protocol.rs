@@ -4,7 +4,31 @@ use super::error::{AppError, AppResult};
 
 pub const HANDSHAKE_MAX_BYTES: usize = 64 * 1024;
 pub const FRAME_MAX_BYTES: usize = 1024 * 1024;
+pub const LOG_MAX_BYTES: usize = 64 * 1024;
 pub const TEXT_MAX_CHARACTERS: usize = 262_144;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum BackendLifecycleState {
+    Stopped,
+    Starting,
+    Ready,
+    Busy,
+    Restarting,
+    Stopping,
+    Faulted,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum TaskState {
+    Queued,
+    Running,
+    Cancelling,
+    Succeeded,
+    Failed,
+    Cancelled,
+    TimedOut,
+    Interrupted,
+}
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -42,13 +66,13 @@ pub struct BundleFile {
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct RequestEnvelope<'a> {
+pub struct RequestEnvelope<'a, T: Serialize> {
     pub protocol: &'static str,
     pub kind: &'static str,
     pub request_id: &'a str,
     pub trace_id: &'a str,
     pub operation: &'static str,
-    pub payload: EchoPayload<'a>,
+    pub payload: T,
 }
 
 #[derive(Debug, Serialize)]
@@ -56,22 +80,79 @@ pub struct EchoPayload<'a> {
     pub text: &'a str,
 }
 
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
-pub struct ResponseEnvelope {
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CountPayload<'a> {
+    pub target: u64,
+    pub delay_ms: u64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub task_id: Option<&'a str>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct EmptyPayload {}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CancelEnvelope<'a> {
+    pub protocol: &'static str,
+    pub kind: &'static str,
+    pub request_id: &'a str,
+    pub trace_id: &'a str,
+    pub task_id: &'a str,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AckEnvelope {
     pub protocol: String,
     pub kind: String,
-    pub request_id: Option<String>,
+    pub request_id: String,
     pub trace_id: String,
-    pub operation: Option<String>,
-    pub payload: Option<EchoResultPayload>,
-    pub error: Option<BackendErrorPayload>,
+    pub task_id: String,
+    pub status: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TaskEventPayload {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub current: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub target: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status: Option<TaskState>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub completed: Option<u64>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TaskEvent {
+    pub protocol: String,
+    pub kind: String,
+    pub request_id: String,
+    pub trace_id: String,
+    pub task_id: String,
+    pub sequence: u64,
+    pub event: String,
+    pub payload: TaskEventPayload,
 }
 
 #[derive(Debug, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct EchoResultPayload {
-    pub text: String,
+#[serde(rename_all = "camelCase")]
+pub struct GenericIncomingFrame {
+    pub protocol: String,
+    pub kind: String,
+    pub request_id: Option<String>,
+    pub trace_id: Option<String>,
+    pub task_id: Option<String>,
+    pub operation: Option<String>,
+    pub sequence: Option<u64>,
+    pub event: Option<String>,
+    pub status: Option<String>,
+    pub payload: Option<serde_json::Value>,
+    pub error: Option<BackendErrorPayload>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -81,17 +162,26 @@ pub struct BackendErrorPayload {
     pub message: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct BackendStatus {
+    pub state: BackendLifecycleState,
     pub ready: bool,
-    #[serde(rename = "backendVersion")]
     pub backend_version: Option<String>,
+    pub circuit_open: bool,
 }
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct EchoResponse {
     pub text: String,
+    pub trace_id: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TaskStartResponse {
+    pub task_id: String,
     pub trace_id: String,
 }
 
@@ -124,7 +214,14 @@ pub fn validate_hello(
             trace,
         ));
     }
-    if hello.python_version.is_empty() || hello.supported_operations != ["spike.echo".to_owned()] {
+    let expected_ops = [
+        "spike.echo",
+        "spike.count",
+        "spike.crash",
+        "spike.hang",
+        "spike.largeRejected",
+    ];
+    if hello.python_version.is_empty() || hello.supported_operations != expected_ops {
         return Err(AppError::mismatch(
             "Packaged backend capabilities mismatch.",
             trace,
@@ -161,24 +258,25 @@ mod tests {
             target_triple: "linux-x86_64".to_owned(),
             python_version: "3.12.13".to_owned(),
             schema_hash: manifest().schema_hash,
-            supported_operations: vec!["spike.echo".to_owned()],
+            supported_operations: vec![
+                "spike.echo".to_owned(),
+                "spike.count".to_owned(),
+                "spike.crash".to_owned(),
+                "spike.hang".to_owned(),
+                "spike.largeRejected".to_owned(),
+            ],
         }
     }
 
     #[test]
     fn valid_handshake_passes() {
-        let expected = manifest().schema_hash;
-        validate_hello(&hello(), &manifest(), &expected).expect("handshake must pass");
+        assert!(validate_hello(&hello(), &manifest(), &manifest().schema_hash).is_ok());
     }
 
     #[test]
     fn stale_schema_is_rejected() {
-        let error = validate_hello(
-            &hello(),
-            &manifest(),
-            "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
-        )
-        .expect_err("stale schema must fail");
-        assert_eq!(error.code, "BACKEND_PROTOCOL_MISMATCH");
+        let err = validate_hello(&hello(), &manifest(), "sha256:mismatch")
+            .expect_err("mismatched schema must fail");
+        assert_eq!(err.code, "BACKEND_PROTOCOL_MISMATCH");
     }
 }

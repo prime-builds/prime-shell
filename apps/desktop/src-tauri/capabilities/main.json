@@ -1,12 +1,13 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "main-capability",
-  "description": "Only the two WP01 application commands are exposed to the main window.",
+  "description": "WP01 echo and WP02 lifecycle commands are exposed to the main window.",
   "windows": ["main"],
   "permissions": [
     "core:default",
     "allow-backend-status",
     "allow-echo-text",
+    "allow-task-lifecycle",
     "allow-runtime-probe"
   ]
 }

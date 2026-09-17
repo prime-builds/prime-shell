@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 
-EVIDENCE_DIR="$ROOT/artifacts/wp01-native-runtime"
+EVIDENCE_DIR="${WP_EVIDENCE_DIR:-$ROOT/artifacts/wp02-native-runtime}"
 EVIDENCE_FILE="$EVIDENCE_DIR/native-runtime-evidence.json"
 mkdir -p "$EVIDENCE_DIR"
 
@@ -15,7 +15,7 @@ if [[ -z "$DEB_PATH" || ! -f "$DEB_PATH" ]]; then
 fi
 
 PACKAGE_NAME="$(dpkg-deb -f "$DEB_PATH" Package)"
-sudo apt-get install -y "$DEB_PATH"
+sudo dpkg -i "$DEB_PATH"
 
 APP_BINARY="$(
   dpkg-query -L "$PACKAGE_NAME" |
@@ -28,6 +28,9 @@ fi
 
 rm -f "$EVIDENCE_FILE"
 timeout 45s xvfb-run -a env \
+  LIBGL_ALWAYS_SOFTWARE=1 \
+  WEBKIT_DISABLE_DMABUF_RENDERER=1 \
+  WEBKIT_DISABLE_COMPOSITING_MODE=1 \
   PRIME_SHELL_NATIVE_RUNTIME_VERIFY=1 \
   PRIME_SHELL_RUNTIME_EVIDENCE="$EVIDENCE_FILE" \
   "$APP_BINARY"
@@ -55,6 +58,7 @@ checks = {
     "safeErrorPath": str(data.get("safeErrorPath", "")).startswith(
         "RESOURCE_EXHAUSTED:"
     ),
+    "countOperationVerified": data.get("countOperationVerified", True) is True,
 }
 failed = [name for name, ok in checks.items() if not ok]
 if failed:

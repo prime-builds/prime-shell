@@ -9,3 +9,5 @@ __pycache__/
 services/python-backend/build/
 services/python-backend/dist/
 apps/desktop/src-tauri/gen/
+artifacts/
+apps/desktop/src-tauri/resources/

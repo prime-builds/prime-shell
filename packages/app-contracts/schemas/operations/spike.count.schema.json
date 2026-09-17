@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://prime-shell.local/schemas/operations/spike.count.schema.json",
+  "title": "spike.count",
+  "$defs": {
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target", "delayMs"],
+      "properties": {
+        "target": { "type": "integer", "minimum": 1, "maximum": 100000 },
+        "delayMs": { "type": "integer", "minimum": 0, "maximum": 5000 },
+        "taskId": { "type": "string", "minLength": 1, "maxLength": 128 }
+      }
+    },
+    "response": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["completed"],
+      "properties": {
+        "completed": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

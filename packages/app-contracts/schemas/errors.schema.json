@@ -20,7 +20,12 @@
             "VALIDATION_ERROR",
             "PROTOCOL_ERROR",
             "RESOURCE_EXHAUSTED",
-            "INTERNAL_ERROR"
+            "INTERNAL_ERROR",
+            "BACKEND_CRASHED",
+            "BACKEND_UNAVAILABLE",
+            "TASK_CANCELLED",
+            "TASK_TIMED_OUT",
+            "TASK_INTERRUPTED"
           ]
         },
         "message": { "type": "string", "minLength": 1, "maxLength": 256 }

@@ -1,0 +1,13 @@
+{
+  "protocol": "generic-app",
+  "kind": "event",
+  "requestId": "count-req-1",
+  "traceId": "trace-count-1",
+  "taskId": "task-count-1",
+  "sequence": 1,
+  "event": "progress",
+  "payload": {
+    "current": 1,
+    "target": 5
+  }
+}

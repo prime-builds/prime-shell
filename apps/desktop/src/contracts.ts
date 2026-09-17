@@ -9,14 +9,75 @@ export const appErrorSchema = z.object({
     "RESOURCE_EXHAUSTED",
     "IO_ERROR",
     "INTERNAL_ERROR",
+    "BACKEND_CRASHED",
+    "TASK_CANCELLED",
+    "TASK_TIMED_OUT",
+    "TASK_INTERRUPTED",
   ]),
   message: z.string().min(1).max(256),
   traceId: z.string().min(1).max(128),
 });
 
+export const backendLifecycleStateSchema = z.enum([
+  "stopped",
+  "starting",
+  "ready",
+  "busy",
+  "restarting",
+  "faulted",
+  "stopping",
+  "Stopped",
+  "Starting",
+  "Ready",
+  "Busy",
+  "Restarting",
+  "Stopping",
+  "Faulted",
+]);
+
 export const backendStatusSchema = z.object({
+  state: backendLifecycleStateSchema,
   ready: z.boolean(),
   backendVersion: z.string().max(64).nullable(),
+  circuitOpen: z.boolean(),
+});
+
+export const taskStateSchema = z.enum([
+  "Queued",
+  "Running",
+  "Cancelling",
+  "Succeeded",
+  "Failed",
+  "Cancelled",
+  "TimedOut",
+  "Interrupted",
+]);
+
+export const taskEventPayloadSchema = z.object({
+  current: z.number().optional(),
+  target: z.number().optional(),
+  status: taskStateSchema.optional(),
+  completed: z.number().optional(),
+});
+
+export const taskEventSchema = z.object({
+  protocol: z.literal("generic-app"),
+  kind: z.literal("event"),
+  requestId: z.string(),
+  traceId: z.string(),
+  taskId: z.string(),
+  sequence: z.number(),
+  event: z.string(),
+  payload: taskEventPayloadSchema,
+});
+
+export const ackEnvelopeSchema = z.object({
+  protocol: z.literal("generic-app"),
+  kind: z.literal("ack"),
+  requestId: z.string(),
+  traceId: z.string(),
+  taskId: z.string(),
+  status: z.string(),
 });
 
 export const echoResponseSchema = z.object({
@@ -30,6 +91,11 @@ export const runtimeProbeConfigSchema = z.object({
 });
 
 export type AppError = z.infer<typeof appErrorSchema>;
+export type BackendLifecycleState = z.infer<typeof backendLifecycleStateSchema>;
 export type BackendStatus = z.infer<typeof backendStatusSchema>;
+export type TaskState = z.infer<typeof taskStateSchema>;
+export type TaskEventPayload = z.infer<typeof taskEventPayloadSchema>;
+export type TaskEvent = z.infer<typeof taskEventSchema>;
+export type AckEnvelope = z.infer<typeof ackEnvelopeSchema>;
 export type EchoResponse = z.infer<typeof echoResponseSchema>;
 export type RuntimeProbeConfig = z.infer<typeof runtimeProbeConfigSchema>;

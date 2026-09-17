@@ -3,7 +3,10 @@ use std::{
     io::{BufRead, BufReader, Read, Write},
     path::{Path, PathBuf},
     process::{Child, ChildStdin, Command, Stdio},
-    sync::mpsc::{self, Receiver},
+    sync::{
+        mpsc::{self, Receiver},
+        Arc, Mutex, RwLock,
+    },
     thread,
     time::{Duration, Instant},
 };
@@ -14,15 +17,19 @@ use sha2::{Digest, Sha256};
 use super::{
     error::{AppError, AppResult},
     protocol::{
-        validate_hello, BackendStatus, BundleManifest, EchoPayload, EchoResponse, Hello,
-        RequestEnvelope, ResponseEnvelope, FRAME_MAX_BYTES, HANDSHAKE_MAX_BYTES,
+        validate_hello, AckEnvelope, BackendLifecycleState, BackendStatus, BundleManifest,
+        CancelEnvelope, CountPayload, EchoPayload, EchoResponse, EmptyPayload,
+        GenericIncomingFrame, Hello, RequestEnvelope, TaskEvent, TaskEventPayload, TaskState,
+        FRAME_MAX_BYTES, HANDSHAKE_MAX_BYTES, TEXT_MAX_CHARACTERS,
     },
     registry::BackendOperation,
 };
 
 const HANDSHAKE_TIMEOUT: Duration = Duration::from_secs(3);
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(5);
+const CANCELLATION_DEADLINE: Duration = Duration::from_secs(2);
 const SHUTDOWN_TIMEOUT: Duration = Duration::from_secs(2);
+const CIRCUIT_WINDOW: Duration = Duration::from_secs(60);
 
 #[derive(Debug)]
 enum FrameReadError {
@@ -31,9 +38,10 @@ enum FrameReadError {
     TooLarge,
 }
 
+#[derive(Clone)]
 pub struct LaunchSpec {
-    executable: PathBuf,
-    target_root: PathBuf,
+    pub executable: PathBuf,
+    pub target_root: PathBuf,
 }
 
 impl LaunchSpec {
@@ -61,16 +69,14 @@ impl LaunchSpec {
     }
 }
 
-pub struct BackendClient {
-    child: Child,
-    stdin: Option<ChildStdin>,
-    frames: Receiver<Result<Vec<u8>, FrameReadError>>,
-    backend_version: String,
+struct BackendProcess {
+    child: Mutex<Child>,
+    stdin: Mutex<Option<ChildStdin>>,
+    frames: Mutex<Receiver<Result<Vec<u8>, FrameReadError>>>,
 }
 
-impl BackendClient {
-    pub fn launch(spec: LaunchSpec) -> AppResult<Self> {
-        let trace = "backend-launch";
+impl BackendProcess {
+    fn spawn(spec: &LaunchSpec, trace: &str) -> AppResult<(Self, String)> {
         let target_root = spec
             .target_root
             .canonicalize()
@@ -108,7 +114,7 @@ impl BackendClient {
         let stdout = child.stdout.take().ok_or_else(|| AppError::io(trace))?;
         let stderr = child.stderr.take().ok_or_else(|| AppError::io(trace))?;
 
-        let (sender, frames) = mpsc::sync_channel(64);
+        let (sender, frames) = mpsc::sync_channel(256);
         thread::spawn(move || {
             let mut reader = BufReader::new(stdout);
             let mut first = true;
@@ -145,28 +151,145 @@ impl BackendClient {
             .map_err(|_| AppError::mismatch("Backend hello is malformed.", trace))?;
         validate_hello(&hello, &manifest, env!("PRIME_SHELL_SCHEMA_HASH"))?;
 
+        Ok((
+            Self {
+                child: Mutex::new(child),
+                stdin: Mutex::new(Some(stdin)),
+                frames: Mutex::new(frames),
+            },
+            hello.backend_version,
+        ))
+    }
+
+    fn write_frame<T: Serialize>(&self, value: &T, trace_id: &str) -> AppResult<()> {
+        let mut encoded = serde_json::to_vec(value).map_err(|_| AppError::internal(trace_id))?;
+        if encoded.len() > FRAME_MAX_BYTES {
+            return Err(AppError::exhausted(trace_id));
+        }
+        encoded.push(b'\n');
+        let mut guard = self
+            .stdin
+            .lock()
+            .map_err(|_| AppError::internal(trace_id))?;
+        let stdin = guard
+            .as_mut()
+            .ok_or_else(|| AppError::unavailable(trace_id))?;
+        stdin
+            .write_all(&encoded)
+            .map_err(|_| AppError::io(trace_id))?;
+        stdin.flush().map_err(|_| AppError::io(trace_id))
+    }
+
+    fn recv_frame(
+        &self,
+        timeout: Duration,
+    ) -> Result<Result<Vec<u8>, FrameReadError>, mpsc::RecvTimeoutError> {
+        let guard = self
+            .frames
+            .lock()
+            .map_err(|_| mpsc::RecvTimeoutError::Disconnected)?;
+        guard.recv_timeout(timeout)
+    }
+
+    fn is_alive(&self) -> bool {
+        if let Ok(mut guard) = self.child.lock() {
+            matches!(guard.try_wait(), Ok(None))
+        } else {
+            false
+        }
+    }
+
+    fn kill(&self) {
+        if let Ok(mut guard) = self.child.lock() {
+            let _ = guard.kill();
+            let _ = guard.wait();
+        }
+    }
+}
+
+impl Drop for BackendProcess {
+    fn drop(&mut self) {
+        if let Ok(mut stdin_guard) = self.stdin.lock() {
+            if let Some(stdin) = stdin_guard.as_mut() {
+                let _ = stdin.write_all(b"{\"protocol\":\"generic-app\",\"kind\":\"shutdown\"}\n");
+                let _ = stdin.flush();
+            }
+            stdin_guard.take();
+        }
+
+        let deadline = Instant::now() + SHUTDOWN_TIMEOUT;
+        while Instant::now() < deadline {
+            if let Ok(mut child_guard) = self.child.lock() {
+                match child_guard.try_wait() {
+                    Ok(Some(_)) => return,
+                    Ok(None) => thread::sleep(Duration::from_millis(20)),
+                    Err(_) => break,
+                }
+            }
+        }
+        if let Ok(mut child_guard) = self.child.lock() {
+            let _ = child_guard.kill();
+            let _ = child_guard.wait();
+        }
+    }
+}
+
+#[derive(Clone)]
+pub struct BackendClient {
+    spec: LaunchSpec,
+    process: Arc<RwLock<BackendProcess>>,
+    backend_version: Arc<RwLock<String>>,
+    state: Arc<RwLock<BackendLifecycleState>>,
+    restart_budget: Arc<Mutex<u32>>,
+    failure_history: Arc<Mutex<Vec<Instant>>>,
+    circuit_open: Arc<RwLock<bool>>,
+    active_task: Arc<RwLock<Option<String>>>,
+    cancelling_task: Arc<RwLock<Option<(String, Instant)>>>,
+}
+
+impl BackendClient {
+    pub fn launch(spec: LaunchSpec) -> AppResult<Self> {
+        let trace = "backend-launch";
+        let (process, backend_version) = BackendProcess::spawn(&spec, trace)?;
+
         Ok(Self {
-            child,
-            stdin: Some(stdin),
-            frames,
-            backend_version: hello.backend_version,
+            spec,
+            process: Arc::new(RwLock::new(process)),
+            backend_version: Arc::new(RwLock::new(backend_version)),
+            state: Arc::new(RwLock::new(BackendLifecycleState::Ready)),
+            restart_budget: Arc::new(Mutex::new(1)),
+            failure_history: Arc::new(Mutex::new(Vec::new())),
+            circuit_open: Arc::new(RwLock::new(false)),
+            active_task: Arc::new(RwLock::new(None)),
+            cancelling_task: Arc::new(RwLock::new(None)),
         })
     }
 
     pub fn status(&self) -> BackendStatus {
+        let state = *self.state.read().unwrap_or_else(|e| e.into_inner());
+        let circuit_open = *self.circuit_open.read().unwrap_or_else(|e| e.into_inner());
+        let backend_version = self
+            .backend_version
+            .read()
+            .unwrap_or_else(|e| e.into_inner())
+            .clone();
+
         BackendStatus {
-            ready: true,
-            backend_version: Some(self.backend_version.clone()),
+            state,
+            ready: state == BackendLifecycleState::Ready,
+            backend_version: Some(backend_version),
+            circuit_open,
         }
     }
 
-    pub fn echo(
-        &mut self,
-        text: &str,
-        request_id: &str,
-        trace_id: &str,
-    ) -> AppResult<EchoResponse> {
-        if text.chars().count() > super::protocol::TEXT_MAX_CHARACTERS {
+    pub fn echo(&self, text: &str, request_id: &str, trace_id: &str) -> AppResult<EchoResponse> {
+        if *self.circuit_open.read().unwrap_or_else(|e| e.into_inner())
+            || *self.state.read().unwrap_or_else(|e| e.into_inner())
+                == BackendLifecycleState::Faulted
+        {
+            return Err(AppError::unavailable(trace_id));
+        }
+        if text.chars().count() > TEXT_MAX_CHARACTERS {
             return Err(AppError::exhausted(trace_id));
         }
         let operation = BackendOperation::authorize("spike.echo", trace_id)?;
@@ -178,108 +301,473 @@ impl BackendClient {
             operation: operation.name(),
             payload: EchoPayload { text },
         };
-        self.write_frame(&request, trace_id)?;
 
-        let frame = self
-            .frames
-            .recv_timeout(REQUEST_TIMEOUT)
-            .map_err(|_| AppError::unavailable(trace_id))?
-            .map_err(|error| map_frame_error(error, trace_id))?;
-        let response: ResponseEnvelope = serde_json::from_slice(&frame)
+        let proc = self
+            .process
+            .read()
+            .map_err(|_| AppError::internal(trace_id))?;
+        proc.write_frame(&request, trace_id)?;
+
+        let frame = match proc.recv_frame(REQUEST_TIMEOUT) {
+            Ok(Ok(f)) => f,
+            Ok(Err(err)) => return Err(map_frame_error(err, trace_id)),
+            Err(_) => return Err(AppError::unavailable(trace_id)),
+        };
+
+        let response: GenericIncomingFrame = serde_json::from_slice(&frame)
             .map_err(|_| AppError::protocol("Backend response is malformed.", trace_id))?;
-        validate_response(response, request_id, trace_id)
+
+        if response.kind == "result" {
+            if let Some(payload) = response.payload {
+                if let Some(res_text) = payload.get("text").and_then(|v| v.as_str()) {
+                    return Ok(EchoResponse {
+                        text: res_text.to_owned(),
+                        trace_id: trace_id.to_owned(),
+                    });
+                }
+            }
+        } else if response.kind == "error" {
+            if let Some(err) = response.error {
+                return Err(AppError {
+                    code: Box::leak(err.code.into_boxed_str()),
+                    message: err.message,
+                    trace_id: trace_id.to_owned(),
+                });
+            }
+        }
+
+        Err(AppError::protocol(
+            "Invalid echo response structure.",
+            trace_id,
+        ))
     }
 
-    fn write_frame<T: Serialize>(&mut self, value: &T, trace_id: &str) -> AppResult<()> {
-        let mut encoded =
-            serde_json::to_vec(value).map_err(|_| AppError::internal(trace_id.to_owned()))?;
-        if encoded.len() > FRAME_MAX_BYTES {
+    pub fn count<F>(
+        &self,
+        target: u64,
+        delay_ms: u64,
+        request_id: &str,
+        trace_id: &str,
+        task_id: &str,
+        mut on_event: F,
+    ) -> AppResult<u64>
+    where
+        F: FnMut(TaskEvent),
+    {
+        if *self.circuit_open.read().unwrap_or_else(|e| e.into_inner())
+            || *self.state.read().unwrap_or_else(|e| e.into_inner())
+                == BackendLifecycleState::Faulted
+        {
+            return Err(AppError::unavailable(trace_id));
+        }
+
+        let operation = BackendOperation::authorize("spike.count", trace_id)?;
+        {
+            let mut state_guard = self
+                .state
+                .write()
+                .map_err(|_| AppError::internal(trace_id))?;
+            if *state_guard != BackendLifecycleState::Ready {
+                return Err(AppError::busy("Backend is not ready.", trace_id));
+            }
+            *state_guard = BackendLifecycleState::Busy;
+        }
+        *self.active_task.write().unwrap() = Some(task_id.to_owned());
+        *self.cancelling_task.write().unwrap() = None;
+
+        let request = RequestEnvelope {
+            protocol: "generic-app",
+            kind: "request",
+            request_id,
+            trace_id,
+            operation: operation.name(),
+            payload: CountPayload {
+                target,
+                delay_ms,
+                task_id: Some(task_id),
+            },
+        };
+
+        {
+            let proc = self
+                .process
+                .read()
+                .map_err(|_| AppError::internal(trace_id))?;
+            if let Err(err) = proc.write_frame(&request, trace_id) {
+                *self.state.write().unwrap() = BackendLifecycleState::Ready;
+                *self.active_task.write().unwrap() = None;
+                return Err(err);
+            }
+        }
+
+        let mut last_progress_sent = Instant::now() - Duration::from_millis(150);
+        let mut last_reported_count = 0_u64;
+        let max_timeout = Duration::from_millis(delay_ms.saturating_mul(target) + 15_000);
+        let start_time = Instant::now();
+
+        loop {
+            if start_time.elapsed() > max_timeout {
+                self.handle_failure(trace_id);
+                return Err(AppError::timed_out(trace_id));
+            }
+
+            // Cancellation deadline escalation check (<= 2s)
+            if let Some((cancelling_id, requested_at)) =
+                self.cancelling_task.read().unwrap().as_ref()
+            {
+                if cancelling_id == task_id && requested_at.elapsed() > CANCELLATION_DEADLINE {
+                    if let Ok(proc) = self.process.read() {
+                        proc.kill();
+                    }
+                    self.handle_failure(trace_id);
+                    on_event(TaskEvent {
+                        protocol: "generic-app".to_owned(),
+                        kind: "event".to_owned(),
+                        request_id: request_id.to_owned(),
+                        trace_id: trace_id.to_owned(),
+                        task_id: task_id.to_owned(),
+                        sequence: 999999,
+                        event: "terminal".to_owned(),
+                        payload: TaskEventPayload {
+                            current: None,
+                            target: Some(target),
+                            status: Some(TaskState::Interrupted),
+                            completed: Some(last_reported_count),
+                        },
+                    });
+                    return Err(AppError::timed_out(trace_id));
+                }
+            }
+
+            let frame_res = {
+                let proc = self
+                    .process
+                    .read()
+                    .map_err(|_| AppError::internal(trace_id))?;
+                if !proc.is_alive() {
+                    drop(proc);
+                    self.handle_failure(trace_id);
+                    on_event(TaskEvent {
+                        protocol: "generic-app".to_owned(),
+                        kind: "event".to_owned(),
+                        request_id: request_id.to_owned(),
+                        trace_id: trace_id.to_owned(),
+                        task_id: task_id.to_owned(),
+                        sequence: 999999,
+                        event: "terminal".to_owned(),
+                        payload: TaskEventPayload {
+                            current: None,
+                            target: Some(target),
+                            status: Some(TaskState::Interrupted),
+                            completed: Some(last_reported_count),
+                        },
+                    });
+                    return Err(AppError::crashed(trace_id));
+                }
+                proc.recv_frame(Duration::from_millis(100))
+            };
+
+            let frame = match frame_res {
+                Ok(Ok(bytes)) => bytes,
+                Ok(Err(err)) => {
+                    self.handle_failure(trace_id);
+                    return Err(map_frame_error(err, trace_id));
+                }
+                Err(mpsc::RecvTimeoutError::Timeout) => {
+                    continue;
+                }
+                Err(mpsc::RecvTimeoutError::Disconnected) => {
+                    self.handle_failure(trace_id);
+                    return Err(AppError::crashed(trace_id));
+                }
+            };
+
+            let incoming: GenericIncomingFrame = serde_json::from_slice(&frame)
+                .map_err(|_| AppError::protocol("Malformed task frame from backend.", trace_id))?;
+
+            if incoming.kind == "event" {
+                let event_type = incoming.event.as_deref().unwrap_or("");
+                let is_terminal = event_type == "terminal";
+                let should_send = if is_terminal {
+                    true
+                } else {
+                    let now = Instant::now();
+                    if now.duration_since(last_progress_sent) >= Duration::from_millis(100) {
+                        last_progress_sent = now;
+                        true
+                    } else {
+                        false
+                    }
+                };
+
+                let event_payload: TaskEventPayload = incoming
+                    .payload
+                    .and_then(|p| serde_json::from_value(p).ok())
+                    .unwrap_or(TaskEventPayload {
+                        current: None,
+                        target: None,
+                        status: None,
+                        completed: None,
+                    });
+
+                if let Some(cur) = event_payload.current {
+                    last_reported_count = cur;
+                }
+                if let Some(comp) = event_payload.completed {
+                    last_reported_count = comp;
+                }
+
+                if should_send {
+                    let task_event = TaskEvent {
+                        protocol: "generic-app".to_owned(),
+                        kind: "event".to_owned(),
+                        request_id: incoming.request_id.clone().unwrap_or_default(),
+                        trace_id: trace_id.to_owned(),
+                        task_id: incoming
+                            .task_id
+                            .clone()
+                            .unwrap_or_else(|| task_id.to_owned()),
+                        sequence: incoming.sequence.unwrap_or(0),
+                        event: event_type.to_owned(),
+                        payload: event_payload,
+                    };
+                    on_event(task_event);
+                }
+            } else if incoming.kind == "result" {
+                *self.state.write().unwrap() = BackendLifecycleState::Ready;
+                *self.active_task.write().unwrap() = None;
+                *self.cancelling_task.write().unwrap() = None;
+                let completed = incoming
+                    .payload
+                    .and_then(|p| p.get("completed").and_then(|v| v.as_u64()))
+                    .unwrap_or(target);
+                return Ok(completed);
+            } else if incoming.kind == "error" {
+                *self.state.write().unwrap() = BackendLifecycleState::Ready;
+                *self.active_task.write().unwrap() = None;
+                *self.cancelling_task.write().unwrap() = None;
+                let code = incoming
+                    .error
+                    .as_ref()
+                    .map(|e| e.code.as_str())
+                    .unwrap_or("INTERNAL_ERROR");
+                let msg = incoming
+                    .error
+                    .as_ref()
+                    .map(|e| e.message.clone())
+                    .unwrap_or_else(|| "Task error".to_owned());
+                if code == "TASK_CANCELLED" {
+                    return Err(AppError::cancelled(trace_id));
+                }
+                return Err(AppError {
+                    code: Box::leak(code.to_owned().into_boxed_str()),
+                    message: msg,
+                    trace_id: trace_id.to_owned(),
+                });
+            }
+        }
+    }
+
+    pub fn cancel_task(
+        &self,
+        task_id: &str,
+        request_id: &str,
+        trace_id: &str,
+    ) -> AppResult<AckEnvelope> {
+        let active = self.active_task.read().unwrap().clone();
+        if active.as_deref() != Some(task_id) {
+            return Ok(AckEnvelope {
+                protocol: "generic-app".to_owned(),
+                kind: "ack".to_owned(),
+                request_id: request_id.to_owned(),
+                trace_id: trace_id.to_owned(),
+                task_id: task_id.to_owned(),
+                status: "not_found".to_owned(),
+            });
+        }
+
+        *self.cancelling_task.write().unwrap() = Some((task_id.to_owned(), Instant::now()));
+
+        let cancel = CancelEnvelope {
+            protocol: "generic-app",
+            kind: "cancel",
+            request_id,
+            trace_id,
+            task_id,
+        };
+        let proc = self
+            .process
+            .read()
+            .map_err(|_| AppError::internal(trace_id))?;
+        proc.write_frame(&cancel, trace_id)?;
+
+        Ok(AckEnvelope {
+            protocol: "generic-app".to_owned(),
+            kind: "ack".to_owned(),
+            request_id: request_id.to_owned(),
+            trace_id: trace_id.to_owned(),
+            task_id: task_id.to_owned(),
+            status: "cancelling".to_owned(),
+        })
+    }
+
+    pub fn crash(&self, request_id: &str, trace_id: &str) -> AppResult<()> {
+        let operation = BackendOperation::authorize("spike.crash", trace_id)?;
+        let request = RequestEnvelope {
+            protocol: "generic-app",
+            kind: "request",
+            request_id,
+            trace_id,
+            operation: operation.name(),
+            payload: EmptyPayload {},
+        };
+        {
+            let proc = self
+                .process
+                .read()
+                .map_err(|_| AppError::internal(trace_id))?;
+            let _ = proc.write_frame(&request, trace_id);
+        }
+        thread::sleep(Duration::from_millis(150));
+        self.handle_failure(trace_id);
+        Err(AppError::crashed(trace_id))
+    }
+
+    pub fn hang(&self, request_id: &str, trace_id: &str) -> AppResult<()> {
+        let operation = BackendOperation::authorize("spike.hang", trace_id)?;
+        let request = RequestEnvelope {
+            protocol: "generic-app",
+            kind: "request",
+            request_id,
+            trace_id,
+            operation: operation.name(),
+            payload: EmptyPayload {},
+        };
+        {
+            let proc = self
+                .process
+                .read()
+                .map_err(|_| AppError::internal(trace_id))?;
+            let _ = proc.write_frame(&request, trace_id);
+        }
+
+        // Simulate hang: wait deadline, then escalate and kill
+        thread::sleep(CANCELLATION_DEADLINE);
+        {
+            let proc = self
+                .process
+                .read()
+                .map_err(|_| AppError::internal(trace_id))?;
+            proc.kill();
+        }
+        self.handle_failure(trace_id);
+        Err(AppError::timed_out(trace_id))
+    }
+
+    pub fn large_rejected(&self, request_id: &str, trace_id: &str) -> AppResult<()> {
+        let operation = BackendOperation::authorize("spike.largeRejected", trace_id)?;
+        let request = RequestEnvelope {
+            protocol: "generic-app",
+            kind: "request",
+            request_id,
+            trace_id,
+            operation: operation.name(),
+            payload: EmptyPayload {},
+        };
+        let proc = self
+            .process
+            .read()
+            .map_err(|_| AppError::internal(trace_id))?;
+        proc.write_frame(&request, trace_id)?;
+
+        let frame = match proc.recv_frame(REQUEST_TIMEOUT) {
+            Ok(Ok(bytes)) => bytes,
+            Ok(Err(err)) => return Err(map_frame_error(err, trace_id)),
+            Err(_) => return Err(AppError::unavailable(trace_id)),
+        };
+
+        let response: GenericIncomingFrame = serde_json::from_slice(&frame)
+            .map_err(|_| AppError::protocol("Malformed response.", trace_id))?;
+
+        if response.kind == "error" {
             return Err(AppError::exhausted(trace_id));
         }
-        encoded.push(b'\n');
-        let stdin = self
-            .stdin
-            .as_mut()
-            .ok_or_else(|| AppError::unavailable(trace_id))?;
-        stdin
-            .write_all(&encoded)
-            .map_err(|_| AppError::io(trace_id))?;
-        stdin.flush().map_err(|_| AppError::io(trace_id))
+        Ok(())
     }
-}
 
-impl Drop for BackendClient {
-    fn drop(&mut self) {
-        if let Some(stdin) = self.stdin.as_mut() {
-            let _ = stdin.write_all(b"{\"protocol\":\"generic-app\",\"kind\":\"shutdown\"}\n");
-            let _ = stdin.flush();
+    pub fn reset(&self) -> AppResult<BackendStatus> {
+        let trace = "backend-reset";
+        *self.circuit_open.write().unwrap() = false;
+        self.failure_history.lock().unwrap().clear();
+        *self.restart_budget.lock().unwrap() = 1;
+
+        *self.state.write().unwrap() = BackendLifecycleState::Starting;
+        let (new_proc, new_version) = BackendProcess::spawn(&self.spec, trace)?;
+
+        {
+            let mut proc_guard = self
+                .process
+                .write()
+                .map_err(|_| AppError::internal(trace))?;
+            *proc_guard = new_proc;
         }
-        self.stdin.take();
+        *self.backend_version.write().unwrap() = new_version;
+        *self.state.write().unwrap() = BackendLifecycleState::Ready;
+        *self.active_task.write().unwrap() = None;
+        *self.cancelling_task.write().unwrap() = None;
 
-        let deadline = Instant::now() + SHUTDOWN_TIMEOUT;
-        while Instant::now() < deadline {
-            match self.child.try_wait() {
-                Ok(Some(_)) => return,
-                Ok(None) => thread::sleep(Duration::from_millis(20)),
-                Err(_) => break,
+        Ok(self.status())
+    }
+
+    fn handle_failure(&self, trace_id: &str) {
+        let now = Instant::now();
+        let mut history = self.failure_history.lock().unwrap();
+        history.retain(|t| now.duration_since(*t) < CIRCUIT_WINDOW);
+        history.push(now);
+
+        *self.active_task.write().unwrap() = None;
+        *self.cancelling_task.write().unwrap() = None;
+
+        let mut budget = self.restart_budget.lock().unwrap();
+        // Check circuit breaker
+        if history.len() >= 2 || *budget == 0 {
+            *self.circuit_open.write().unwrap() = true;
+            *self.state.write().unwrap() = BackendLifecycleState::Faulted;
+            if let Ok(proc) = self.process.read() {
+                proc.kill();
+            }
+            return;
+        }
+
+        // Attempt single bounded restart
+        *self.state.write().unwrap() = BackendLifecycleState::Restarting;
+        if let Ok(proc) = self.process.read() {
+            proc.kill();
+        }
+
+        thread::sleep(Duration::from_millis(100));
+        match BackendProcess::spawn(&self.spec, trace_id) {
+            Ok((new_proc, ver)) => {
+                if let Ok(mut proc_guard) = self.process.write() {
+                    *proc_guard = new_proc;
+                }
+                *self.backend_version.write().unwrap() = ver;
+                *budget = budget.saturating_sub(1);
+                *self.state.write().unwrap() = BackendLifecycleState::Ready;
+            }
+            Err(_) => {
+                *self.circuit_open.write().unwrap() = true;
+                *self.state.write().unwrap() = BackendLifecycleState::Faulted;
             }
         }
-        let _ = self.child.kill();
-        let _ = self.child.wait();
-    }
-}
-
-fn validate_response(
-    response: ResponseEnvelope,
-    request_id: &str,
-    trace_id: &str,
-) -> AppResult<EchoResponse> {
-    if response.protocol != "generic-app"
-        || response.request_id.as_deref() != Some(request_id)
-        || response.trace_id != trace_id
-    {
-        return Err(AppError::protocol(
-            "Backend response identity mismatch.",
-            trace_id,
-        ));
-    }
-    match response.kind.as_str() {
-        "result" => {
-            if response.operation.as_deref() != Some("spike.echo") || response.error.is_some() {
-                return Err(AppError::protocol("Backend result is invalid.", trace_id));
-            }
-            let payload = response
-                .payload
-                .ok_or_else(|| AppError::protocol("Backend result is missing.", trace_id))?;
-            Ok(EchoResponse {
-                text: payload.text,
-                trace_id: trace_id.to_owned(),
-            })
-        }
-        "error" => {
-            let error = response
-                .error
-                .ok_or_else(|| AppError::protocol("Backend error is missing.", trace_id))?;
-            match error.code.as_str() {
-                "VALIDATION_ERROR" => Err(AppError::validation(error.message, trace_id)),
-                "RESOURCE_EXHAUSTED" => Err(AppError::exhausted(trace_id)),
-                _ => Err(AppError::protocol(
-                    "Backend rejected the request.",
-                    trace_id,
-                )),
-            }
-        }
-        _ => Err(AppError::protocol(
-            "Backend response kind is invalid.",
-            trace_id,
-        )),
     }
 }
 
 fn map_frame_error(error: FrameReadError, trace_id: &str) -> AppError {
     match error {
         FrameReadError::TooLarge => AppError::exhausted(trace_id),
-        FrameReadError::Io | FrameReadError::Eof => AppError::io(trace_id),
+        FrameReadError::Io => AppError::io(trace_id),
+        FrameReadError::Eof => AppError::crashed(trace_id),
     }
 }
 
@@ -287,15 +775,17 @@ fn read_bounded_line<R: BufRead>(
     reader: &mut R,
     maximum: usize,
 ) -> Result<Vec<u8>, FrameReadError> {
-    let mut line = Vec::with_capacity(maximum.min(8192));
+    let mut line = Vec::new();
     loop {
         let available = reader.fill_buf().map_err(|_| FrameReadError::Io)?;
         if available.is_empty() {
-            return if line.is_empty() {
-                Err(FrameReadError::Eof)
-            } else {
-                Ok(line)
-            };
+            if line.is_empty() {
+                return Err(FrameReadError::Eof);
+            }
+            if line.len() > maximum {
+                return Err(FrameReadError::TooLarge);
+            }
+            return Ok(line);
         }
         if let Some(index) = available.iter().position(|byte| *byte == b'\n') {
             if line.len() + index > maximum {

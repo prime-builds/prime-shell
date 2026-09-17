@@ -8,9 +8,12 @@ use std::{
     },
 };
 
-use backend::{AppError, AppResult, BackendClient, BackendStatus, EchoResponse, LaunchSpec};
+use backend::{
+    protocol::{AckEnvelope, BackendLifecycleState},
+    AppError, AppResult, BackendClient, BackendStatus, EchoResponse, LaunchSpec,
+};
 use serde::Serialize;
-use tauri::{AppHandle, Manager, State};
+use tauri::{AppHandle, Emitter, Manager, State};
 
 struct BackendState {
     client: Mutex<Option<BackendClient>>,
@@ -27,15 +30,20 @@ struct RuntimeProbeConfig {
 
 #[tauri::command]
 fn backend_status(state: State<'_, BackendState>) -> AppResult<BackendStatus> {
-    let client = state
-        .client
-        .lock()
-        .map_err(|_| AppError::internal("backend-status"))?;
-    Ok(match client.as_ref() {
+    let client = {
+        let guard = state
+            .client
+            .lock()
+            .map_err(|_| AppError::internal("backend-status"))?;
+        guard.as_ref().cloned()
+    };
+    Ok(match client {
         Some(client) => client.status(),
         None => BackendStatus {
+            state: BackendLifecycleState::Stopped,
             ready: false,
             backend_version: None,
+            circuit_open: false,
         },
     })
 }
@@ -45,14 +53,148 @@ fn echo_text(text: String, state: State<'_, BackendState>) -> AppResult<EchoResp
     let sequence = REQUEST_SEQUENCE.fetch_add(1, Ordering::Relaxed);
     let request_id = format!("request-{sequence}");
     let trace_id = format!("trace-{}-{sequence}", std::process::id());
-    let mut client = state
-        .client
-        .lock()
-        .map_err(|_| AppError::internal(&trace_id))?;
-    client
-        .as_mut()
-        .ok_or_else(|| AppError::unavailable(&trace_id))?
-        .echo(&text, &request_id, &trace_id)
+    let client = {
+        let guard = state
+            .client
+            .lock()
+            .map_err(|_| AppError::internal(&trace_id))?;
+        guard
+            .as_ref()
+            .cloned()
+            .ok_or_else(|| AppError::unavailable(&trace_id))?
+    };
+    client.echo(&text, &request_id, &trace_id)
+}
+
+#[tauri::command]
+fn start_count_task(
+    target: u64,
+    delay_ms: u64,
+    app: AppHandle,
+    state: State<'_, BackendState>,
+) -> AppResult<String> {
+    let sequence = REQUEST_SEQUENCE.fetch_add(1, Ordering::Relaxed);
+    let task_id = format!("task-{sequence}");
+    let request_id = format!("request-{sequence}");
+    let trace_id = format!("trace-{}-{sequence}", std::process::id());
+
+    let client = {
+        let guard = state
+            .client
+            .lock()
+            .map_err(|_| AppError::internal(&trace_id))?;
+        guard
+            .as_ref()
+            .cloned()
+            .ok_or_else(|| AppError::unavailable(&trace_id))?
+    };
+
+    let thread_app = app.clone();
+    let thread_task_id = task_id.clone();
+    let thread_req_id = request_id.clone();
+    let thread_trace_id = trace_id.clone();
+
+    std::thread::spawn(move || {
+        let _ = client.count(
+            target,
+            delay_ms,
+            &thread_req_id,
+            &thread_trace_id,
+            &thread_task_id,
+            move |event| {
+                let _ = thread_app.emit("task-event", &event);
+            },
+        );
+    });
+
+    Ok(task_id)
+}
+
+#[tauri::command]
+fn cancel_task(task_id: String, state: State<'_, BackendState>) -> AppResult<AckEnvelope> {
+    let sequence = REQUEST_SEQUENCE.fetch_add(1, Ordering::Relaxed);
+    let request_id = format!("cancel-{sequence}");
+    let trace_id = format!("trace-{}-{sequence}", std::process::id());
+    let client = {
+        let guard = state
+            .client
+            .lock()
+            .map_err(|_| AppError::internal(&trace_id))?;
+        guard
+            .as_ref()
+            .cloned()
+            .ok_or_else(|| AppError::unavailable(&trace_id))?
+    };
+    client.cancel_task(&task_id, &request_id, &trace_id)
+}
+
+#[tauri::command]
+fn trigger_crash(state: State<'_, BackendState>) -> AppResult<()> {
+    let sequence = REQUEST_SEQUENCE.fetch_add(1, Ordering::Relaxed);
+    let request_id = format!("crash-{sequence}");
+    let trace_id = format!("trace-{}-{sequence}", std::process::id());
+    let client = {
+        let guard = state
+            .client
+            .lock()
+            .map_err(|_| AppError::internal(&trace_id))?;
+        guard
+            .as_ref()
+            .cloned()
+            .ok_or_else(|| AppError::unavailable(&trace_id))?
+    };
+    client.crash(&request_id, &trace_id)
+}
+
+#[tauri::command]
+fn trigger_hang(state: State<'_, BackendState>) -> AppResult<()> {
+    let sequence = REQUEST_SEQUENCE.fetch_add(1, Ordering::Relaxed);
+    let request_id = format!("hang-{sequence}");
+    let trace_id = format!("trace-{}-{sequence}", std::process::id());
+    let client = {
+        let guard = state
+            .client
+            .lock()
+            .map_err(|_| AppError::internal(&trace_id))?;
+        guard
+            .as_ref()
+            .cloned()
+            .ok_or_else(|| AppError::unavailable(&trace_id))?
+    };
+    client.hang(&request_id, &trace_id)
+}
+
+#[tauri::command]
+fn trigger_large_rejected(state: State<'_, BackendState>) -> AppResult<()> {
+    let sequence = REQUEST_SEQUENCE.fetch_add(1, Ordering::Relaxed);
+    let request_id = format!("large-rejected-{sequence}");
+    let trace_id = format!("trace-{}-{sequence}", std::process::id());
+    let client = {
+        let guard = state
+            .client
+            .lock()
+            .map_err(|_| AppError::internal(&trace_id))?;
+        guard
+            .as_ref()
+            .cloned()
+            .ok_or_else(|| AppError::unavailable(&trace_id))?
+    };
+    client.large_rejected(&request_id, &trace_id)
+}
+
+#[tauri::command]
+fn reset_backend(state: State<'_, BackendState>) -> AppResult<BackendStatus> {
+    let client = {
+        let guard = state
+            .client
+            .lock()
+            .map_err(|_| AppError::internal("reset-backend"))?;
+        guard
+            .as_ref()
+            .cloned()
+            .ok_or_else(|| AppError::unavailable("reset-backend"))?
+    };
+    client.reset()
 }
 
 #[tauri::command]
@@ -96,9 +238,15 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             backend_status,
             echo_text,
+            start_count_task,
+            cancel_task,
+            trigger_crash,
+            trigger_hang,
+            trigger_large_rejected,
+            reset_backend,
             runtime_probe_config,
             write_runtime_evidence
         ])
         .run(tauri::generate_context!())
-        .expect("error while running Prime Shell Echo Spike");
+        .expect("error while running Prime Shell Lifecycle Spike");
 }

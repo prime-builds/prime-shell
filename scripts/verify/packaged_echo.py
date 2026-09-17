@@ -63,7 +63,13 @@ def main() -> int:
     hello = read_frame(process.stdout, 64 * 1024)
     handshake_ms = round((time.monotonic() - started) * 1000, 3)
     assert hello["kind"] == "hello"
-    assert hello["supportedOperations"] == ["spike.echo"]
+    assert hello["supportedOperations"] == [
+        "spike.echo",
+        "spike.count",
+        "spike.crash",
+        "spike.hang",
+        "spike.largeRejected",
+    ]
     for field in ("buildId", "schemaHash", "targetTriple"):
         assert hello[field] == manifest[field]
 

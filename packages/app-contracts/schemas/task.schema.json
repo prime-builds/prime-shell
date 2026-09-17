@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://prime-shell.local/schemas/task.schema.json",
+  "title": "Prime Shell Task Lifecycle and Event Contracts",
+  "$defs": {
+    "taskState": {
+      "type": "string",
+      "enum": [
+        "Queued",
+        "Running",
+        "Cancelling",
+        "Succeeded",
+        "Failed",
+        "Cancelled",
+        "TimedOut",
+        "Interrupted"
+      ]
+    },
+    "backendState": {
+      "type": "string",
+      "enum": [
+        "Stopped",
+        "Starting",
+        "Ready",
+        "Busy",
+        "Restarting",
+        "Stopping",
+        "Faulted"
+      ]
+    },
+    "taskEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protocol", "kind", "requestId", "traceId", "taskId", "sequence", "event", "payload"],
+      "properties": {
+        "protocol": { "const": "generic-app" },
+        "kind": { "const": "event" },
+        "requestId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "traceId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "taskId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "sequence": { "type": "integer", "minimum": 1 },
+        "event": {
+          "type": "string",
+          "enum": ["progress", "terminal"]
+        },
+        "payload": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "current": { "type": "integer", "minimum": 0 },
+            "target": { "type": "integer", "minimum": 1 },
+            "status": { "$ref": "#/$defs/taskState" },
+            "completed": { "type": "integer", "minimum": 0 }
+          }
+        }
+      }
+    },
+    "cancelControl": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protocol", "kind", "requestId", "traceId", "taskId"],
+      "properties": {
+        "protocol": { "const": "generic-app" },
+        "kind": { "const": "cancel" },
+        "requestId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "traceId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "taskId": { "type": "string", "minLength": 1, "maxLength": 128 }
+      }
+    },
+    "ackControl": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protocol", "kind", "requestId", "traceId", "taskId", "status"],
+      "properties": {
+        "protocol": { "const": "generic-app" },
+        "kind": { "const": "ack" },
+        "requestId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "traceId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "taskId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "status": {
+          "type": "string",
+          "enum": ["cancelling", "completed", "not_found"]
+        }
+      }
+    }
+  }
+}
