@@ -238,12 +238,13 @@ pub fn run() {
             let client = app.path().resource_dir().ok().and_then(|resource_dir| {
                 if let Some(sidecar_path) = env::var_os("PRIME_SHELL_PACKAGED_SIDECAR") {
                     let exec = std::path::PathBuf::from(sidecar_path);
-                    if let Some(target_root) = exec.parent().and_then(|p| p.parent()).map(std::path::Path::to_path_buf) {
-                        return BackendClient::launch(LaunchSpec::from_paths(
-                            exec,
-                            target_root,
-                        ))
-                        .ok();
+                    if let Some(target_root) = exec
+                        .parent()
+                        .and_then(|p| p.parent())
+                        .map(std::path::Path::to_path_buf)
+                    {
+                        return BackendClient::launch(LaunchSpec::from_paths(exec, target_root))
+                            .ok();
                     }
                 }
                 BackendClient::launch(LaunchSpec::from_resource_dir(&resource_dir)).ok()
