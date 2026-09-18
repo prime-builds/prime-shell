@@ -359,7 +359,7 @@ export default function App() {
           <Card className="card">
             <header>
               <div>
-                <Title1>Prime Shell Lifecycle &amp; Resilience</Title1>
+                <Title1 as="h1" id="main-title">Prime Shell Lifecycle &amp; Resilience</Title1>
                 <Text size={200} className="subtitle">
                   Work Package GFD-P0B-WP02 Spike UI
                 </Text>
@@ -372,6 +372,8 @@ export default function App() {
                     <Text weight="semibold">
                       Backend:{" "}
                       <span
+                        id="backend-status-text"
+                        data-testid="backend-status-badge"
                         className={`status-badge status-badge-${
                           stateLower === "ready"
                             ? "success"
@@ -389,7 +391,7 @@ export default function App() {
                       </span>
                     </Text>
                     {status?.circuitOpen && (
-                      <span className="status-badge status-badge-danger">
+                      <span id="backend-circuit-badge" className="status-badge status-badge-danger">
                         Circuit: OPEN
                       </span>
                     )}
@@ -400,6 +402,7 @@ export default function App() {
 
             <div className="backend-controls">
               <Button
+                id="btn-reset-backend"
                 appearance="outline"
                 onClick={() => void handleResetBackend()}
                 disabled={checking}
@@ -408,6 +411,7 @@ export default function App() {
                 Reset Backend
               </Button>
               <Button
+                id="btn-refresh-status"
                 appearance="subtle"
                 onClick={() => void refreshStatus()}
                 disabled={checking}
@@ -430,6 +434,7 @@ export default function App() {
               <Title2>Long-Running Task Resilience</Title2>
               {taskState && (
                 <span
+                  id="task-state-badge"
                   className={`status-badge status-badge-${
                     taskState === "Succeeded"
                       ? "success"
@@ -471,6 +476,7 @@ export default function App() {
 
             <div className="task-actions">
               <Button
+                id="btn-start-count"
                 appearance="primary"
                 onClick={() => void handleStartTask()}
                 disabled={!isReady || isBusy}
@@ -480,6 +486,7 @@ export default function App() {
               </Button>
 
               <Button
+                id="btn-cancel-count"
                 appearance="secondary"
                 onClick={() => void handleCancelTask()}
                 disabled={taskState !== "Running" || cancelling}
@@ -492,6 +499,7 @@ export default function App() {
             {/* Accessible Progress Bar & Values */}
             {(taskState === "Running" || taskCompleted !== null) && (
               <div
+                id="task-progressbar"
                 className="progress-container"
                 role="progressbar"
                 aria-valuenow={currentProgress}
@@ -500,11 +508,11 @@ export default function App() {
                 aria-valuetext={`${currentProgress} of ${targetCount}`}
               >
                 <div className="progress-labels">
-                  <Text size={200}>
+                  <Text id="progress-text" size={200}>
                     Progress: {currentProgress} / {targetCount}
                   </Text>
                   {activeTaskId && (
-                    <Text size={200} className="task-id">
+                    <Text id="task-id-text" size={200} className="task-id">
                       ID: {activeTaskId}
                     </Text>
                   )}
@@ -536,13 +544,13 @@ export default function App() {
             )}
 
             {taskMessage && (
-              <div className="task-message" aria-live="polite">
+              <div id="task-message" className="task-message" aria-live="polite">
                 <Text weight="semibold">{taskMessage}</Text>
               </div>
             )}
 
             {taskError && (
-              <Text role="alert" className="error">
+              <Text id="task-error" role="alert" className="error">
                 {taskError}
               </Text>
             )}
@@ -559,6 +567,7 @@ export default function App() {
 
             <div className="fault-actions">
               <Button
+                id="btn-trigger-crash"
                 appearance="outline"
                 onClick={() => void handleTriggerCrash()}
                 disabled={isBusy}
@@ -568,6 +577,7 @@ export default function App() {
               </Button>
 
               <Button
+                id="btn-trigger-hang"
                 appearance="outline"
                 onClick={() => void handleTriggerHang()}
                 disabled={isBusy}
@@ -577,6 +587,7 @@ export default function App() {
               </Button>
 
               <Button
+                id="btn-trigger-oversized"
                 appearance="outline"
                 onClick={() => void handleTriggerOversized()}
                 disabled={isBusy}
@@ -587,13 +598,13 @@ export default function App() {
             </div>
 
             {faultAction && (
-              <Text size={200} className="fault-status">
+              <Text id="fault-status" size={200} className="fault-status">
                 {faultAction}
               </Text>
             )}
 
             {faultError && (
-              <Text role="alert" className="error">
+              <Text id="fault-error" role="alert" className="error">
                 {faultError}
               </Text>
             )}
@@ -604,7 +615,7 @@ export default function App() {
             <header>
               <Title2>Packaged Unicode Echo</Title2>
               <div className="status" aria-live="polite">
-                <Text weight="semibold">
+                <Text id="echo-status-text" weight="semibold">
                   Echo Status: {isReady ? "Ready" : "Unavailable"}
                 </Text>
               </div>
@@ -612,6 +623,7 @@ export default function App() {
 
             <Field label="Unicode text">
               <Input
+                id="echo-input"
                 value={echoInput}
                 onChange={(_, data) => setEchoInput(data.value)}
                 disabled={!isReady || echoBusy}
@@ -620,6 +632,7 @@ export default function App() {
             </Field>
 
             <Button
+              id="btn-echo"
               appearance="primary"
               onClick={() => void handleEchoSubmit()}
               disabled={!isReady || echoBusy}
@@ -631,12 +644,12 @@ export default function App() {
             {echoResult && (
               <section className="result" aria-live="polite">
                 <Text weight="semibold">Result</Text>
-                <output>{echoResult}</output>
+                <output id="echo-result">{echoResult}</output>
               </section>
             )}
 
             {echoError && (
-              <Text role="alert" className="error">
+              <Text id="echo-error" role="alert" className="error">
                 {echoError}
               </Text>
             )}
