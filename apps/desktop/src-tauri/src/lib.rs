@@ -225,9 +225,27 @@ fn write_runtime_evidence(evidence: serde_json::Value, app: AppHandle) -> AppRes
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
+    #[allow(unused_mut)]
+    let mut builder = tauri::Builder::default();
+
+    #[cfg(feature = "webdriver")]
+    {
+        builder = builder.plugin(tauri_plugin_wdio_webdriver::init());
+    }
+
+    builder
         .setup(|app| {
             let client = app.path().resource_dir().ok().and_then(|resource_dir| {
+                if let Some(sidecar_path) = env::var_os("PRIME_SHELL_PACKAGED_SIDECAR") {
+                    let exec = std::path::PathBuf::from(sidecar_path);
+                    if let Some(target_root) = exec.parent().and_then(|p| p.parent()).map(std::path::Path::to_path_buf) {
+                        return BackendClient::launch(LaunchSpec::from_paths(
+                            exec,
+                            target_root,
+                        ))
+                        .ok();
+                    }
+                }
                 BackendClient::launch(LaunchSpec::from_resource_dir(&resource_dir)).ok()
             });
             app.manage(BackendState {

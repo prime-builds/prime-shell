@@ -8,51 +8,47 @@
 **Task ID:** `GFD-P0B-WP03`
 **Prompt ID:** `PRIME-SHELL-GFD-P0B-WP03-PROMPT`
 **Prompt version:** `R1`
-**Prompt lifecycle state:** `Provisional`
+**Prompt lifecycle state:** `Activated`
 **Implementation status at authoring:** `Not started`
 **Recommended implementation model:** `GPT-5.6 Sol`
 **Reasoning/intelligence:** `Extra High`
 **Authorization boundary:** Exactly one package, `GFD-P0B-WP03`
-**Execution status:** `Execution is not authorized`
+**Execution status:** `Execution authorized for GFD-P0B-WP03 only`
 
 Extra High is the minimum suitable reasoning level because this package must
 classify cross-platform build, package, packaged-runtime, native automation,
 native-window, release-CSP, accessibility, process, and measurement evidence
 without conflating evidence layers or expanding the spike.
 
-This provisional prompt is complete for review but is non-executable. Chat
-Session must first accept it as an approved provisional prompt and later issue
-a separately activated revision after WP02 is accepted and merged.
-
 ### Activation metadata
 
 ```text
-Activation ID: Not activated — Chat Session must refresh and supply this exact value.
-Activated by: Not activated — Chat Session must refresh and supply this exact value.
-Activation UTC: Not activated — Chat Session must refresh and supply this exact value.
-Authoritative main SHA: Not activated — Chat Session must refresh and supply this exact value.
-Required fresh implementation branch: Not activated — Chat Session must refresh and supply this exact value.
-Accepted WP01 and WP02 heads/evidence: Not activated — Chat Session must supply exact commits, reports, artifacts, hashes, CI runs/jobs, runtime evidence, measurements, deviations, and blockers.
-Accepted targeted amendments: Not activated — Chat Session must refresh and supply the exact list or None.
-Predecessor deviations incorporated: Not activated — Chat Session must refresh and supply the exact list or None.
-Current target matrix, runners, tools, and architectures: Not activated — Chat Session must verify and supply them.
-Current native automation capability: Not activated — Chat Session must verify and supply exact supported targets and limitations.
-Manual-test ownership and target access: Not activated — Chat Session must name exact owners/environments or mark them unavailable.
-Signing/notarization credentials and scope: Not activated — Chat Session must record availability while preserving the production-signing deferral.
-Unresolved blockers/assumptions: Not activated — Chat Session must refresh and supply the exact list or None.
-Authorization boundary: Not activated — the future activation may authorize only GFD-P0B-WP03.
-Authorization expires/invalidates when: Not activated — the future activation must invalidate on any base-SHA, accepted-predecessor, material runner/platform/tool capability, manual-owner, or authorization-boundary change.
+Activation ID: PRIME-SHELL-CHAT-GFD-P0B-WP03-ACT-20260917T223000Z-R1
+Prompt ID and version: PRIME-SHELL-GFD-P0B-WP03-PROMPT / R1
+Package ID: GFD-P0B-WP03
+Lifecycle state: Activated
+Activated by: Chat Session
+Activation UTC: 2026-09-17T22:30:00Z
+Repository: Mirarsoft/prime-shell
+Authoritative base branch: main
+Authoritative main SHA: 5fb2e3df789333b6df318411a38d243d5a43dda9
+Required fresh branch: feat/gfd-p0b-wp03-cross-platform-evidence
+Accepted predecessor commits: 35d53bffec6e5b05aefdf8c7fed39a9bfdf288a2 (WP01), 5fb2e3df789333b6df318411a38d243d5a43dda9 (WP02)
+Accepted predecessor evidence: WP01 Unicode echo, readiness, CSP, safe errors, normal close; WP02 7 packaged sidecar integration tests (monotonic progress, cancel ack/stop, crash/restart budget, hang timeout escalation, circuit breaker, bounds, 0 orphans), WSL2 Ubuntu 24.04 native runtime evidence (0 CSP violations, 0 surviving sidecars)
+Accepted deviations/amendments: None
+Activation-time changes applied: Refreshed authoritative main SHA (5fb2e3d), predecessor evidence, fresh branch (feat/gfd-p0b-wp03-cross-platform-evidence), and toolchain versions
+Current tools/CI/platform facts: Windows 11 x64 (Node v24.16, pnpm 11.7, Rust 1.85, Python 3.12.9, PyInstaller 6.11.1); WSL2 Ubuntu 24.04.4 LTS (Node v24.18, pnpm 11.7, Rust 1.88, Python 3.12.3, PyInstaller 6.21.0, Xvfb); GitHub Actions Ubuntu 24.04 runner
+Unresolved blockers/assumptions: Physical macOS arm64 hardware unavailable locally; macOS build/package evidence recorded via CI, while Windows 11 and Ubuntu 24.04 (WSL2) are executed locally
+Authorization boundary: Execute exactly GFD-P0B-WP03; no successor or merge
+Invalidation condition: Any change to base SHA, accepted predecessor state, material platform capability, or named authorization boundary
 ```
 
 ## 2. Repository and exact starting state
 
 **Repository:** `Mirarsoft/prime-shell`
 **Authoritative base branch:** `main`
-**Required starting commit:** Not activated — Chat Session must refresh and
-supply the exact current accepted and merged `main` SHA after WP02 acceptance
-and merge.
-**Required implementation branch:** Not activated — Chat Session must verify
-absence and supply one exact fresh branch name.
+**Required starting commit:** `5fb2e3df789333b6df318411a38d243d5a43dda9`
+**Required implementation branch:** `feat/gfd-p0b-wp03-cross-platform-evidence`
 
 Authoring-time facts, for review only:
 
