@@ -126,6 +126,7 @@ export default function App() {
         setCancelling(false);
         if (typeof event.payload.completed === "number") {
           setTaskCompleted(event.payload.completed);
+          setCurrentProgress(event.payload.completed);
         }
         setLiveAnnouncement(`Task ${terminalState}`);
         setTaskMessage(`Task terminated with state: ${terminalState}`);
