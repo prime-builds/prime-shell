@@ -8,7 +8,7 @@
 | Review date | `2026-07-29` |
 | Review run ID | `20260729T093126Z` |
 | Model and reasoning | `GPT-5.6 Sol / Extra High` |
-| Repository | `Mirarsoft/prime-shell` |
+| Repository | `prime-builds/prime-shell` |
 | Documentation branch | `docs/gfd-work-package-prompt-pack-v1` |
 | Starting head | `896835d931c55744b1abc424a6aae4670e734e5d` |
 | Starting tree | `7248af8281714bc169dff8acd006d148ba85542d` |

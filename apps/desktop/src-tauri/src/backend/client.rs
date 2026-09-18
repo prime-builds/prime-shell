@@ -488,18 +488,6 @@ impl BackendClient {
             if incoming.kind == "event" {
                 let event_type = incoming.event.as_deref().unwrap_or("");
                 let is_terminal = event_type == "terminal";
-                let should_send = if is_terminal {
-                    true
-                } else {
-                    let now = Instant::now();
-                    if now.duration_since(last_progress_sent) >= Duration::from_millis(100) {
-                        last_progress_sent = now;
-                        true
-                    } else {
-                        false
-                    }
-                };
-
                 let event_payload: TaskEventPayload = incoming
                     .payload
                     .and_then(|p| serde_json::from_value(p).ok())
@@ -516,6 +504,21 @@ impl BackendClient {
                 if let Some(comp) = event_payload.completed {
                     last_reported_count = comp;
                 }
+
+                let is_final_progress =
+                    event_payload.current.is_some() && event_payload.current == Some(target);
+                let should_send = if is_terminal || is_final_progress {
+                    last_progress_sent = Instant::now();
+                    true
+                } else {
+                    let now = Instant::now();
+                    if now.duration_since(last_progress_sent) >= Duration::from_millis(100) {
+                        last_progress_sent = now;
+                        true
+                    } else {
+                        false
+                    }
+                };
 
                 if should_send {
                     let task_event = TaskEvent {

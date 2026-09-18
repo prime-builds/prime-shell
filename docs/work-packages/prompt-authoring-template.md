@@ -48,7 +48,7 @@ Authorization expires/invalidates when: <EXACT_STATE_CHANGE_RULE>
 
 ## 2. Repository and exact starting state
 
-**Repository:** `Mirarsoft/prime-shell`
+**Repository:** `prime-builds/prime-shell`
 **Authoritative base branch:** `main`
 **Required starting commit:** `<EXACT_ACTIVATION_TIME_MAIN_SHA>`
 **Required implementation branch:** `<EXACT_FRESH_BRANCH_NAME>`

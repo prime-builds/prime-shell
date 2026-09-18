@@ -48,7 +48,7 @@ Authorization expires/invalidates when: Not activated — the future activation 
 
 ## 2. Repository and exact starting state
 
-**Repository:** `Mirarsoft/prime-shell`
+**Repository:** `prime-builds/prime-shell`
 **Authoritative base branch:** `main`
 **Required starting commit:** Not activated — Chat Session must refresh and
 supply the exact current accepted and merged `main` SHA after WP02 and WP03
@@ -72,7 +72,7 @@ Authoring-time facts, for review only:
   `074bb2c8bd117e17477ac97ee859e5e89cfe4f82`;
 - prompt-pack documentation branch:
   `docs/gfd-work-package-prompt-pack-v1`;
-- WP02 and WP03 activation and implementation: `Not started`;
+- WP02 and WP03 activation and implementation: `Implemented` and merged (Phase 0B closed at `v0.2.0-phase0b-closure`, commit `0560eea`);
 - Phase 1 implementation: `Not started`.
 
 The documentation refs do not authorize implementation. Phase 1 activation
@@ -82,7 +82,7 @@ report is accepted.
 
 Required activation and Work Session preflight:
 
-1. Verify exact access and write permission for `Mirarsoft/prime-shell`.
+1. Verify exact access and write permission for `prime-builds/prime-shell`.
 2. Verify the default branch is `main` and record its exact 40-character SHA.
 3. Verify WP01, WP02, and WP03 are accepted and merged at that SHA.
 4. Verify the final accepted Phase 0B closure report, source snapshot,

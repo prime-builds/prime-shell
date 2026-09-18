@@ -78,7 +78,7 @@ Authorization invalidates when: Not activated — a future activation must inval
 
 ## 2. Repository and exact starting state
 
-**Repository:** `Mirarsoft/prime-shell`
+**Repository:** `prime-builds/prime-shell`
 **Authoritative future base branch:** `main`
 **Required future starting commit:** Not activated — Chat Session must refresh
 and supply the exact accepted and merged `main` SHA after `GFD-P7-WP02`
@@ -114,7 +114,7 @@ Authoring-time documentation facts, for review only:
   `ff277e89f8814000a68b2f220cd85f351aa78a28a9ac9c5d474b7b860547a640`;
 - prompt-pack documentation branch:
   `docs/gfd-work-package-prompt-pack-v1`;
-- package activation and implementation after WP01: `Not started`;
+- Phase 0B activation and implementation: `Implemented` and merged (closed at tag `v0.2.0-phase0b-closure`); Phase 1 through P7-WP02: `Not started`;
 - `GFD-P8-WP01` implementation: `Not started`.
 
 The authoring-time application remains the accepted WP01 Unicode echo spike.
@@ -129,7 +129,7 @@ credentials, signed artifacts, channels, or support claims.
 
 Required future activation and Work Session preflight:
 
-1. Verify exact read/write access to `Mirarsoft/prime-shell`, default branch
+1. Verify exact read/write access to `prime-builds/prime-shell`, default branch
    `main`, and the exact accepted merged 40-character starting SHA.
 2. Verify WP01 and every package through P7-WP02 are accepted and merged at
    that SHA.
