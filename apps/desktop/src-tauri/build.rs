@@ -36,5 +36,7 @@ fn main() {
         "cargo:rustc-env=PRIME_SHELL_SCHEMA_HASH=sha256:{:x}",
         digest.finalize()
     );
+    let sidecar_resource_dir = Path::new("../../../services/python-backend/dist/sidecar");
+    let _ = fs::create_dir_all(sidecar_resource_dir);
     tauri_build::build();
 }
