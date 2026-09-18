@@ -8,46 +8,43 @@
 **Task ID:** `GFD-P0B-WP02`
 **Prompt ID:** `PRIME-SHELL-GFD-P0B-WP02-PROMPT`
 **Prompt version:** `R1`
-**Prompt lifecycle state:** `Provisional`
-**Implementation status at authoring:** `Not started`
+**Prompt lifecycle state:** `Completed`
+**Implementation status at authoring:** `Implemented`
 **Recommended implementation model:** `GPT-5.6 Sol`
 **Reasoning/intelligence:** `Extra High`
 **Authorization boundary:** Exactly one package, `GFD-P0B-WP02`
-**Execution status:** `Execution is not authorized`
+**Execution status:** `Execution completed and merged`
 
 Extra High is the minimum suitable reasoning level because this package crosses
 lifecycle-state, concurrency, cancellation-race, timeout, crash/hang recovery,
 bounded-protocol, process-tree-containment, and no-replay boundaries.
 
-This provisional prompt is complete for review but is non-executable. Chat
-Session must first accept it as an approved provisional prompt and later issue a
-separately activated revision against current repository and predecessor facts.
+This package prompt has been executed and completed. Its implementation,
+tests, and evidence were verified and merged into `main` under commit `5fb2e3d`.
 
 ### Activation metadata
 
 ```text
-Activation ID: Not activated — Chat Session must refresh and supply this exact value.
-Activated by: Not activated — Chat Session must refresh and supply this exact value.
-Activation UTC: Not activated — Chat Session must refresh and supply this exact value.
-Authoritative main SHA: Not activated — Chat Session must refresh and supply this exact value.
-Required fresh implementation branch: Not activated — Chat Session must refresh and supply this exact value.
-Accepted predecessor heads/evidence: Not activated — Chat Session must refresh and supply exact refs, artifacts, hashes, and CI evidence.
-Accepted targeted amendments: Not activated — Chat Session must refresh and supply the exact list or None.
-Predecessor deviations incorporated: Not activated — Chat Session must refresh and supply the exact list or None.
-Current tools/CI/platform facts: Not activated — Chat Session must verify and supply them.
-Unresolved blockers/assumptions: Not activated — Chat Session must refresh and supply the exact list or None.
-Authorization boundary: Not activated — the future activation may authorize only GFD-P0B-WP02.
-Authorization expires/invalidates when: Not activated — the future activation must invalidate on any base-SHA, accepted-predecessor, material platform-capability, or authorization-boundary change.
+Activation ID: PRIME-SHELL-CHAT-GFD-P0B-WP02-ACT-20260729T204347Z-R1
+Activated by: Chat Session
+Activation UTC: 2026-07-29T20:43:47Z
+Authoritative main SHA: 35d53bffec6e5b05aefdf8c7fed39a9bfdf288a2
+Required fresh implementation branch: feature/gfd-p0b-wp02-lifecycle-resilience-20260729T204347Z
+Accepted predecessor heads/evidence: WP01 merged commit 35d53bffec6e5b05aefdf8c7fed39a9bfdf288a2; Unicode echo, readiness, CSP, safe errors, normal close.
+Accepted targeted amendments: Hang timeout recovery, strict CSP styling, WSL2 Ubuntu 24.04 runtime support.
+Predecessor deviations incorporated: None.
+Current tools/CI/platform facts: Windows 11 x64, WSL2 Ubuntu 24.04 LTS (Xvfb), Python 3.12, Rust 1.85+.
+Unresolved blockers/assumptions: None.
+Authorization boundary: Execute exactly GFD-P0B-WP02.
+Final implementation commit SHA: 5fb2e3df789333b6df318411a38d243d5a43dda9
 ```
 
 ## 2. Repository and exact starting state
 
-**Repository:** `Mirarsoft/prime-shell`
+**Repository:** `prime-builds/prime-shell`
 **Authoritative base branch:** `main`
-**Required starting commit:** Not activated — Chat Session must refresh and
-supply the exact current accepted and merged `main` SHA.
-**Required implementation branch:** Not activated — Chat Session must verify
-absence and supply one exact fresh branch name.
+**Required starting commit:** `35d53bffec6e5b05aefdf8c7fed39a9bfdf288a2`
+**Required implementation branch:** `feature/gfd-p0b-wp02-lifecycle-resilience-20260729T204347Z`
 
 Authoring-time facts, for review only:
 
@@ -68,7 +65,7 @@ merged `main`.
 
 Required activation and Work Session preflight:
 
-1. Verify exact access and write permission for `Mirarsoft/prime-shell`.
+1. Verify exact access and write permission for `prime-builds/prime-shell`.
 2. Verify the default branch is `main` and record its exact 40-character SHA.
 3. Verify the accepted WP01 merge, files, evidence, deviations, and relevant
    status inventory.

@@ -3,16 +3,16 @@
 **Document role:** Authoritative planning index for work remaining after accepted WP01
 **Prompt-pack stage:** Stage 1 foundation
 **Prompt status:** Future package prompts are provisional until explicitly activated
-**Repository:** `Mirarsoft/prime-shell`
-**Planning base:** `main` at `35d53bffec6e5b05aefdf8c7fed39a9bfdf288a2`
+**Repository:** `prime-builds/prime-shell`
+**Planning base:** `main` at `0560eea847bbcbbeaa70f5eefcaad2b694b8782a` (`v0.2.0-phase0b-closure`)
 
 ## 1. Current accepted position
 
 - Phase 0A is accepted as `READY WITH ASSUMPTIONS`.
-- Phase 0B WP01 is `Implemented` and merged. It is an accepted predecessor, not future work.
-- Phase 0B WP02 and WP03 are `Not started`.
-- No application implementation later than WP01 is authorized by this index.
-- This index does not redo Phase 0A, restart WP01, amend frozen architecture, or authorize a package.
+- Phase 0B WP01 is `Implemented` and merged. It is an accepted predecessor.
+- Phase 0B WP02 is `Implemented` and merged (`5fb2e3d`).
+- Phase 0B WP03 is `Implemented` and merged (`0560eea`). Phase 0B is closed at tag `v0.2.0-phase0b-closure`.
+- Phase 1 WP01 is `Not started` and ready for activation.
 - All future package prompts are **provisional until activated** by Chat Session.
 
 Only these implementation-status labels are valid throughout the prompt pack:
@@ -23,8 +23,8 @@ Only these implementation-status labels are valid throughout the prompt pack:
 
 | Package ID | Phase | Title | Status | Minimum suitable model |
 |---|---|---|---|---|
-| `GFD-P0B-WP02` | Phase 0B | Lifecycle and Task Resilience Spike | `Not started` | GPT-5.6 Sol / Extra High |
-| `GFD-P0B-WP03` | Phase 0B | Cross-Platform Evidence and Spike Closure | `Not started` | GPT-5.6 Sol / Extra High |
+| `GFD-P0B-WP02` | Phase 0B | Lifecycle and Task Resilience Spike | `Implemented` | GPT-5.6 Sol / Extra High |
+| `GFD-P0B-WP03` | Phase 0B | Cross-Platform Evidence and Spike Closure | `Implemented` | GPT-5.6 Sol / Extra High |
 | `GFD-P1-WP01` | Phase 1 | Post-Spike Architecture and Repository Baseline | `Not started` | GPT-5.6 Sol / High |
 | `GFD-P2-WP01` | Phase 2 | Theme, Tokens, and Accessibility Foundation | `Not started` | GPT-5.6 Sol / High |
 | `GFD-P2-WP02` | Phase 2 | Responsive Application Shell | `Not started` | GPT-5.6 Sol / High |

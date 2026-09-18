@@ -8,12 +8,12 @@
 **Task ID:** `GFD-P0B-WP03`
 **Prompt ID:** `PRIME-SHELL-GFD-P0B-WP03-PROMPT`
 **Prompt version:** `R1`
-**Prompt lifecycle state:** `Activated`
-**Implementation status at authoring:** `Not started`
+**Prompt lifecycle state:** `Completed`
+**Implementation status at authoring:** `Implemented`
 **Recommended implementation model:** `GPT-5.6 Sol`
 **Reasoning/intelligence:** `Extra High`
 **Authorization boundary:** Exactly one package, `GFD-P0B-WP03`
-**Execution status:** `Execution authorized for GFD-P0B-WP03 only`
+**Execution status:** `Execution completed and merged`
 
 Extra High is the minimum suitable reasoning level because this package must
 classify cross-platform build, package, packaged-runtime, native automation,
@@ -26,10 +26,10 @@ without conflating evidence layers or expanding the spike.
 Activation ID: PRIME-SHELL-CHAT-GFD-P0B-WP03-ACT-20260917T223000Z-R1
 Prompt ID and version: PRIME-SHELL-GFD-P0B-WP03-PROMPT / R1
 Package ID: GFD-P0B-WP03
-Lifecycle state: Activated
+Lifecycle state: Completed
 Activated by: Chat Session
 Activation UTC: 2026-09-17T22:30:00Z
-Repository: Mirarsoft/prime-shell
+Repository: prime-builds/prime-shell
 Authoritative base branch: main
 Authoritative main SHA: 5fb2e3df789333b6df318411a38d243d5a43dda9
 Required fresh branch: feat/gfd-p0b-wp03-cross-platform-evidence
@@ -40,12 +40,13 @@ Activation-time changes applied: Refreshed authoritative main SHA (5fb2e3d), pre
 Current tools/CI/platform facts: Windows 11 x64 (Node v24.16, pnpm 11.7, Rust 1.85, Python 3.12.9, PyInstaller 6.11.1); WSL2 Ubuntu 24.04.4 LTS (Node v24.18, pnpm 11.7, Rust 1.88, Python 3.12.3, PyInstaller 6.21.0, Xvfb); GitHub Actions Ubuntu 24.04 runner
 Unresolved blockers/assumptions: Physical macOS arm64 hardware unavailable locally; macOS build/package evidence recorded via CI, while Windows 11 and Ubuntu 24.04 (WSL2) are executed locally
 Authorization boundary: Execute exactly GFD-P0B-WP03; no successor or merge
-Invalidation condition: Any change to base SHA, accepted predecessor state, material platform capability, or named authorization boundary
+Final implementation commit SHA: 3544efde9eca70379aae4e3d3b786e4b783d5023
+Merged commit SHA on main: 0560eea847bbcbbeaa70f5eefcaad2b694b8782a (tag v0.2.0-phase0b-closure)
 ```
 
 ## 2. Repository and exact starting state
 
-**Repository:** `Mirarsoft/prime-shell`
+**Repository:** `prime-builds/prime-shell`
 **Authoritative base branch:** `main`
 **Required starting commit:** `5fb2e3df789333b6df318411a38d243d5a43dda9`
 **Required implementation branch:** `feat/gfd-p0b-wp03-cross-platform-evidence`
@@ -64,7 +65,7 @@ Authoring-time facts, for review only:
   `cf2c2613d1facca1e61ba03eab88078a0fc1ffbf`;
 - approved-provisional WP02 prompt documentation head:
   `4195d6588afa78448bb0a909e78ce973c0ab1b24`;
-- WP02 implementation: `Not started`.
+- WP02 implementation: `Implemented`.
 
 The documentation refs do not authorize implementation. WP03 activation and
 implementation must start from the latest accepted and merged `main`, only
@@ -72,7 +73,7 @@ after accepted WP02 implementation is present there.
 
 Required activation and Work Session preflight:
 
-1. Verify exact access and write permission for `Mirarsoft/prime-shell`.
+1. Verify exact access and write permission for `prime-builds/prime-shell`.
 2. Verify the default branch is `main` and record its exact 40-character SHA.
 3. Verify WP01 and WP02 are accepted and merged at that SHA.
 4. Verify all required predecessor source, reports, evidence indexes,

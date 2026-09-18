@@ -41,7 +41,7 @@ Activation starts from the latest accepted and merged `main`.
 
 Verify and record:
 
-- exact repository `Mirarsoft/prime-shell`;
+- exact repository `prime-builds/prime-shell`;
 - default branch `main`;
 - current remote `main` 40-character SHA;
 - clean/fresh repository access and expected branch absence;
@@ -164,7 +164,7 @@ Package ID: <PACKAGE-ID>
 Lifecycle state: Activated
 Activated by: Chat Session
 Activation UTC: <YYYY-MM-DDTHH:MM:SSZ>
-Repository: Mirarsoft/prime-shell
+Repository: prime-builds/prime-shell
 Authoritative base branch: main
 Authoritative main SHA: <EXACT-40-CHARACTER-SHA>
 Required fresh branch: <EXACT-BRANCH>
