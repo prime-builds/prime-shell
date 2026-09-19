@@ -24,3 +24,8 @@ commands.allow = [
 identifier = "allow-runtime-probe"
 description = "Allows the environment-gated native runtime verifier commands."
 commands.allow = ["runtime_probe_config", "write_runtime_evidence"]
+
+[[permission]]
+identifier = "allow-theme-state"
+description = "Allows the main window to query theme state and synchronize native window theme."
+commands.allow = ["get_theme_state", "sync_native_window_theme"]

@@ -2,13 +2,6 @@
   font-family:
     "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, sans-serif;
   color-scheme: light dark;
-  background: #f5f5f5;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    background: #1f1f1f;
-  }
 }
 
 * {
@@ -33,7 +26,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 24px;
-  width: min(720px, 100%);
+  width: min(780px, 100%);
 }
 
 .card {
@@ -224,6 +217,111 @@ output {
   width: 100%;
   height: 6px;
   display: block;
+}
+
+/* --- Phase 2: Theme, Tokens, and Accessibility Styles --- */
+
+.theme-control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.control-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.button-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tokens-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.token-swatch {
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(128, 128, 128, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.token-swatch-name {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.token-swatch-val {
+  font-family: monospace;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-message-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.status-message-danger {
+  background-color: var(--colorPaletteRedBackground1, #fdf3f4);
+  color: var(--colorPaletteRedForeground1, #b10e1c);
+  border-left: 4px solid var(--colorPaletteRedForeground1, #b10e1c);
+}
+
+.status-message-success {
+  background-color: var(--colorPaletteGreenBackground1, #f1faf1);
+  color: var(--colorPaletteGreenForeground1, #0e700e);
+  border-left: 4px solid var(--colorPaletteGreenForeground1, #0e700e);
+}
+
+.status-message-warning {
+  background-color: var(--colorPaletteMarigoldBackground1, #fff9f5);
+  color: var(--colorPaletteMarigoldForeground1, #bc4b09);
+  border-left: 4px solid var(--colorPaletteMarigoldForeground1, #bc4b09);
+}
+
+.dual-tone-focus-target {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  outline: none;
+}
+
+.dual-tone-focus-target:focus-visible {
+  box-shadow:
+    0 0 0 2px var(--colorStrokeFocus2, #000000),
+    0 0 0 4px var(--colorStrokeFocus1, #ffffff);
+}
+
+.portal-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.custom-seed-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
 }
 
 /* Reduced-motion accessibility */

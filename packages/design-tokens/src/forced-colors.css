@@ -1,0 +1,49 @@
+/**
+ * Windows High Contrast & OS Forced-Colors Stylesheet
+ * Strictly relies on platform system colors and preserves native user settings.
+ */
+
+@media (forced-colors: active) {
+  :root {
+    --color-surface-shell: Canvas;
+    --color-surface-workspace: Canvas;
+    --color-surface-card: Canvas;
+    --color-text-primary: CanvasText;
+    --color-text-secondary: CanvasText;
+    --color-text-disabled: GrayText;
+    --color-accent-bg: Highlight;
+    --color-accent-fg: HighlightText;
+    --color-accent-link: LinkText;
+    --color-border-standard: ButtonText;
+    --color-border-subtle: GrayText;
+  }
+
+  /* Ensure focus indicators use Highlight and remain visible */
+  :focus-visible {
+    outline: 2px solid Highlight !important;
+    outline-offset: 2px !important;
+  }
+
+  /* Maintain distinction for disabled elements */
+  :disabled,
+  [aria-disabled="true"] {
+    color: GrayText !important;
+    border-color: GrayText !important;
+  }
+
+  /* Force background/border transparency suppression in materials */
+  .fluent-material-surface {
+    background-color: Canvas !important;
+    backdrop-filter: none !important;
+  }
+
+  /* Card elevated boundaries */
+  .fluent-card {
+    border: 1px solid ButtonText !important;
+  }
+
+  /* Status communication retains border visibility */
+  .status-badge {
+    border: 1px solid ButtonText !important;
+  }
+}
