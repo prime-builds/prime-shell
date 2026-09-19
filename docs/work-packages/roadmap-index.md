@@ -374,6 +374,7 @@ the controlled Stage 2 workflow and remain provisional and non-executable.
 
 ### GFD-P8-WP01 — Template Extraction and Second Branded Application
 
+- **Status:** `Implemented` (Execution completed and verified)
 - **Objective:** Extract only the reusable structure proven by the completed
   application and demonstrate it through a second branded application.
 - **Prerequisites:** Accepted `GFD-P7-WP02`, two proven static feature

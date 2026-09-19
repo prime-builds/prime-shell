@@ -1,0 +1,61 @@
+[[permission]]
+identifier = "allow-backend-status"
+description = "Allows the main window to read the bounded backend readiness status."
+commands.allow = ["backend_status"]
+
+[[permission]]
+identifier = "allow-echo-text"
+description = "Allows the main window to invoke only the typed WP01 Unicode echo command."
+commands.allow = ["echo_text"]
+
+[[permission]]
+identifier = "allow-task-lifecycle"
+description = "Allows production task lifecycle commands."
+commands.allow = [
+  "start_count_task",
+  "cancel_task",
+  "get_task_snapshot",
+  "reset_backend"
+]
+
+[[permission]]
+identifier = "allow-theme-state"
+description = "Allows the main window to query theme state and synchronize native window theme."
+commands.allow = ["get_theme_state", "sync_native_window_theme"]
+
+[[permission]]
+identifier = "allow-layout-preferences"
+description = "Allows the main window to query, persist, and reset bounded shell layout preferences."
+commands.allow = [
+  "get_shell_layout_preferences",
+  "save_shell_layout_preferences",
+  "reset_shell_layout_preferences"
+]
+
+[[permission]]
+identifier = "allow-settings"
+description = "Allows the main window to load, update, and reset bounded application settings."
+commands.allow = [
+  "load_settings_document",
+  "save_settings_document",
+  "reset_settings_document",
+  "reset_settings_section"
+]
+
+[[permission]]
+identifier = "allow-diagnostics"
+description = "Allows reading, exporting, and managing bounded diagnostics and privacy redaction."
+commands.allow = [
+  "get_diagnostics_records",
+  "export_diagnostics_zip",
+  "clear_diagnostics_records"
+]
+
+[[permission]]
+identifier = "allow-update"
+description = "Allows the main window to query update status, switch channels, and check for updates."
+commands.allow = [
+  "get_update_status",
+  "set_update_channel",
+  "check_for_updates"
+]

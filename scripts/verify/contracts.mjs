@@ -58,6 +58,9 @@ const validateUpdateManifest = ajv.getSchema(
 const validateUpdateStatus = ajv.getSchema(
   "https://prime-shell.local/schemas/update.schema.json#/$defs/updateStatus",
 );
+const validateAppManifest = ajv.getSchema(
+  "https://prime-shell.local/schemas/app-manifest.schema.json",
+);
 if (
   !validateHandshake ||
   !validateEnvelope ||
@@ -68,7 +71,8 @@ if (
   !validateSettingsDocument ||
   !validateDiagnosticRecord ||
   !validateUpdateManifest ||
-  !validateUpdateStatus
+  !validateUpdateStatus ||
+  !validateAppManifest
 ) {
   throw new Error("contract validators were not compiled");
 }
@@ -94,6 +98,8 @@ const validCases = [
   [validateUpdateManifest, "update/valid-stable-manifest.json"],
   [validateUpdateManifest, "update/valid-beta-manifest.json"],
   [validateUpdateStatus, "update/valid-status.json"],
+  [validateAppManifest, "template/valid-prime-shell.json"],
+  [validateAppManifest, "template/valid-prime-text-studio.json"],
 ];
 
 for (const [validate, name] of validCases) {
@@ -115,6 +121,9 @@ const invalidCases = [
   [validateDiagnosticRecord, "diagnostics/invalid-event-code.json"],
   [validateUpdateManifest, "update/invalid-channel.json"],
   [validateUpdateManifest, "update/invalid-version.json"],
+  [validateAppManifest, "template/invalid-app-id.json"],
+  [validateAppManifest, "template/invalid-bundle-id.json"],
+  [validateAppManifest, "template/invalid-missing-brand.json"],
 ];
 
 for (const [validate, name] of invalidCases) {
