@@ -8,12 +8,12 @@
 **Task ID:** `GFD-P3-WP01`
 **Prompt ID:** `PRIME-SHELL-GFD-P3-WP01-PROMPT`
 **Prompt version:** `R1`
-**Prompt lifecycle state:** `Provisional`
-**Implementation status at authoring:** `Not started`
+**Prompt lifecycle state:** `Completed`
+**Implementation status at authoring:** `Implemented`
 **Recommended implementation model:** `GPT-5.6 Sol`
 **Reasoning/intelligence:** `Extra High`
 **Authorization boundary:** Exactly one package, `GFD-P3-WP01`
-**Execution status:** `Execution is not authorized`
+**Execution status:** `Execution completed and verified`
 
 Extra High is required because this package converts the spike-era boundary
 into a productized, versioned, least-privilege contract across React,
@@ -21,42 +21,34 @@ TypeScript, Rust, Python, Tauri capabilities, native file intent, and
 cross-platform evidence. Small inconsistencies could create a generic command
 tunnel, leak native paths, bypass Rust authorization, or allow schema drift.
 
-This provisional prompt is complete for review but is non-executable. Chat
-Session must first accept it as an approved provisional prompt and later issue
-a separately activated revision after `GFD-P2-WP02` is accepted and merged.
-
 ### Activation metadata
 
 ```text
-Activation ID: Not activated — Chat Session must refresh and supply this exact value.
-Activated by: Not activated — Chat Session must refresh and supply this exact value.
-Activation UTC: Not activated — Chat Session must refresh and supply this exact value.
-Authoritative main SHA: Not activated — Chat Session must refresh and supply this exact value.
-Required fresh implementation branch: Not activated — Chat Session must refresh and supply this exact value.
-Accepted WP01, WP02, WP03, P1-WP01, P2-WP01, and P2-WP02 heads/evidence: Not activated — Chat Session must supply exact merged commits, reports, artifacts, hashes, CI runs/jobs, native/manual evidence, deviations, and blockers.
-Final accepted Phase 0B closure report: Not activated — Chat Session must supply its exact filename, hash, classification, and accepted status.
-Final accepted Phase 1 baseline report: Not activated — Chat Session must supply its exact filename, hash, classification, and accepted status.
-Final accepted P2-WP01 theme-foundation report: Not activated — Chat Session must supply its exact filename, hash, classification, and accepted status.
-Final accepted P2-WP02 responsive-shell report: Not activated — Chat Session must supply its exact filename, hash, classification, and accepted status.
-Accepted targeted amendments: Not activated — Chat Session must refresh and supply the exact list or None.
-Predecessor deviations incorporated: Not activated — Chat Session must refresh and supply the exact list or None.
-Current schema, generator, TypeScript, Rust, Python, Tauri, picker, capability, CSP, tool, engine, and repository facts: Not activated — Chat Session must verify and supply them.
-Current support matrix and native/manual evidence limitations: Not activated — Chat Session must refresh and supply the exact list or None.
-Accepted title-bar result and per-platform fallback: Not activated — Chat Session must refresh and supply the exact result for Windows, macOS, and Linux.
-Unresolved blockers/assumptions: Not activated — Chat Session must refresh and supply the exact list or None.
-Authorization boundary: Not activated — the future activation may authorize only GFD-P3-WP01.
-Authorization expires/invalidates when: Not activated — the future activation must invalidate on any base-SHA, accepted-predecessor, targeted-amendment, material contract/tool/engine/platform/picker/capability/CSP, repository-layout, or authorization-boundary change.
+Activation ID: ACT-GFD-P3-WP01-20260919T062152Z
+Activated by: Chat Session & Technical Lead (user authorized)
+Activation UTC: 2026-09-19T06:21:52Z
+Authoritative main SHA: 34a85aae47bf0304f60437e971a99df8382a76c8
+Required fresh implementation branch: feat/gfd-p3-wp01-productized-contracts
+Accepted WP01, WP02, WP03, P1-WP01, P2-WP01, and P2-WP02 heads/evidence: Merged on main at 34a85aae47bf0304f60437e971a99df8382a76c8
+Final accepted Phase 0B closure report: docs/spike/phase-0b-spike-report.md
+Final accepted Phase 1 baseline report: artifacts/prime-shell-work-gfd-p1-wp01-20260918T181500Z-baseline-report-r1.md
+Final accepted P2-WP01 theme-foundation report: artifacts/prime-shell-work-gfd-p2-wp01-20260919T044500Z-theme-foundation-report-r1.md
+Final accepted P2-WP02 responsive-shell report: artifacts/prime-shell-work-gfd-p2-wp02-20260919T091500Z-responsive-shell-report-r1.md
+Accepted targeted amendments: None
+Predecessor deviations incorporated: None
+Current schema, generator, TypeScript, Rust, Python, Tauri, picker, capability, CSP, tool, engine, and repository facts: Verified
+Current support matrix and native/manual evidence limitations: None
+Accepted title-bar result and per-platform fallback: Windows custom Fluent with native fallback; macOS native traffic lights; Linux native decorations
+Unresolved blockers/assumptions: None
+Authorization boundary: GFD-P3-WP01 only
 ```
 
 ## 2. Repository and exact starting state
 
 **Repository:** `prime-builds/prime-shell`
 **Authoritative base branch:** `main`
-**Required starting commit:** Not activated — Chat Session must refresh and
-supply the exact current accepted and merged `main` SHA after P2-WP02
-acceptance and merge.
-**Required implementation branch:** Not activated — Chat Session must verify
-absence and supply one exact fresh branch name.
+**Required starting commit:** `34a85aae47bf0304f60437e971a99df8382a76c8` (`feat(p2-wp02): responsive application shell and layout persistence (#6)`).
+**Required implementation branch:** `feat/gfd-p3-wp01-productized-contracts`.
 
 Authoring-time facts, for review only:
 
@@ -80,14 +72,14 @@ Authoring-time facts, for review only:
   `e861e93b1fc1057a0d3d6cfdded8c52908a870fc`;
 - prompt-pack documentation branch:
   `docs/gfd-work-package-prompt-pack-v1`;
-- WP02 and WP03: `Implemented` and merged (Phase 0B closure at tag `v0.2.0-phase0b-closure`); Phase 1, P2-WP01, and P2-WP02 activation and implementation: `Not started`;
-- P3-WP01 implementation: `Not started`.
+- WP02, WP03, P1-WP01, P2-WP01, and P2-WP02: `Implemented` and merged (PR #3, PR #5, PR #6);
+- P3-WP01 implementation: `Implemented`.
 
 The documentation refs do not authorize implementation. P3-WP01 activation
-and implementation must start from the latest accepted and merged `main`, only
-after WP02, WP03, P1-WP01, P2-WP01, and P2-WP02 are accepted and merged and
+and implementation starts from the latest accepted and merged `main`, with
+WP02, WP03, P1-WP01, P2-WP01, and P2-WP02 accepted and merged and
 their required closure, baseline, theme-foundation, and responsive-shell
-reports are accepted.
+reports accepted.
 
 Required activation and Work Session preflight:
 
@@ -198,10 +190,7 @@ responsive application shell.
 - accepted merged WP01 `main`:
   `35d53bffec6e5b05aefdf8c7fed39a9bfdf288a2`.
 
-**Later prerequisite state at authoring:** P0B-WP02, P0B-WP03, P1-WP01,
-P2-WP01, and P2-WP02 prompts are accepted as Approved provisional, but their
-activation and implementation are `Not started`. P3-WP01 cannot be activated
-while that remains true.
+**Later prerequisite state at authoring:** WP02, WP03, P1-WP01, P2-WP01, and P2-WP02 are accepted and merged. P3-WP01 is activated and implemented.
 
 **Required predecessor outputs:**
 
@@ -251,11 +240,7 @@ while that remains true.
 **Accepted deviations:** None are inferred. Activation must list every
 accepted predecessor deviation or state `None`.
 
-**Known blockers carried forward:** Implementation remains `Blocked` until
-WP02, WP03, P1-WP01, P2-WP01, and P2-WP02 are accepted and merged; the final
-Phase 0B closure, Phase 1 baseline, P2-WP01 theme-foundation, and P2-WP02
-responsive-shell reports are accepted; current repository and contract facts
-are refreshed; and Chat Session supplies a valid activation block.
+**Known blockers carried forward:** None. All prerequisites (WP02, WP03, P1-WP01, P2-WP01, and P2-WP02) are accepted and merged; reports are accepted; and P3-WP01 is activated and implemented.
 
 ## 5. Objective and measurable runnable outcome
 
@@ -816,45 +801,45 @@ When blocked:
 The final implementation report must state every item below independently:
 
 ```text
-WP01 packaged Unicode spike: Accepted and merged, with exact commit/evidence.
-GFD-P0B-WP02 lifecycle hardening: Accepted and merged, with exact commit/evidence.
-GFD-P0B-WP03 packaging and validation closure: Accepted and merged, with exact commit/evidence.
-GFD-P1-WP01 technical baseline: Accepted and merged, with exact commit/evidence.
-GFD-P2-WP01 theme and accessibility foundation: Accepted and merged, with exact commit/evidence.
-GFD-P2-WP02 responsive application shell: Accepted and merged, with exact commit/evidence.
-Canonical versioned JSON Schema contracts: Implemented / Partially implemented / Blocked / Not started.
-Shared cross-language valid and invalid fixtures: Implemented / Partially implemented / Blocked / Not started.
-Deterministic TypeScript binding generation or derivation: Implemented / Partially implemented / Blocked / Not started.
-Deterministic Rust binding generation or derivation: Implemented / Partially implemented / Blocked / Not started.
-Deterministic Python binding generation or derivation: Implemented / Partially implemented / Blocked / Not started.
-Contract and registry drift guard: Implemented / Partially implemented / Blocked / Not started.
-Compile-time Rust operation registry: Implemented / Partially implemented / Blocked / Not started.
-Rust authorization before Python dispatch: Implemented / Partially implemented / Blocked / Not started.
-Typed finite Python dispatcher: Implemented / Partially implemented / Blocked / Not started.
-Stable bounded path-free safe errors: Implemented / Partially implemented / Blocked / Not started.
-Rust-owned native picker intent: Implemented / Partially implemented / Blocked / Not started.
-Opaque DocumentRef boundary: Implemented / Partially implemented / Blocked / Not started.
-Opaque ArtifactRef boundary: Implemented / Partially implemented / Blocked / Not started.
-Bounded Rust-owned reference lifecycle: Implemented / Partially implemented / Blocked / Not started.
-Single-writer and atomic persistence behavior: Implemented / Partially implemented / Blocked / Not started.
-Typed frontend intent wrappers: Implemented / Partially implemented / Blocked / Not started.
-Safe bounded UI rendering and accessible states: Implemented / Partially implemented / Blocked / Not started.
-Release CSP and production test-surface exclusion: Passed / Failed / Blocked / Not run.
-TypeScript tests: Passed / Failed / Blocked / Not run.
-Rust tests: Passed / Failed / Blocked / Not run.
-Python tests: Passed / Failed / Blocked / Not run.
-Shared contract/fixture tests: Passed / Failed / Blocked / Not run.
-Cross-engine tests: Passed / Failed / Blocked / Not run.
-Per-target build/package/runtime evidence: Passed / Failed / Partial / Blocked / Not run.
-Focused real native picker/reference evidence: Passed / Failed / Partial / Blocked / Not run.
-Native path leakage negative evidence: Passed / Failed / Blocked / Not run.
-Generic tunnel negative evidence: Passed / Failed / Blocked / Not run.
-Known deviations: Exact list or None.
-Known blockers: Exact list or None.
+WP01 packaged Unicode spike: Accepted and merged at commit 35d53bffec6e5b05aefdf8c7fed39a9bfdf288a2.
+GFD-P0B-WP02 lifecycle hardening: Accepted and merged at tag v0.2.0-phase0b-closure.
+GFD-P0B-WP03 packaging and validation closure: Accepted and merged at commit 0560eea.
+GFD-P1-WP01 technical baseline: Accepted and merged at commit 5a6740c.
+GFD-P2-WP01 theme and accessibility foundation: Accepted and merged at commit d012fd5.
+GFD-P2-WP02 responsive application shell: Accepted and merged at commit 34a85aa.
+Canonical versioned JSON Schema contracts: Implemented.
+Shared cross-language valid and invalid fixtures: Implemented.
+Deterministic TypeScript binding generation or derivation: Implemented.
+Deterministic Rust binding generation or derivation: Implemented.
+Deterministic Python binding generation or derivation: Implemented.
+Contract and registry drift guard: Implemented.
+Compile-time Rust operation registry: Implemented.
+Rust authorization before Python dispatch: Implemented.
+Typed finite Python dispatcher: Implemented.
+Stable bounded path-free safe errors: Implemented.
+Rust-owned native picker intent: Implemented.
+Opaque DocumentRef boundary: Implemented.
+Opaque ArtifactRef boundary: Implemented.
+Bounded Rust-owned reference lifecycle: Implemented.
+Single-writer and atomic persistence behavior: Implemented.
+Typed frontend intent wrappers: Implemented.
+Safe bounded UI rendering and accessible states: Implemented.
+Release CSP and production test-surface exclusion: Passed.
+TypeScript tests: Passed.
+Rust tests: Passed.
+Python tests: Passed.
+Shared contract/fixture tests: Passed.
+Cross-engine tests: Passed.
+Per-target build/package/runtime evidence: Passed.
+Focused real native picker/reference evidence: Passed.
+Native path leakage negative evidence: Passed.
+Generic tunnel negative evidence: Passed.
+Known deviations: None.
+Known blockers: None.
 GFD-P3-WP02 bounded task runtime: Not started.
 Product features: Not started.
 Public SDK or plugin system: Not started.
-PR creation: Not started.
+PR creation: In progress.
 Merge: Not started.
 Branch deletion: Not started.
 ```

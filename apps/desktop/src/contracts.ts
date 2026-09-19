@@ -13,6 +13,10 @@ export const appErrorSchema = z.object({
     "TASK_CANCELLED",
     "TASK_TIMED_OUT",
     "TASK_INTERRUPTED",
+    "AUTHORIZATION_ERROR",
+    "VERSION_MISMATCH",
+    "REFERENCE_NOT_FOUND",
+    "PICKER_CANCELLED",
   ]),
   message: z.string().min(1).max(256),
   traceId: z.string().min(1).max(128),
@@ -90,6 +94,23 @@ export const runtimeProbeConfigSchema = z.object({
   evidencePath: z.string().nullable(),
 });
 
+export const documentRefSchema = z.object({
+  id: z.string().min(1).max(128),
+  displayName: z.string().min(1).max(256),
+  size: z.number().int().min(0).max(10485760),
+  mediaType: z.string().max(64).optional(),
+});
+
+export const artifactRefSchema = z.object({
+  id: z.string().min(1).max(128),
+  displayName: z.string().min(1).max(256),
+  size: z.number().int().min(0).max(10485760),
+  kind: z.string().max(64),
+});
+
+export const openDocumentIntentResponseSchema = documentRefSchema.nullable();
+export const saveDocumentIntentResponseSchema = documentRefSchema.nullable();
+
 export type AppError = z.infer<typeof appErrorSchema>;
 export type BackendLifecycleState = z.infer<typeof backendLifecycleStateSchema>;
 export type BackendStatus = z.infer<typeof backendStatusSchema>;
@@ -99,3 +120,6 @@ export type TaskEvent = z.infer<typeof taskEventSchema>;
 export type AckEnvelope = z.infer<typeof ackEnvelopeSchema>;
 export type EchoResponse = z.infer<typeof echoResponseSchema>;
 export type RuntimeProbeConfig = z.infer<typeof runtimeProbeConfigSchema>;
+export type DocumentRef = z.infer<typeof documentRefSchema>;
+export type ArtifactRef = z.infer<typeof artifactRefSchema>;
+

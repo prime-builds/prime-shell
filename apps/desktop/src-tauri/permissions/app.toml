@@ -39,3 +39,15 @@ commands.allow = [
   "reset_shell_layout_preferences"
 ]
 
+[[permission]]
+identifier = "allow-native-intent"
+description = "Allows the main window to invoke named native document intent commands."
+commands.allow = [
+  "open_document_intent",
+  "save_document_intent",
+  "read_document_content",
+  "write_document_content",
+  "revoke_document_ref"
+]
+
+

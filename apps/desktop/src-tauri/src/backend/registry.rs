@@ -20,6 +20,48 @@ impl BackendOperation {
         }
     }
 
+    pub const fn version(self) -> u32 {
+        1
+    }
+
+    pub const fn max_payload_bytes(self) -> usize {
+        match self {
+            Self::SpikeEcho => 262_144,
+            Self::SpikeCount => 1024,
+            Self::SpikeCrash => 1024,
+            Self::SpikeHang => 1024,
+            Self::SpikeLargeRejected => 1024 * 1024,
+        }
+    }
+
+    pub const fn timeout_ms(self) -> u64 {
+        match self {
+            Self::SpikeEcho => 5_000,
+            Self::SpikeCount => 60_000,
+            Self::SpikeCrash => 5_000,
+            Self::SpikeHang => 5_000,
+            Self::SpikeLargeRejected => 5_000,
+        }
+    }
+
+    pub const fn cancellable(self) -> bool {
+        match self {
+            Self::SpikeCount => true,
+            _ => false,
+        }
+    }
+
+    pub const fn idempotent(self) -> bool {
+        match self {
+            Self::SpikeEcho => true,
+            _ => false,
+        }
+    }
+
+    pub const fn destination(self) -> &'static str {
+        "python-sidecar"
+    }
+
     pub fn authorize(name: &str, trace_id: &str) -> AppResult<Self> {
         match name {
             "spike.echo" => Ok(Self::SpikeEcho),
@@ -27,7 +69,7 @@ impl BackendOperation {
             "spike.crash" => Ok(Self::SpikeCrash),
             "spike.hang" => Ok(Self::SpikeHang),
             "spike.largeRejected" => Ok(Self::SpikeLargeRejected),
-            _ => Err(AppError::validation(
+            _ => Err(AppError::authorization(
                 "The requested operation is not authorized.",
                 trace_id,
             )),
@@ -43,7 +85,7 @@ mod tests {
     fn unknown_operation_is_rejected_before_backend() {
         let error = BackendOperation::authorize("spike.future", "trace-registry")
             .expect_err("unknown operation must fail");
-        assert_eq!(error.code, "VALIDATION_ERROR");
+        assert_eq!(error.code, "AUTHORIZATION_ERROR");
     }
 
     #[test]

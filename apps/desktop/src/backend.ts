@@ -5,11 +5,14 @@ import {
   appErrorSchema,
   backendStatusSchema,
   echoResponseSchema,
+  openDocumentIntentResponseSchema,
   runtimeProbeConfigSchema,
+  saveDocumentIntentResponseSchema,
   taskEventSchema,
   type AckEnvelope,
   type AppError,
   type BackendStatus,
+  type DocumentRef,
   type EchoResponse,
   type RuntimeProbeConfig,
   type TaskEvent,
@@ -72,6 +75,35 @@ export async function writeRuntimeEvidence(
   evidence: Record<string, unknown>,
 ): Promise<void> {
   await invoke("write_runtime_evidence", { evidence });
+}
+
+export async function openDocumentIntent(): Promise<DocumentRef | null> {
+  const result = await invoke("open_document_intent");
+  return openDocumentIntentResponseSchema.parse(result);
+}
+
+export async function saveDocumentIntent(
+  defaultName?: string,
+): Promise<DocumentRef | null> {
+  const result = await invoke("save_document_intent", { defaultName });
+  return saveDocumentIntentResponseSchema.parse(result);
+}
+
+export async function readDocumentContent(id: string): Promise<string> {
+  const result = await invoke("read_document_content", { id });
+  return String(result);
+}
+
+export async function writeDocumentContent(
+  id: string,
+  content: string,
+): Promise<void> {
+  await invoke("write_document_content", { id, content });
+}
+
+export async function revokeDocumentRef(id: string): Promise<boolean> {
+  const result = await invoke("revoke_document_ref", { id });
+  return Boolean(result);
 }
 
 export function toSafeError(value: unknown): AppError {

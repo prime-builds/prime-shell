@@ -34,7 +34,22 @@ const validateHandshake = ajv.getSchema(
 const validateEnvelope = ajv.getSchema(
   "https://prime-shell.local/schemas/envelope.schema.json",
 );
-if (!validateHandshake || !validateEnvelope) {
+const validateErrors = ajv.getSchema(
+  "https://prime-shell.local/schemas/errors.schema.json",
+);
+const validateDocumentRef = ajv.getSchema(
+  "https://prime-shell.local/schemas/references.schema.json#/$defs/documentRef",
+);
+const validateArtifactRef = ajv.getSchema(
+  "https://prime-shell.local/schemas/references.schema.json#/$defs/artifactRef",
+);
+if (
+  !validateHandshake ||
+  !validateEnvelope ||
+  !validateErrors ||
+  !validateDocumentRef ||
+  !validateArtifactRef
+) {
   throw new Error("contract validators were not compiled");
 }
 
@@ -46,6 +61,9 @@ const validCases = [
   [validateEnvelope, "valid/count-event.json"],
   [validateEnvelope, "valid/count-result.json"],
   [validateEnvelope, "valid/cancel-request.json"],
+  [validateDocumentRef, "valid/document-ref.json"],
+  [validateArtifactRef, "valid/artifact-ref.json"],
+  [validateErrors, "valid/error-envelope.json"],
 ];
 
 for (const [validate, name] of validCases) {
@@ -55,12 +73,16 @@ for (const [validate, name] of validCases) {
   }
 }
 
-for (const name of [
-  "invalid/unknown-operation.json",
-  "invalid/echo-extra-property.json",
-]) {
+const invalidCases = [
+  [validateEnvelope, "invalid/unknown-operation.json"],
+  [validateEnvelope, "invalid/echo-extra-property.json"],
+  [validateDocumentRef, "invalid/document-ref-leak-path.json"],
+  [validateErrors, "invalid/invalid-error-code.json"],
+];
+
+for (const [validate, name] of invalidCases) {
   const value = JSON.parse(fs.readFileSync(path.join(fixturesDir, name), "utf8"));
-  if (validateEnvelope(value)) {
+  if (validate(value)) {
     throw new Error(`${name} should be invalid`);
   }
 }
@@ -82,6 +104,6 @@ console.log(
     schemaDraft: "2020-12",
     schemas: schemaFiles.length,
     validFixtures: validCases.length,
-    invalidFixtures: 3,
+    invalidFixtures: invalidCases.length + 1,
   }),
 );

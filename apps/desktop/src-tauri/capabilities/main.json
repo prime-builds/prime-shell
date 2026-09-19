@@ -10,6 +10,7 @@
     "allow-task-lifecycle",
     "allow-runtime-probe",
     "allow-theme-state",
-    "allow-layout-preferences"
+    "allow-layout-preferences",
+    "allow-native-intent"
   ]
 }

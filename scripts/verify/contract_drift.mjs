@@ -108,7 +108,13 @@ if (JSON.stringify(sortedSchemaOps) !== JSON.stringify(sortedPythonOps)) {
 // 7. Verify frontend contract synchronization
 const frontendContent = fs.readFileSync(frontendContractsPath, "utf8");
 const errorsSchema = JSON.parse(fs.readFileSync(path.join(schemasDir, "errors.schema.json"), "utf8"));
-const schemaErrorCodes = errorsSchema.properties?.code?.enum || [];
+const schemaErrorCodes =
+  errorsSchema.properties?.error?.properties?.code?.enum ||
+  errorsSchema.properties?.code?.enum ||
+  [];
+if (schemaErrorCodes.length === 0) {
+  throw new Error("No error codes found in errors.schema.json");
+}
 for (const code of schemaErrorCodes) {
   if (!frontendContent.includes(`"${code}"`)) {
     throw new Error(`Frontend contracts.ts is missing error code defined in errors.schema.json: ${code}`);
