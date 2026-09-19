@@ -47,6 +47,7 @@ const allowedPermissions = new Set([
   "allow-task-lifecycle",
   "allow-runtime-probe",
   "allow-theme-state",
+  "allow-layout-preferences",
 ]);
 
 for (const perm of capability.permissions || []) {

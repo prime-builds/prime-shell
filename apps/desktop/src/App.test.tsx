@@ -51,6 +51,33 @@ beforeEach(() => {
         circuitOpen: false,
       });
     }
+    if (command === "get_shell_layout_preferences") {
+      return Promise.resolve({
+        schemaVersion: 1,
+        sidebarWidth: 280,
+        sidebarCollapsed: false,
+        inspectorWidth: 340,
+        inspectorOpen: true,
+        bottomPanelHeightRatio: 0.3,
+        bottomPanelOpen: false,
+        activeNavigationId: "workspace",
+      });
+    }
+    if (command === "save_shell_layout_preferences") {
+      return Promise.resolve();
+    }
+    if (command === "reset_shell_layout_preferences") {
+      return Promise.resolve({
+        schemaVersion: 1,
+        sidebarWidth: 280,
+        sidebarCollapsed: false,
+        inspectorWidth: 340,
+        inspectorOpen: true,
+        bottomPanelHeightRatio: 0.3,
+        bottomPanelOpen: false,
+        activeNavigationId: "workspace",
+      });
+    }
     return Promise.resolve();
   });
 });
@@ -375,3 +402,70 @@ describe("Phase 2 — Theme, Tokens, and Accessibility Foundation", () => {
     expect(screen.getByTestId("status-warning")).toHaveTextContent("Warning:");
   });
 });
+
+describe("Phase 2 — Responsive Application Shell (GFD-P2-WP02)", () => {
+  it("renders full shell structure with TitleBar, NavigationRail, Workspace, and StatusBar", async () => {
+    render(<App />);
+
+    // App shell root
+    expect(await screen.findByTestId("prime-app-shell")).toBeInTheDocument();
+
+    // Title bar
+    expect(screen.getByLabelText("Application Title Bar")).toBeInTheDocument();
+    expect(screen.getAllByText("Prime Shell Desktop").length).toBeGreaterThanOrEqual(1);
+
+    // Navigation Rail
+    expect(screen.getByLabelText("Main Navigation")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Workspace" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Settings" })).toBeInTheDocument();
+
+    // Workspace host
+    expect(screen.getByLabelText("Main Workspace")).toBeInTheDocument();
+
+    // Status bar
+    expect(screen.getByLabelText("Status Bar")).toBeInTheDocument();
+    expect(screen.getByText("Backend Ready")).toBeInTheDocument();
+  });
+
+  it("navigates to Settings view and back to Workspace via navigation rail", async () => {
+    render(<App />);
+
+    const settingsNavBtn = await screen.findByRole("button", { name: "Settings" });
+    await userEvent.click(settingsNavBtn);
+
+    // Settings view rendered
+    expect(await screen.findByRole("heading", { level: 1, name: "Settings" })).toBeInTheDocument();
+    expect(screen.getByTestId("tab-appearance")).toBeInTheDocument();
+    expect(screen.getByTestId("tab-layout")).toBeInTheDocument();
+    expect(screen.getByTestId("tab-system")).toBeInTheDocument();
+
+    // Navigate back to Workspace
+    const backBtn = screen.getByTestId("settings-back-btn");
+    await userEvent.click(backBtn);
+
+    expect(await screen.findByText(/Responsive Application Shell \(GFD-P2-WP02\)/i)).toBeInTheDocument();
+  });
+
+  it("supports switching tabs and resetting layout preferences in Settings view", async () => {
+    render(<App />);
+
+    const settingsNavBtn = await screen.findByRole("button", { name: "Settings" });
+    await userEvent.click(settingsNavBtn);
+
+    // Switch to Layout tab
+    const layoutTab = await screen.findByTestId("tab-layout");
+    await userEvent.click(layoutTab);
+
+    expect(screen.getByText("Shell Panel Dimensions & Persistence")).toBeInTheDocument();
+
+    // Reset layout
+    const resetBtn = screen.getByTestId("reset-layout-btn");
+    await userEvent.click(resetBtn);
+
+    await waitFor(() => {
+      expect(invoke).toHaveBeenCalledWith("reset_shell_layout_preferences");
+    });
+    expect(await screen.findByText("Layout preferences reset to default values.")).toBeInTheDocument();
+  });
+});
+

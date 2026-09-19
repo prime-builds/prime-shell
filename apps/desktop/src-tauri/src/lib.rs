@@ -1,4 +1,5 @@
 pub mod backend;
+pub mod layout;
 pub mod theme;
 
 use std::{
@@ -268,7 +269,10 @@ pub fn run() {
             runtime_probe_config,
             write_runtime_evidence,
             theme::get_theme_state,
-            theme::sync_native_window_theme
+            theme::sync_native_window_theme,
+            layout::get_shell_layout_preferences,
+            layout::save_shell_layout_preferences,
+            layout::reset_shell_layout_preferences
         ])
         .run(tauri::generate_context!())
         .expect("error while running Prime Shell Lifecycle Spike");

@@ -13,11 +13,14 @@
   },
   "dependencies": {
     "@fluentui/react-components": "9.74.4",
+    "@fluentui/react-icons": "^2.0.341",
     "@prime-shell/design-tokens": "workspace:*",
     "@tauri-apps/api": "2.11.1",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "zod": "4.4.3"
+    "react-router-dom": "^7.18.4",
+    "zod": "4.4.3",
+    "zustand": "^5.0.15"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

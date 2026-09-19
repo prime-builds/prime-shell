@@ -9,6 +9,7 @@
     "allow-echo-text",
     "allow-task-lifecycle",
     "allow-runtime-probe",
-    "allow-theme-state"
+    "allow-theme-state",
+    "allow-layout-preferences"
   ]
 }
