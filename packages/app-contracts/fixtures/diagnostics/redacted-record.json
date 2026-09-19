@@ -1,0 +1,12 @@
+{
+  "timestamp": "2026-09-19T17:19:29Z",
+  "level": "info",
+  "component": "shell",
+  "eventCode": "DIAGNOSTICS_EXPORT",
+  "traceId": "trace-export-42",
+  "message": "Export bundle written to [REDACTED_PATH]",
+  "details": {
+    "redactionVerified": true,
+    "entryCount": 5
+  }
+}

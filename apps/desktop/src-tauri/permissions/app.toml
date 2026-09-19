@@ -66,3 +66,15 @@ commands.allow = [
   "reset_settings_section",
   "reset_all_settings"
 ]
+
+[[permission]]
+identifier = "allow-diagnostics"
+description = "Allows the main window to query diagnostics summary, safe errors, preview/export diagnostics, recover backend, and repair settings sections."
+commands.allow = [
+  "get_diagnostics_summary",
+  "get_recent_safe_errors",
+  "get_export_preview",
+  "export_diagnostics",
+  "recover_backend",
+  "repair_settings_section"
+]

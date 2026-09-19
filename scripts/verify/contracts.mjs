@@ -49,6 +49,9 @@ const validateTaskSnapshot = ajv.getSchema(
 const validateSettingsDocument = ajv.getSchema(
   "https://prime-shell.local/schemas/settings.schema.json#/$defs/settingsDocument",
 );
+const validateDiagnosticRecord = ajv.getSchema(
+  "https://prime-shell.local/schemas/diagnostics.schema.json#/$defs/diagnosticRecord",
+);
 if (
   !validateHandshake ||
   !validateEnvelope ||
@@ -56,7 +59,8 @@ if (
   !validateDocumentRef ||
   !validateArtifactRef ||
   !validateTaskSnapshot ||
-  !validateSettingsDocument
+  !validateSettingsDocument ||
+  !validateDiagnosticRecord
 ) {
   throw new Error("contract validators were not compiled");
 }
@@ -77,6 +81,8 @@ const validCases = [
   [validateEnvelope, "valid/doc-analyze-result.json"],
   [validateEnvelope, "valid/doc-analyze-event.json"],
   [validateSettingsDocument, "settings/valid-v1.json"],
+  [validateDiagnosticRecord, "diagnostics/valid-record.json"],
+  [validateDiagnosticRecord, "diagnostics/redacted-record.json"],
 ];
 
 for (const [validate, name] of validCases) {
@@ -95,6 +101,7 @@ const invalidCases = [
   [validateSettingsDocument, "settings/invalid-section.json"],
   [validateSettingsDocument, "settings/future-version-v99.json"],
   [validateSettingsDocument, "settings/unknown-fields.json"],
+  [validateDiagnosticRecord, "diagnostics/invalid-event-code.json"],
 ];
 
 for (const [validate, name] of invalidCases) {

@@ -1,4 +1,5 @@
 pub mod backend;
+pub mod diagnostics;
 pub mod instance;
 pub mod layout;
 pub mod settings;
@@ -21,8 +22,8 @@ use backend::{
 use serde::Serialize;
 use tauri::{AppHandle, Emitter, Manager, State};
 
-struct BackendState {
-    client: Mutex<Option<BackendClient>>,
+pub struct BackendState {
+    pub client: Mutex<Option<BackendClient>>,
 }
 
 static REQUEST_SEQUENCE: AtomicU64 = AtomicU64::new(1);
@@ -450,6 +451,10 @@ pub fn run() {
                 .map_err(|e| Box::new(std::io::Error::new(std::io::ErrorKind::Other, e)) as Box<dyn std::error::Error>)?;
             app.manage(settings_manager);
 
+            let log_dir = app.path().app_data_dir().ok();
+            let diagnostics_manager = diagnostics::DiagnosticsManager::new(log_dir);
+            app.manage(diagnostics_manager);
+
             theme::apply_initial_window_theme(app.handle());
             Ok(())
         })
@@ -480,7 +485,13 @@ pub fn run() {
             save_settings,
             reset_setting,
             reset_settings_section,
-            reset_all_settings
+            reset_all_settings,
+            diagnostics::get_diagnostics_summary,
+            diagnostics::get_recent_safe_errors,
+            diagnostics::get_export_preview,
+            diagnostics::export_diagnostics,
+            diagnostics::recover_backend,
+            diagnostics::repair_settings_section
         ])
         .run(tauri::generate_context!())
         .expect("error while running Prime Shell Lifecycle Spike");

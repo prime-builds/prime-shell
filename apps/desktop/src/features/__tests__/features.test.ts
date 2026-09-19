@@ -23,10 +23,10 @@ describe("Feature Contracts & Deterministic Validation", () => {
     expect(result.errors).toHaveLength(0);
 
     const registry = createFeatureRegistry(defaultFeatures);
-    expect(registry.getFeatures()).toHaveLength(2);
-    expect(registry.getRoutes()).toHaveLength(2);
-    expect(registry.getNavigationItems()).toHaveLength(2);
-    expect(registry.getCommands().length).toBeGreaterThanOrEqual(5);
+    expect(registry.getFeatures()).toHaveLength(3);
+    expect(registry.getRoutes()).toHaveLength(3);
+    expect(registry.getNavigationItems()).toHaveLength(3);
+    expect(registry.getCommands().length).toBeGreaterThanOrEqual(7);
     expect(registry.getSettings().length).toBeGreaterThanOrEqual(2);
   });
 
@@ -35,12 +35,14 @@ describe("Feature Contracts & Deterministic Validation", () => {
 
     expect(registry.getActiveNavId("/analysis")).toBe("analysis");
     expect(registry.getActiveNavId("/text-utility")).toBe("text-utility");
+    expect(registry.getActiveNavId("/diagnostics")).toBe("diagnostics");
     expect(registry.getActiveNavId("/settings")).toBe("settings");
     expect(registry.getActiveNavId("/")).toBe("workspace");
     expect(registry.getActiveNavId("/unknown")).toBe("workspace");
 
     expect(registry.getRouteTitle("/analysis")).toBe("Document Analysis");
     expect(registry.getRouteTitle("/text-utility")).toBe("Text Utility");
+    expect(registry.getRouteTitle("/diagnostics")).toBe("Diagnostics & Recovery");
     expect(registry.getRouteTitle("/settings")).toBe("Settings");
     expect(registry.getRouteTitle("/")).toBe("Workspace");
   });
