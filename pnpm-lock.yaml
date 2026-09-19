@@ -35,6 +35,9 @@ importers:
       '@fluentui/react-components':
         specifier: 9.74.4
         version: 9.74.4(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(scheduler@0.27.0)
+      '@fluentui/react-icons':
+        specifier: ^2.0.341
+        version: 2.0.341(react@19.2.8)
       '@prime-shell/design-tokens':
         specifier: workspace:*
         version: link:../../packages/design-tokens
@@ -47,9 +50,15 @@ importers:
       react-dom:
         specifier: 19.2.8
         version: 19.2.8(react@19.2.8)
+      react-router-dom:
+        specifier: ^7.18.4
+        version: 7.18.4(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       zod:
         specifier: 4.4.3
         version: 4.4.3
+      zustand:
+        specifier: ^5.0.15
+        version: 5.0.15(@types/react@19.2.14)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))
     devDependencies:
       '@eslint/js':
         specifier: 10.0.1
@@ -558,6 +567,11 @@ packages:
 
   '@fluentui/react-icons@2.0.334':
     resolution: {integrity: sha512-6A2boRTWkn7qOSX6kgLPVqCMZ9WQg6babIx14LKrwpsRGPOYx7QaqgGs+XE671wiJqNQX0JjuIGhvRRGL5zD+A==}
+    peerDependencies:
+      react: '>=16.8.0 <20.0.0'
+
+  '@fluentui/react-icons@2.0.341':
+    resolution: {integrity: sha512-m4HHq7pRzSw8WlCghLZk1S6wT4hWN7LPCO98dWP3qeReH+8TYaml+lMDW30Ug6Ako6UxLD++7AGDBUQibrI0cQ==}
     peerDependencies:
       react: '>=16.8.0 <20.0.0'
 
@@ -1916,6 +1930,10 @@ packages:
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
 
+  cookie@1.1.1:
+    resolution: {integrity: sha512-ei8Aos7ja0weRpFzJnEA9UHJ/7XQmqglbRwnf2ATjcB9Wq874VKH9kfjjirM6UhU2/E5fFYadylyhFldcqSidQ==}
+    engines: {node: '>=18'}
+
   core-util-is@1.0.3:
     resolution: {integrity: sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==}
 
@@ -2980,6 +2998,23 @@ packages:
   react-is@19.3.0:
     resolution: {integrity: sha512-UpMYezM4v5/18F28aC66AEsjXIgE02kyEMH6yLdgLXu/UTfa1Ntwck/nNLrbqJsEXW7gPb0coNO9FQse9WTovA==}
 
+  react-router-dom@7.18.4:
+    resolution: {integrity: sha512-yrfmJHIpDG7taCpqKjT1G5B6q3O2K+RN8/fgNf0lTjCwiPbQ0ei6vXX9ZjQR+7ld8Tr7Z5xmyMnZ8YJrphWQUw==}
+    engines: {node: '>=20.0.0'}
+    peerDependencies:
+      react: '>=18'
+      react-dom: '>=18'
+
+  react-router@7.18.4:
+    resolution: {integrity: sha512-PUPQcMhMGRAslLcvtlPz/kmzBEWPhLdgLFrL7pLNepBL6dX0lWj4WD2cUYVgYCuT3jxvghYFg81cDTj44DhetQ==}
+    engines: {node: '>=20.0.0'}
+    peerDependencies:
+      react: '>=18'
+      react-dom: '>=18'
+    peerDependenciesMeta:
+      react-dom:
+        optional: true
+
   react@19.2.8:
     resolution: {integrity: sha512-PWaYA1L/q9u2u7xYQi+Y3L3Yfnie7XyLeaJICV1MGD6LprsBxcAqGjYyr0eY3p+QdsA+x/Irkt4Qif8D63+Sbw==}
     engines: {node: '>=0.10.0'}
@@ -3086,6 +3121,9 @@ packages:
 
   serialize-javascript@6.0.2:
     resolution: {integrity: sha512-Saa1xPByTTq2gdeFZYLLo+RFE35NHZkAbqZeWNd3BpzppeVisAqpDjcp8dyf6uIvEqJRd46jemmyA4iFIeVk8g==}
+
+  set-cookie-parser@2.7.2:
+    resolution: {integrity: sha512-oeM1lpU/UvhTxw+g3cIfxXHyJRc/uidd3yK1P242gzHds0udQBYzs3y8j4gCCW+ZJ7ad0yctld8RYO+bdurlvw==}
 
   setimmediate@1.0.5:
     resolution: {integrity: sha512-MATJdZp8sLqDl/68LfQmbP8zKPLQNV6BIZoIgrscFDQ+RsvK/BxeDQOgyxKKoh0y/8h3BqVFnCqQ/gd+reiIXA==}
@@ -3599,6 +3637,24 @@ packages:
 
   zod@4.4.3:
     resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
+
+  zustand@5.0.15:
+    resolution: {integrity: sha512-MpSEjRiBkA9crSYeOUH32rJC7SVqAbm0Fqcqge/bUi2PPoLcBWKOsG+C8mevmpr8TwXHBVkChbbJiyvkE+i/3A==}
+    engines: {node: '>=12.20.0'}
+    peerDependencies:
+      '@types/react': '>=18.0.0'
+      immer: '>=9.0.6'
+      react: '>=18.0.0'
+      use-sync-external-store: '>=1.2.0'
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      immer:
+        optional: true
+      react:
+        optional: true
+      use-sync-external-store:
+        optional: true
 
 snapshots:
 
@@ -4192,6 +4248,12 @@ snapshots:
       - scheduler
 
   '@fluentui/react-icons@2.0.334(react@19.2.8)':
+    dependencies:
+      '@griffel/react': 1.7.6(react@19.2.8)
+      react: 19.2.8
+      tslib: 2.8.1
+
+  '@fluentui/react-icons@2.0.341(react@19.2.8)':
     dependencies:
       '@griffel/react': 1.7.6(react@19.2.8)
       react: 19.2.8
@@ -6058,6 +6120,8 @@ snapshots:
 
   convert-source-map@2.0.0: {}
 
+  cookie@1.1.1: {}
+
   core-util-is@1.0.3: {}
 
   crc-32@1.2.2: {}
@@ -7159,6 +7223,20 @@ snapshots:
 
   react-is@19.3.0: {}
 
+  react-router-dom@7.18.4(react-dom@19.2.8(react@19.2.8))(react@19.2.8):
+    dependencies:
+      react: 19.2.8
+      react-dom: 19.2.8(react@19.2.8)
+      react-router: 7.18.4(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+
+  react-router@7.18.4(react-dom@19.2.8(react@19.2.8))(react@19.2.8):
+    dependencies:
+      cookie: 1.1.1
+      react: 19.2.8
+      set-cookie-parser: 2.7.2
+    optionalDependencies:
+      react-dom: 19.2.8(react@19.2.8)
+
   react@19.2.8: {}
 
   read-pkg-up@10.1.0:
@@ -7281,6 +7359,8 @@ snapshots:
   serialize-javascript@6.0.2:
     dependencies:
       randombytes: 2.1.0
+
+  set-cookie-parser@2.7.2: {}
 
   setimmediate@1.0.5: {}
 
@@ -7781,3 +7861,9 @@ snapshots:
       readable-stream: 4.7.0
 
   zod@4.4.3: {}
+
+  zustand@5.0.15(@types/react@19.2.14)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8)):
+    optionalDependencies:
+      '@types/react': 19.2.14
+      react: 19.2.8
+      use-sync-external-store: 1.6.0(react@19.2.8)

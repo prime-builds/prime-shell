@@ -29,3 +29,13 @@ commands.allow = ["runtime_probe_config", "write_runtime_evidence"]
 identifier = "allow-theme-state"
 description = "Allows the main window to query theme state and synchronize native window theme."
 commands.allow = ["get_theme_state", "sync_native_window_theme"]
+
+[[permission]]
+identifier = "allow-layout-preferences"
+description = "Allows the main window to query, persist, and reset bounded shell layout preferences."
+commands.allow = [
+  "get_shell_layout_preferences",
+  "save_shell_layout_preferences",
+  "reset_shell_layout_preferences"
+]
+

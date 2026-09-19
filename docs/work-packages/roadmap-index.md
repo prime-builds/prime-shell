@@ -14,7 +14,7 @@
 - Phase 0B WP03 is `Implemented` and merged (`0560eea`). Phase 0B is closed at tag `v0.2.0-phase0b-closure`.
 - Phase 1 WP01 is `Implemented` and merged via PR #3 (`5a6740c`).
 - Phase 2 WP01 is `Implemented` and merged (`d012fd5`).
-- Phase 2 WP02 is `Activated` and authorized for execution (`feat/gfd-p2-wp02-responsive-shell`).
+- Phase 2 WP02 is `Implemented` (executed and verified via branch `feat/gfd-p2-wp02-responsive-shell`).
 - Future package prompts remain **provisional until activated** by Chat Session.
 
 Only these implementation-status labels are valid throughout the prompt pack:
@@ -29,7 +29,7 @@ Only these implementation-status labels are valid throughout the prompt pack:
 | `GFD-P0B-WP03` | Phase 0B | Cross-Platform Evidence and Spike Closure | `Implemented` | GPT-5.6 Sol / Extra High |
 | `GFD-P1-WP01` | Phase 1 | Post-Spike Architecture and Repository Baseline | `Implemented` | GPT-5.6 Sol / High |
 | `GFD-P2-WP01` | Phase 2 | Theme, Tokens, and Accessibility Foundation | `Implemented` | GPT-5.6 Sol / High |
-| `GFD-P2-WP02` | Phase 2 | Responsive Application Shell | `Activated` | GPT-5.6 Sol / High |
+| `GFD-P2-WP02` | Phase 2 | Responsive Application Shell | `Implemented` | GPT-5.6 Sol / High |
 | `GFD-P3-WP01` | Phase 3 | Productized Contracts and Native Intent Boundary | `Not started` | GPT-5.6 Sol / Extra High |
 | `GFD-P3-WP02` | Phase 3 | Productized Task Runtime and Sidecar Operations | `Not started` | GPT-5.6 Sol / Extra High |
 | `GFD-P4-WP01` | Phase 4 | Local Document-Analysis Reference Feature | `Not started` | GPT-5.6 Sol / High |
