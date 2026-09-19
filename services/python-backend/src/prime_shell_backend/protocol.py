@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import collections
 import json
 import os
 import queue
+import re
 import sys
 import threading
 import time
@@ -23,6 +25,7 @@ SUPPORTED_OPERATIONS = (
     "spike.crash",
     "spike.hang",
     "spike.largeRejected",
+    "doc.analyze",
 )
 
 _STDOUT_LOCK = threading.Lock()
@@ -379,6 +382,216 @@ def handle_request(
             request_id,
             trace_id,
         )
+
+    # 6. doc.analyze
+    elif operation == "doc.analyze":
+        allowed_keys = {"text", "query", "maxTopTerms", "taskId"}
+        payload_keys = set(payload)
+        if (
+            not payload_keys.issubset(allowed_keys)
+            or "text" not in payload_keys
+            or not isinstance(payload["text"], str)
+            or len(payload["text"].encode("utf-8")) > 10 * 1024 * 1024
+        ):
+            return safe_error(
+                "VALIDATION_ERROR",
+                "Analyze payload is invalid or exceeds 10 MB.",
+                request_id,
+                trace_id,
+            )
+
+        query = payload.get("query")
+        if query is not None and (not isinstance(query, str) or len(query) > 100):
+            return safe_error(
+                "VALIDATION_ERROR",
+                "Query must be a string up to 100 characters.",
+                request_id,
+                trace_id,
+            )
+
+        max_top_terms = payload.get("maxTopTerms", 20)
+        if not isinstance(max_top_terms, int) or not 1 <= max_top_terms <= 100:
+            return safe_error(
+                "VALIDATION_ERROR",
+                "maxTopTerms must be an integer between 1 and 100.",
+                request_id,
+                trace_id,
+            )
+
+        task_id_field = payload.get("taskId")
+        if task_id_field is not None and (not isinstance(task_id_field, str) or not 1 <= len(task_id_field) <= 128):
+            return safe_error(
+                "VALIDATION_ERROR",
+                "taskId is invalid.",
+                request_id,
+                trace_id,
+            )
+
+        effective_task_id = task_id_field or task_id or request_id
+        text = payload["text"]
+        seq = 0
+        write_log("info", "doc_analyze_started", requestId=request_id, traceId=trace_id, taskId=effective_task_id)
+
+        # Checkpoint 1: 25% (Basic line and character count)
+        if cancel_event is not None and cancel_event.is_set():
+            seq += 1
+            write_protocol({
+                "protocol": PROTOCOL,
+                "kind": "event",
+                "requestId": request_id,
+                "traceId": trace_id,
+                "taskId": effective_task_id,
+                "sequence": seq,
+                "event": "terminal",
+                "payload": {"status": "Cancelled", "completed": 0},
+            })
+            write_log("info", "doc_analyze_cancelled", requestId=request_id, traceId=trace_id, taskId=effective_task_id)
+            return safe_error("TASK_CANCELLED", "The document analysis task was cancelled.", request_id, trace_id)
+
+        line_count = len(text.splitlines()) if text else 0
+        character_count = len(text)
+
+        seq += 1
+        write_protocol({
+            "protocol": PROTOCOL,
+            "kind": "event",
+            "requestId": request_id,
+            "traceId": trace_id,
+            "taskId": effective_task_id,
+            "sequence": seq,
+            "event": "progress",
+            "payload": {"current": 25, "target": 100},
+        })
+
+        # Checkpoint 2: 50% (Word tokenization and sentences)
+        if cancel_event is not None and cancel_event.is_set():
+            seq += 1
+            write_protocol({
+                "protocol": PROTOCOL,
+                "kind": "event",
+                "requestId": request_id,
+                "traceId": trace_id,
+                "taskId": effective_task_id,
+                "sequence": seq,
+                "event": "terminal",
+                "payload": {"status": "Cancelled", "completed": 25},
+            })
+            write_log("info", "doc_analyze_cancelled", requestId=request_id, traceId=trace_id, taskId=effective_task_id)
+            return safe_error("TASK_CANCELLED", "The document analysis task was cancelled.", request_id, trace_id)
+
+        words = [w.lower() for w in re.findall(r"\b\w+\b", text, re.UNICODE)]
+        word_count = len(words)
+        sentences = [s.strip() for s in re.split(r"[.!?]+", text) if s.strip()]
+        sentence_count = len(sentences)
+        reading_time_seconds = round((word_count / 200.0) * 60, 2)
+        lexical_diversity = round(len(set(words)) / word_count, 4) if word_count > 0 else 0.0
+
+        seq += 1
+        write_protocol({
+            "protocol": PROTOCOL,
+            "kind": "event",
+            "requestId": request_id,
+            "traceId": trace_id,
+            "taskId": effective_task_id,
+            "sequence": seq,
+            "event": "progress",
+            "payload": {"current": 50, "target": 100},
+        })
+
+        # Checkpoint 3: 75% (Term frequencies and keyword search)
+        if cancel_event is not None and cancel_event.is_set():
+            seq += 1
+            write_protocol({
+                "protocol": PROTOCOL,
+                "kind": "event",
+                "requestId": request_id,
+                "traceId": trace_id,
+                "taskId": effective_task_id,
+                "sequence": seq,
+                "event": "terminal",
+                "payload": {"status": "Cancelled", "completed": 50},
+            })
+            write_log("info", "doc_analyze_cancelled", requestId=request_id, traceId=trace_id, taskId=effective_task_id)
+            return safe_error("TASK_CANCELLED", "The document analysis task was cancelled.", request_id, trace_id)
+
+        counts = collections.Counter(words)
+        sorted_terms = sorted(counts.items(), key=lambda item: (-item[1], item[0]))
+        top_terms = [{"term": t, "count": c} for t, c in sorted_terms[:max_top_terms]]
+
+        keyword_matches = []
+        if query:
+            q_lower = query.lower()
+            positions = []
+            start = 0
+            text_lower = text.lower()
+            while True:
+                pos = text_lower.find(q_lower, start)
+                if pos == -1:
+                    break
+                positions.append(pos)
+                start = pos + max(1, len(q_lower))
+            keyword_matches.append({"term": query, "count": len(positions), "positions": positions})
+
+        seq += 1
+        write_protocol({
+            "protocol": PROTOCOL,
+            "kind": "event",
+            "requestId": request_id,
+            "traceId": trace_id,
+            "taskId": effective_task_id,
+            "sequence": seq,
+            "event": "progress",
+            "payload": {"current": 75, "target": 100},
+        })
+
+        # Checkpoint 4: 100% (Terminal success)
+        if cancel_event is not None and cancel_event.is_set():
+            seq += 1
+            write_protocol({
+                "protocol": PROTOCOL,
+                "kind": "event",
+                "requestId": request_id,
+                "traceId": trace_id,
+                "taskId": effective_task_id,
+                "sequence": seq,
+                "event": "terminal",
+                "payload": {"status": "Cancelled", "completed": 75},
+            })
+            write_log("info", "doc_analyze_cancelled", requestId=request_id, traceId=trace_id, taskId=effective_task_id)
+            return safe_error("TASK_CANCELLED", "The document analysis task was cancelled.", request_id, trace_id)
+
+        metrics = {
+            "wordCount": word_count,
+            "characterCount": character_count,
+            "lineCount": line_count,
+            "sentenceCount": sentence_count,
+            "readingTimeSeconds": reading_time_seconds,
+            "lexicalDiversity": lexical_diversity,
+            "topTerms": top_terms,
+            "keywordMatches": keyword_matches,
+        }
+
+        seq += 1
+        write_protocol({
+            "protocol": PROTOCOL,
+            "kind": "event",
+            "requestId": request_id,
+            "traceId": trace_id,
+            "taskId": effective_task_id,
+            "sequence": seq,
+            "event": "terminal",
+            "payload": {"status": "Succeeded", "completed": 100},
+        })
+        write_log("info", "doc_analyze_completed", requestId=request_id, traceId=trace_id, taskId=effective_task_id)
+
+        return {
+            "protocol": PROTOCOL,
+            "kind": "result",
+            "requestId": request_id,
+            "traceId": trace_id,
+            "operation": "doc.analyze",
+            "payload": {"metrics": metrics},
+        }
 
     return safe_error("INTERNAL_ERROR", "Unhandled operation.", request_id, trace_id)
 

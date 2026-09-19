@@ -1,0 +1,31 @@
+{
+  "protocol": "generic-app",
+  "kind": "result",
+  "requestId": "request-doc-analyze-1",
+  "traceId": "trace-doc-analyze-1",
+  "operation": "doc.analyze",
+  "payload": {
+    "metrics": {
+      "wordCount": 15,
+      "characterCount": 80,
+      "lineCount": 1,
+      "sentenceCount": 2,
+      "readingTimeSeconds": 4.5,
+      "lexicalDiversity": 0.8667,
+      "topTerms": [
+        { "term": "quick", "count": 2 },
+        { "term": "and", "count": 1 },
+        { "term": "are", "count": 1 },
+        { "term": "brown", "count": 1 },
+        { "term": "dog", "count": 1 }
+      ],
+      "keywordMatches": [
+        {
+          "term": "quick",
+          "count": 2,
+          "positions": [4, 46]
+        }
+      ]
+    }
+  }
+}

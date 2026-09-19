@@ -4,6 +4,8 @@ import {
   AppFolder24Filled,
   AppFolder24Regular,
   DarkTheme24Regular,
+  DocumentSearch24Filled,
+  DocumentSearch24Regular,
   PanelLeftExpand20Regular,
   Settings24Filled,
   Settings24Regular,
@@ -93,6 +95,18 @@ export const NavigationRail: React.FC<NavigationRailProps> = ({
           </Tooltip>
         )}
 
+        <Tooltip content="Document Analysis" relationship="label">
+          <Button
+            appearance="subtle"
+            className={`${styles.railButton} ${activeId === "analysis" ? styles.activeButton : ""}`}
+            icon={activeId === "analysis" ? <DocumentSearch24Filled /> : <DocumentSearch24Regular />}
+            onClick={() => onNavigate("analysis", "/analysis")}
+            aria-label="Document Analysis"
+            aria-current={activeId === "analysis" ? "page" : undefined}
+            data-testid="nav-analysis-btn"
+          />
+        </Tooltip>
+
         <Tooltip content="Workspace" relationship="label">
           <Button
             appearance="subtle"
@@ -101,6 +115,7 @@ export const NavigationRail: React.FC<NavigationRailProps> = ({
             onClick={() => onNavigate("workspace", "/")}
             aria-label="Workspace"
             aria-current={activeId === "workspace" ? "page" : undefined}
+            data-testid="nav-workspace-btn"
           />
         </Tooltip>
 
@@ -112,6 +127,7 @@ export const NavigationRail: React.FC<NavigationRailProps> = ({
             onClick={() => onNavigate("settings", "/settings")}
             aria-label="Settings"
             aria-current={activeId === "settings" ? "page" : undefined}
+            data-testid="nav-settings-btn"
           />
         </Tooltip>
       </div>

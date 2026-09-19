@@ -19,9 +19,10 @@ use super::{
     error::{AppError, AppResult},
     protocol::{
         validate_hello, AckEnvelope, BackendLifecycleState, BackendStatus, BundleManifest,
-        CancelEnvelope, CountPayload, EchoPayload, EchoResponse, EmptyPayload,
-        GenericIncomingFrame, Hello, RequestEnvelope, TaskEvent, TaskEventPayload, TaskState,
-        FRAME_MAX_BYTES, HANDSHAKE_MAX_BYTES, LOG_MAX_BYTES, TEXT_MAX_CHARACTERS,
+        CancelEnvelope, CountPayload, DocAnalyzePayload, DocAnalyzeResultPayload,
+        DocumentAnalysisMetrics, EchoPayload, EchoResponse, EmptyPayload, GenericIncomingFrame,
+        Hello, RequestEnvelope, TaskEvent, TaskEventPayload, TaskState, FRAME_MAX_BYTES,
+        HANDSHAKE_MAX_BYTES, LOG_MAX_BYTES, TEXT_MAX_CHARACTERS,
     },
     registry::BackendOperation,
     tasks::{TaskSnapshot, TaskStore},
@@ -608,6 +609,277 @@ impl BackendClient {
                     .and_then(|p| p.get("completed").and_then(|v| v.as_u64()))
                     .unwrap_or(target);
                 return Ok(completed);
+            } else if incoming.kind == "error" {
+                *self.state.write().unwrap() = BackendLifecycleState::Ready;
+                *self.active_task.write().unwrap() = None;
+                *self.cancelling_task.write().unwrap() = None;
+                let code = incoming
+                    .error
+                    .as_ref()
+                    .map(|e| e.code.as_str())
+                    .unwrap_or("INTERNAL_ERROR");
+                let msg = incoming
+                    .error
+                    .as_ref()
+                    .map(|e| e.message.clone())
+                    .unwrap_or_else(|| "Task error".to_owned());
+                let final_status = if code == "TASK_CANCELLED" {
+                    TaskState::Cancelled
+                } else {
+                    TaskState::Failed
+                };
+                self.task_store.complete_task(task_id, final_status, Some(msg.clone()));
+                if code == "TASK_CANCELLED" {
+                    return Err(AppError::cancelled(trace_id));
+                }
+                return Err(AppError {
+                    code: Box::leak(code.to_owned().into_boxed_str()),
+                    message: msg,
+                    trace_id: trace_id.to_owned(),
+                });
+            }
+        }
+    }
+
+    pub fn analyze_document<F>(
+        &self,
+        text: &str,
+        query: Option<&str>,
+        max_top_terms: Option<usize>,
+        request_id: &str,
+        trace_id: &str,
+        task_id: &str,
+        mut on_event: F,
+    ) -> AppResult<DocumentAnalysisMetrics>
+    where
+        F: FnMut(TaskEvent),
+    {
+        if *self.circuit_open.read().unwrap_or_else(|e| e.into_inner())
+            || *self.state.read().unwrap_or_else(|e| e.into_inner())
+                == BackendLifecycleState::Faulted
+        {
+            return Err(AppError::unavailable(trace_id));
+        }
+
+        let operation = BackendOperation::authorize("doc.analyze", trace_id)?;
+        self.task_store.start_task(
+            task_id.to_owned(),
+            operation.name().to_owned(),
+            100,
+            trace_id,
+        )?;
+        {
+            let mut state_guard = self
+                .state
+                .write()
+                .map_err(|_| AppError::internal(trace_id))?;
+            if *state_guard != BackendLifecycleState::Ready {
+                return Err(AppError::busy("Backend is not ready.", trace_id));
+            }
+            *state_guard = BackendLifecycleState::Busy;
+        }
+        *self.active_task.write().unwrap() = Some(task_id.to_owned());
+        *self.cancelling_task.write().unwrap() = None;
+
+        let request = RequestEnvelope {
+            protocol: "generic-app",
+            kind: "request",
+            request_id,
+            trace_id,
+            operation: operation.name(),
+            payload: DocAnalyzePayload {
+                text,
+                query,
+                max_top_terms,
+                task_id: Some(task_id),
+            },
+        };
+
+        {
+            let proc = self
+                .process
+                .read()
+                .map_err(|_| AppError::internal(trace_id))?;
+            if let Err(err) = proc.write_frame(&request, trace_id) {
+                *self.state.write().unwrap() = BackendLifecycleState::Ready;
+                *self.active_task.write().unwrap() = None;
+                self.task_store.complete_task(
+                    task_id,
+                    TaskState::Failed,
+                    Some("Failed to send request to backend".to_owned()),
+                );
+                return Err(err);
+            }
+        }
+
+        let mut last_progress_sent = Instant::now() - Duration::from_millis(150);
+        let mut last_reported_progress = 0_u64;
+        let max_timeout = Duration::from_millis(60_000);
+        let start_time = Instant::now();
+
+        loop {
+            if start_time.elapsed() > max_timeout {
+                self.task_store.complete_task(
+                    task_id,
+                    TaskState::TimedOut,
+                    Some("Task execution timed out".to_owned()),
+                );
+                self.handle_failure(trace_id);
+                return Err(AppError::timed_out(trace_id));
+            }
+
+            // Cancellation deadline escalation check (<= 2s)
+            if let Some((cancelling_id, requested_at)) =
+                self.cancelling_task.read().unwrap().as_ref()
+            {
+                if cancelling_id == task_id && requested_at.elapsed() > CANCELLATION_DEADLINE {
+                    if let Ok(proc) = self.process.read() {
+                        proc.kill();
+                    }
+                    self.task_store.complete_task(
+                        task_id,
+                        TaskState::Interrupted,
+                        Some("Cancellation deadline escalated to termination".to_owned()),
+                    );
+                    self.handle_failure(trace_id);
+                    on_event(TaskEvent {
+                        protocol: "generic-app".to_owned(),
+                        kind: "event".to_owned(),
+                        request_id: request_id.to_owned(),
+                        trace_id: trace_id.to_owned(),
+                        task_id: task_id.to_owned(),
+                        sequence: 999999,
+                        event: "terminal".to_owned(),
+                        payload: TaskEventPayload {
+                            current: None,
+                            target: Some(100),
+                            status: Some(TaskState::Interrupted),
+                            completed: Some(last_reported_progress),
+                        },
+                    });
+                    return Err(AppError::timed_out(trace_id));
+                }
+            }
+
+            let frame_res = {
+                let proc = self
+                    .process
+                    .read()
+                    .map_err(|_| AppError::internal(trace_id))?;
+                if !proc.is_alive() {
+                    drop(proc);
+                    self.task_store.complete_task(
+                        task_id,
+                        TaskState::Interrupted,
+                        Some("Process terminated unexpectedly".to_owned()),
+                    );
+                    self.handle_failure(trace_id);
+                    on_event(TaskEvent {
+                        protocol: "generic-app".to_owned(),
+                        kind: "event".to_owned(),
+                        request_id: request_id.to_owned(),
+                        trace_id: trace_id.to_owned(),
+                        task_id: task_id.to_owned(),
+                        sequence: 999999,
+                        event: "terminal".to_owned(),
+                        payload: TaskEventPayload {
+                            current: None,
+                            target: Some(100),
+                            status: Some(TaskState::Interrupted),
+                            completed: Some(last_reported_progress),
+                        },
+                    });
+                    return Err(AppError::crashed(trace_id));
+                }
+                proc.recv_frame(Duration::from_millis(100))
+            };
+
+            let frame = match frame_res {
+                Ok(Ok(bytes)) => bytes,
+                Ok(Err(err)) => {
+                    self.handle_failure(trace_id);
+                    return Err(map_frame_error(err, trace_id));
+                }
+                Err(mpsc::RecvTimeoutError::Timeout) => {
+                    continue;
+                }
+                Err(mpsc::RecvTimeoutError::Disconnected) => {
+                    self.handle_failure(trace_id);
+                    return Err(AppError::crashed(trace_id));
+                }
+            };
+
+            let incoming: GenericIncomingFrame = serde_json::from_slice(&frame)
+                .map_err(|_| AppError::protocol("Malformed task frame from backend.", trace_id))?;
+
+            if incoming.kind == "event" {
+                let event_type = incoming.event.as_deref().unwrap_or("");
+                let is_terminal = event_type == "terminal";
+                let event_payload: TaskEventPayload = incoming
+                    .payload
+                    .and_then(|p| serde_json::from_value(p).ok())
+                    .unwrap_or(TaskEventPayload {
+                        current: None,
+                        target: None,
+                        status: None,
+                        completed: None,
+                    });
+
+                if let Some(cur) = event_payload.current {
+                    last_reported_progress = cur;
+                    self.task_store.update_progress(task_id, cur, 100);
+                }
+                if let Some(comp) = event_payload.completed {
+                    last_reported_progress = comp;
+                    self.task_store.update_progress(task_id, comp, 100);
+                }
+                if is_terminal {
+                    if let Some(st) = event_payload.status {
+                        self.task_store.complete_task(task_id, st, None);
+                    }
+                }
+
+                let is_final_progress =
+                    event_payload.current.is_some() && event_payload.current == Some(100);
+                let should_send = if is_terminal || is_final_progress {
+                    last_progress_sent = Instant::now();
+                    true
+                } else {
+                    let now = Instant::now();
+                    if now.duration_since(last_progress_sent) >= Duration::from_millis(100) {
+                        last_progress_sent = now;
+                        true
+                    } else {
+                        false
+                    }
+                };
+
+                if should_send {
+                    let task_event = TaskEvent {
+                        protocol: "generic-app".to_owned(),
+                        kind: "event".to_owned(),
+                        request_id: incoming.request_id.clone().unwrap_or_default(),
+                        trace_id: trace_id.to_owned(),
+                        task_id: incoming
+                            .task_id
+                            .clone()
+                            .unwrap_or_else(|| task_id.to_owned()),
+                        sequence: incoming.sequence.unwrap_or(0),
+                        event: event_type.to_owned(),
+                        payload: event_payload,
+                    };
+                    on_event(task_event);
+                }
+            } else if incoming.kind == "result" {
+                *self.state.write().unwrap() = BackendLifecycleState::Ready;
+                *self.active_task.write().unwrap() = None;
+                *self.cancelling_task.write().unwrap() = None;
+                self.task_store.complete_task(task_id, TaskState::Succeeded, None);
+                let result_payload: DocAnalyzeResultPayload = incoming
+                    .payload
+                    .and_then(|p| serde_json::from_value(p).ok())
+                    .ok_or_else(|| AppError::protocol("Invalid doc.analyze result payload.", trace_id))?;
+                return Ok(result_payload.metrics);
             } else if incoming.kind == "error" {
                 *self.state.write().unwrap() = BackendLifecycleState::Ready;
                 *self.active_task.write().unwrap() = None;

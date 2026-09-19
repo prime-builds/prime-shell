@@ -11,6 +11,7 @@
     "allow-runtime-probe",
     "allow-theme-state",
     "allow-layout-preferences",
-    "allow-native-intent"
+    "allow-native-intent",
+    "allow-document-analysis"
   ]
 }

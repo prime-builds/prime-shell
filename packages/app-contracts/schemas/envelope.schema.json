@@ -134,6 +134,32 @@
       }
     },
     {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protocol", "kind", "requestId", "traceId", "operation", "payload"],
+      "properties": {
+        "protocol": { "const": "generic-app" },
+        "kind": { "const": "request" },
+        "requestId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "traceId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "operation": { "const": "doc.analyze" },
+        "payload": { "$ref": "operations/doc.analyze.schema.json#/$defs/request" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protocol", "kind", "requestId", "traceId", "operation", "payload"],
+      "properties": {
+        "protocol": { "const": "generic-app" },
+        "kind": { "const": "result" },
+        "requestId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "traceId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "operation": { "const": "doc.analyze" },
+        "payload": { "$ref": "operations/doc.analyze.schema.json#/$defs/response" }
+      }
+    },
+    {
       "$ref": "task.schema.json#/$defs/taskEvent"
     },
     {

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://prime-shell.local/schemas/operations/doc.analyze.schema.json",
+  "title": "doc.analyze",
+  "$defs": {
+    "request": {
+      "$ref": "../document-analysis.schema.json#/$defs/request"
+    },
+    "response": {
+      "$ref": "../document-analysis.schema.json#/$defs/response"
+    }
+  }
+}

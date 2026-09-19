@@ -62,6 +62,8 @@ export const taskEventPayloadSchema = z.object({
   target: z.number().optional(),
   status: taskStateSchema.optional(),
   completed: z.number().optional(),
+  message: z.string().optional(),
+  result: z.unknown().optional(),
 });
 
 export const taskEventSchema = z.object({
@@ -124,6 +126,32 @@ export const taskSnapshotSchema = z.object({
 
 export const taskSnapshotResponseSchema = taskSnapshotSchema.nullable();
 
+export const termFrequencyItemSchema = z.object({
+  term: z.string().min(1).max(100),
+  count: z.number().int().min(1),
+});
+
+export const keywordMatchItemSchema = z.object({
+  term: z.string().min(1).max(100),
+  count: z.number().int().min(0),
+  positions: z.array(z.number().int().min(0)),
+});
+
+export const documentAnalysisMetricsSchema = z.object({
+  wordCount: z.number().int().min(0),
+  characterCount: z.number().int().min(0),
+  lineCount: z.number().int().min(0),
+  sentenceCount: z.number().int().min(0),
+  readingTimeSeconds: z.number().min(0),
+  lexicalDiversity: z.number().min(0).max(1),
+  topTerms: z.array(termFrequencyItemSchema),
+  keywordMatches: z.array(keywordMatchItemSchema),
+});
+
+export const docAnalyzeResultSchema = z.object({
+  metrics: documentAnalysisMetricsSchema,
+});
+
 export type AppError = z.infer<typeof appErrorSchema>;
 export type BackendLifecycleState = z.infer<typeof backendLifecycleStateSchema>;
 export type BackendStatus = z.infer<typeof backendStatusSchema>;
@@ -136,4 +164,9 @@ export type EchoResponse = z.infer<typeof echoResponseSchema>;
 export type RuntimeProbeConfig = z.infer<typeof runtimeProbeConfigSchema>;
 export type DocumentRef = z.infer<typeof documentRefSchema>;
 export type ArtifactRef = z.infer<typeof artifactRefSchema>;
+export type TermFrequencyItem = z.infer<typeof termFrequencyItemSchema>;
+export type KeywordMatchItem = z.infer<typeof keywordMatchItemSchema>;
+export type DocumentAnalysisMetrics = z.infer<typeof documentAnalysisMetricsSchema>;
+export type DocAnalyzeResult = z.infer<typeof docAnalyzeResultSchema>;
+
 

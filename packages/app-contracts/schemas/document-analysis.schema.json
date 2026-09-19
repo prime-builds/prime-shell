@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://prime-shell.local/schemas/document-analysis.schema.json",
+  "title": "Prime Shell Document Analysis Models",
+  "$defs": {
+    "termFrequency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["term", "count"],
+      "properties": {
+        "term": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "count": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "keywordMatch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["term", "count", "positions"],
+      "properties": {
+        "term": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "count": { "type": "integer", "minimum": 0 },
+        "positions": {
+          "type": "array",
+          "items": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "wordCount",
+        "characterCount",
+        "lineCount",
+        "sentenceCount",
+        "readingTimeSeconds",
+        "lexicalDiversity",
+        "topTerms",
+        "keywordMatches"
+      ],
+      "properties": {
+        "wordCount": { "type": "integer", "minimum": 0 },
+        "characterCount": { "type": "integer", "minimum": 0 },
+        "lineCount": { "type": "integer", "minimum": 0 },
+        "sentenceCount": { "type": "integer", "minimum": 0 },
+        "readingTimeSeconds": { "type": "number", "minimum": 0 },
+        "lexicalDiversity": { "type": "number", "minimum": 0, "maximum": 1 },
+        "topTerms": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/termFrequency" }
+        },
+        "keywordMatches": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/keywordMatch" }
+        }
+      }
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text"],
+      "properties": {
+        "text": { "type": "string", "maxLength": 10485760 },
+        "query": { "type": "string", "maxLength": 100 },
+        "maxTopTerms": { "type": "integer", "minimum": 1, "maximum": 100 },
+        "taskId": { "type": "string", "minLength": 1, "maxLength": 128 }
+      }
+    },
+    "response": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metrics"],
+      "properties": {
+        "metrics": { "$ref": "#/$defs/metrics" }
+      }
+    }
+  }
+}

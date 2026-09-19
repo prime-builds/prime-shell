@@ -7,6 +7,7 @@ pub enum BackendOperation {
     SpikeCrash,
     SpikeHang,
     SpikeLargeRejected,
+    DocAnalyze,
 }
 
 impl BackendOperation {
@@ -17,6 +18,7 @@ impl BackendOperation {
             Self::SpikeCrash => "spike.crash",
             Self::SpikeHang => "spike.hang",
             Self::SpikeLargeRejected => "spike.largeRejected",
+            Self::DocAnalyze => "doc.analyze",
         }
     }
 
@@ -31,6 +33,7 @@ impl BackendOperation {
             Self::SpikeCrash => 1024,
             Self::SpikeHang => 1024,
             Self::SpikeLargeRejected => 1024 * 1024,
+            Self::DocAnalyze => 10 * 1024 * 1024,
         }
     }
 
@@ -41,19 +44,20 @@ impl BackendOperation {
             Self::SpikeCrash => 5_000,
             Self::SpikeHang => 5_000,
             Self::SpikeLargeRejected => 5_000,
+            Self::DocAnalyze => 60_000,
         }
     }
 
     pub const fn cancellable(self) -> bool {
         match self {
-            Self::SpikeCount => true,
+            Self::SpikeCount | Self::DocAnalyze => true,
             _ => false,
         }
     }
 
     pub const fn idempotent(self) -> bool {
         match self {
-            Self::SpikeEcho => true,
+            Self::SpikeEcho | Self::DocAnalyze => true,
             _ => false,
         }
     }
@@ -69,6 +73,7 @@ impl BackendOperation {
             "spike.crash" => Ok(Self::SpikeCrash),
             "spike.hang" => Ok(Self::SpikeHang),
             "spike.largeRejected" => Ok(Self::SpikeLargeRejected),
+            "doc.analyze" => Ok(Self::DocAnalyze),
             _ => Err(AppError::authorization(
                 "The requested operation is not authorized.",
                 trace_id,
@@ -89,13 +94,14 @@ mod tests {
     }
 
     #[test]
-    fn all_five_operations_are_authorized() {
+    fn all_six_operations_are_authorized() {
         for name in [
             "spike.echo",
             "spike.count",
             "spike.crash",
             "spike.hang",
             "spike.largeRejected",
+            "doc.analyze",
         ] {
             let op = BackendOperation::authorize(name, "trace-registry")
                 .expect("operation must be authorized");

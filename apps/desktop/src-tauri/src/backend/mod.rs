@@ -9,7 +9,10 @@ pub mod tasks;
 pub use client::{BackendClient, LaunchSpec};
 pub use containment::ProcessContainment;
 pub use error::{AppError, AppResult};
-pub use protocol::{BackendStatus, EchoResponse};
+pub use protocol::{
+    BackendStatus, DocAnalyzePayload, DocAnalyzeResultPayload, DocumentAnalysisMetrics,
+    EchoResponse, KeywordMatchItem, TermFrequencyItem,
+};
 pub use references::{
     pick_document_dialog, save_document_dialog, ArtifactRef, DocumentRef, ReferenceRegistry,
 };
