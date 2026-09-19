@@ -13,6 +13,94 @@ const { invoke, listen } = vi.hoisted(() => ({
 vi.mock("@tauri-apps/api/core", () => ({ invoke }));
 vi.mock("@tauri-apps/api/event", () => ({ listen }));
 
+const defaultSettings = {
+  schemaVersion: 1,
+  revision: 0,
+  appearance: {
+    themeMode: "system",
+    accentMode: { mode: "default" },
+    density: "comfortable",
+    materialPreference: "system",
+  },
+  layout: {
+    schemaVersion: 1,
+    sidebarWidth: 280,
+    sidebarCollapsed: false,
+    inspectorWidth: 340,
+    inspectorOpen: true,
+    bottomPanelHeightRatio: 0.3,
+    bottomPanelOpen: false,
+    activeNavigationId: "workspace",
+  },
+  documentAnalysis: {
+    maxTopTerms: 20,
+  },
+  textUtility: {
+    defaultMode: "uppercase",
+  },
+  status: {
+    state: "healthy",
+  },
+};
+
+const handleBaseCommands = (command: string) => {
+  if (command === "get_settings") {
+    return Promise.resolve(defaultSettings);
+  }
+  if (command === "save_settings") {
+    return Promise.resolve();
+  }
+  if (command === "get_theme_state") {
+    return Promise.resolve({
+      systemTheme: "light",
+      systemAccent: null,
+      materialCapabilities: {
+        mica: true,
+        micaAlt: false,
+        transparencyEnabled: true,
+        forcedColors: false,
+        reducedTransparency: false,
+      },
+    });
+  }
+  if (command === "sync_native_window_theme") {
+    return Promise.resolve();
+  }
+  if (command === "runtime_probe_config") {
+    return Promise.resolve({ enabled: false, evidencePath: null });
+  }
+  if (command === "backend_status") {
+    return Promise.resolve({
+      state: "ready",
+      ready: true,
+      backendVersion: "0.1.0",
+      circuitOpen: false,
+    });
+  }
+  if (command === "reset_settings_section") {
+    return Promise.resolve(defaultSettings);
+  }
+  if (command === "reset_setting") {
+    return Promise.resolve(defaultSettings);
+  }
+  if (command === "reset_all_settings") {
+    return Promise.resolve(defaultSettings);
+  }
+  if (command === "get_shell_layout_preferences") {
+    return Promise.resolve(defaultSettings.layout);
+  }
+  if (command === "save_shell_layout_preferences") {
+    return Promise.resolve();
+  }
+  if (command === "reset_shell_layout_preferences") {
+    return Promise.resolve(defaultSettings.layout);
+  }
+  if (command === "get_task_snapshot") {
+    return Promise.resolve(null);
+  }
+  return undefined;
+};
+
 beforeEach(async () => {
   useTaskStore.getState().reset();
   window.location.hash = "#/";
@@ -27,65 +115,10 @@ beforeEach(async () => {
     removeEventListener: vi.fn(),
   });
 
-  // Default handlers for theme commands
+  // Default handlers for base commands
   invoke.mockImplementation((command: string) => {
-    if (command === "get_theme_state") {
-      return Promise.resolve({
-        systemTheme: "light",
-        systemAccent: null,
-        materialCapabilities: {
-          mica: true,
-          micaAlt: false,
-          transparencyEnabled: true,
-          forcedColors: false,
-          reducedTransparency: false,
-        },
-      });
-    }
-    if (command === "sync_native_window_theme") {
-      return Promise.resolve();
-    }
-    if (command === "runtime_probe_config") {
-      return Promise.resolve({ enabled: false, evidencePath: null });
-    }
-    if (command === "backend_status") {
-      return Promise.resolve({
-        state: "ready",
-        ready: true,
-        backendVersion: "0.1.0",
-        circuitOpen: false,
-      });
-    }
-    if (command === "get_shell_layout_preferences") {
-      return Promise.resolve({
-        schemaVersion: 1,
-        sidebarWidth: 280,
-        sidebarCollapsed: false,
-        inspectorWidth: 340,
-        inspectorOpen: true,
-        bottomPanelHeightRatio: 0.3,
-        bottomPanelOpen: false,
-        activeNavigationId: "workspace",
-      });
-    }
-    if (command === "save_shell_layout_preferences") {
-      return Promise.resolve();
-    }
-    if (command === "reset_shell_layout_preferences") {
-      return Promise.resolve({
-        schemaVersion: 1,
-        sidebarWidth: 280,
-        sidebarCollapsed: false,
-        inspectorWidth: 340,
-        inspectorOpen: true,
-        bottomPanelHeightRatio: 0.3,
-        bottomPanelOpen: false,
-        activeNavigationId: "workspace",
-      });
-    }
-    if (command === "get_task_snapshot") {
-      return Promise.resolve(null);
-    }
+    const base = handleBaseCommands(command);
+    if (base !== undefined) return base;
     return Promise.resolve();
   });
 });
@@ -471,7 +504,9 @@ describe("Phase 2 — Responsive Application Shell (GFD-P2-WP02)", () => {
     await userEvent.click(resetBtn);
 
     await waitFor(() => {
-      expect(invoke).toHaveBeenCalledWith("reset_shell_layout_preferences");
+      expect(invoke).toHaveBeenCalledWith("reset_settings_section", {
+        section: "layout",
+      });
     });
     expect(await screen.findByText("Layout preferences reset to default values.")).toBeInTheDocument();
   });

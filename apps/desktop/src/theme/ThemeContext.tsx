@@ -43,47 +43,24 @@ const defaultMaterialCapabilities: MaterialCapabilities = {
   reason: undefined,
 };
 
+import { useSettingsStore } from "../shell/state/useSettingsStore";
+
 const ThemeContext = createContext<ThemeContextValue | null>(null);
-
-function getStoredValue<T>(key: string, fallback: T): T {
-  try {
-    const raw = localStorage.getItem(key);
-    if (raw) {
-      return JSON.parse(raw) as T;
-    }
-  } catch {
-    // Ignore storage errors in test or restricted environments
-  }
-  return fallback;
-}
-
-function setStoredValue<T>(key: string, value: T): void {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-  } catch {
-    // Ignore storage errors
-  }
-}
 
 export const ThemeProviderContext: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [themeMode, setThemeModeState] = useState<ThemeMode>(() =>
-    getStoredValue<ThemeMode>("prime_shell_theme_mode", "system"),
-  );
+  const appearance = useSettingsStore((s) => s.document.appearance);
+  const updateAppearance = useSettingsStore((s) => s.updateAppearance);
 
-  const [accentMode, setAccentModeState] = useState<AccentMode>(() =>
-    getStoredValue<AccentMode>("prime_shell_accent_mode", { mode: "default" }),
-  );
+  const themeMode = appearance.themeMode;
+  const accentMode = appearance.accentMode;
+  const density = appearance.density;
+  const materialPreference = appearance.materialPreference;
 
-  const [density, setDensityState] = useState<DensityMode>(() =>
-    getStoredValue<DensityMode>("prime_shell_density_mode", "comfortable"),
-  );
-
-  const [materialPreference, setMaterialPreferenceState] =
-    useState<WindowMaterialPreference>(() =>
-      getStoredValue<WindowMaterialPreference>("prime_shell_material_preference", "system"),
-    );
+  useEffect(() => {
+    useSettingsStore.getState().loadSettings();
+  }, []);
 
   const [systemDark, setSystemDark] = useState<boolean>(() => {
     if (typeof window !== "undefined" && window.matchMedia) {
@@ -216,23 +193,19 @@ export const ThemeProviderContext: React.FC<{ children: React.ReactNode }> = ({
   }, [effectiveTheme, tokens.surfaces.appShell]);
 
   const setThemeMode = (mode: ThemeMode) => {
-    setThemeModeState(mode);
-    setStoredValue("prime_shell_theme_mode", mode);
+    updateAppearance({ themeMode: mode });
   };
 
   const setAccentMode = (mode: AccentMode) => {
-    setAccentModeState(mode);
-    setStoredValue("prime_shell_accent_mode", mode);
+    updateAppearance({ accentMode: mode });
   };
 
   const setDensity = (d: DensityMode) => {
-    setDensityState(d);
-    setStoredValue("prime_shell_density_mode", d);
+    updateAppearance({ density: d });
   };
 
   const setMaterialPreference = (pref: WindowMaterialPreference) => {
-    setMaterialPreferenceState(pref);
-    setStoredValue("prime_shell_material_preference", pref);
+    updateAppearance({ materialPreference: pref });
   };
 
   const value = useMemo<ThemeContextValue>(

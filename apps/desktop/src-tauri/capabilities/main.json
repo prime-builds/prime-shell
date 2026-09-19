@@ -12,6 +12,7 @@
     "allow-theme-state",
     "allow-layout-preferences",
     "allow-native-intent",
-    "allow-document-analysis"
+    "allow-document-analysis",
+    "allow-settings"
   ]
 }

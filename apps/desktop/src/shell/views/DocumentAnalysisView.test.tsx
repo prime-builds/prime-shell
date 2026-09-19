@@ -58,6 +58,67 @@ beforeEach(async () => {
         circuitOpen: false,
       });
     }
+    if (command === "get_settings") {
+      return Promise.resolve({
+        schemaVersion: 1,
+        revision: 0,
+        appearance: {
+          themeMode: "system",
+          accentMode: { mode: "default" },
+          density: "comfortable",
+          materialPreference: "system",
+        },
+        layout: {
+          schemaVersion: 1,
+          sidebarWidth: 280,
+          sidebarCollapsed: false,
+          inspectorWidth: 340,
+          inspectorOpen: true,
+          bottomPanelHeightRatio: 0.3,
+          bottomPanelOpen: false,
+          activeNavigationId: "analysis",
+        },
+        documentAnalysis: {
+          maxTopTerms: 20,
+        },
+        textUtility: {
+          defaultMode: "uppercase",
+        },
+        status: { state: "healthy" },
+      });
+    }
+    if (command === "save_settings") {
+      return Promise.resolve();
+    }
+    if (command === "reset_settings_section") {
+      return Promise.resolve({
+        schemaVersion: 1,
+        revision: 0,
+        appearance: {
+          themeMode: "system",
+          accentMode: { mode: "default" },
+          density: "comfortable",
+          materialPreference: "system",
+        },
+        layout: {
+          schemaVersion: 1,
+          sidebarWidth: 280,
+          sidebarCollapsed: false,
+          inspectorWidth: 340,
+          inspectorOpen: true,
+          bottomPanelHeightRatio: 0.3,
+          bottomPanelOpen: false,
+          activeNavigationId: "analysis",
+        },
+        documentAnalysis: {
+          maxTopTerms: 20,
+        },
+        textUtility: {
+          defaultMode: "uppercase",
+        },
+        status: { state: "healthy" },
+      });
+    }
     if (command === "get_shell_layout_preferences") {
       return Promise.resolve({
         schemaVersion: 1,
@@ -335,6 +396,8 @@ describe("Phase 4 — Local Document-Analysis Reference Feature (GFD-P4-WP01)", 
     // Reset to default
     const resetBtn = screen.getByTestId("reset-analysis-settings-btn");
     await userEvent.click(resetBtn);
-    expect(useDocumentAnalysisStore.getState().maxTopTerms).toBe(20);
+    await waitFor(() => {
+      expect(useDocumentAnalysisStore.getState().maxTopTerms).toBe(20);
+    });
   });
 });

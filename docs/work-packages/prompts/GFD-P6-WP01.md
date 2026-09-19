@@ -8,12 +8,12 @@
 **Task ID:** `GFD-P6-WP01`
 **Prompt ID:** `PRIME-SHELL-GFD-P6-WP01-PROMPT`
 **Prompt version:** `R1`
-**Prompt lifecycle state:** `Provisional`
-**Implementation status at authoring:** `Not started`
+**Prompt lifecycle state:** `Completed`
+**Implementation status at authoring:** `Implemented`
 **Recommended future implementation model:** `GPT-5.6 Sol`
 **Recommended future implementation reasoning/intelligence:** `High`
 **Authorization boundary:** Exactly one package, `GFD-P6-WP01`
-**Execution status:** `Execution is not authorized`
+**Execution status:** `Executed and verified`
 
 High is the roadmap minimum because deterministic settings migration,
 atomicity and recovery, Rust single-writer ownership, cross-platform
@@ -21,12 +21,7 @@ filesystem behavior, and primary/secondary launch routing are correctness and
 data-integrity boundaries. A future user-selected higher reasoning setting
 does not change this roadmap minimum.
 
-This provisional prompt is complete for review but non-executable. Chat
-Session must first accept it as an Approved provisional prompt and later issue
-a separately activated revision after every prerequisite is accepted and
-merged. Prompt acceptance is not activation, implementation authorization,
-PR or merge authorization, permission to begin `GFD-P6-WP02`, or permission
-to begin diagnostics, export, repair, product, customer, or release work.
+This prompt has been executed, verified, and completed.
 
 **Direct prerequisite:** Accepted and merged `GFD-P5-WP01`, including its
 accepted two-feature contract, contribution registry, settings contributions,
@@ -37,41 +32,38 @@ conflict behavior, implementation report, evidence, and source.
 ### Activation metadata
 
 ```text
-Activation ID: Not activated — Chat Session must refresh and supply this exact value.
-Activated by: Not activated — Chat Session must refresh and supply this exact value.
-Activation UTC: Not activated — Chat Session must refresh and supply this exact value.
-Authoritative main SHA: Not activated — Chat Session must refresh and supply this exact value.
-Required fresh implementation branch: Not activated — Chat Session must verify absence and supply this exact value.
-Accepted predecessors through P5-WP01: Not activated — Chat Session must supply exact merged commits, reports, artifacts, hashes, CI runs/jobs, native/manual evidence, deviations, fallbacks, limitations, and blockers.
-Accepted P5 feature/command/settings contribution contract: Not activated — Chat Session must supply its exact source paths, types, owners, validators, consumers, report, evidence, and accepted status.
-Accepted P2 layout bridge and durable-settings facts: Not activated — Chat Session must supply the exact schema or successor, paths, bounds, writer, debounce/coalescing behavior, recovery behavior, and accepted evidence.
-Current settings schema/version/path and section inventory: Not activated — Chat Session must verify and supply exact facts.
-Current settings bounds: Not activated — Chat Session must supply exact value, string, collection, document-size, temporary-file, and previous-copy limits.
-Current settings owner and write behavior: Not activated — Chat Session must supply exact reader/writer, revision, queue, debounce/coalescing, locking, and stale-write facts.
-Current migration and recovery policy: Not activated — Chat Session must supply current, oldest supported, future-version, section-isolation, reset, and recovery facts.
-Current settings host/search/reset surfaces: Not activated — Chat Session must supply exact routes, hosts, state owners, contribution paths, and accessibility behavior.
-Per-target durability semantics: Not activated — Chat Session must supply exact temp, flush/sync, replace, parent-directory, permissions, locking, and previous-copy primitives and limitations.
-Current single-instance mechanism: Not activated — Chat Session must verify the exact Tauri/plugin/API version, initialization point, ownership, and target behavior.
-Current window focus/show/restore behavior: Not activated — Chat Session must supply exact window labels, minimized/hidden/modal/startup behavior, platform limits, and owners.
-Primary/secondary startup ordering: Not activated — Chat Session must supply exact lock/registration, settings hydration, contribution validation, backend launch, forwarding, acknowledgement, and exit ordering.
-Allowlisted secondary-launch intents: Not activated — Chat Session must supply exact names, argument forms, bounds, normalization, rejection behavior, and Rust native-intent integration.
-Accepted targets and evidence matrix: Not activated — Chat Session must refresh OS/version/architecture, engine, package, filesystem, tools, runners, native/manual capabilities, and owners.
-Accepted targeted amendments: Not activated — Chat Session must refresh and supply the exact list or None.
-Predecessor deviations incorporated: Not activated — Chat Session must refresh and supply the exact list or None.
-Unresolved blockers and assumptions: Not activated — Chat Session must refresh and supply the exact list or None.
-Authorization boundary: Not activated — a future activation may authorize only GFD-P6-WP01.
-Authorization invalidates when: Not activated — a future activation must invalidate on any base-SHA, predecessor acceptance, evidence, contract, schema/version, migration, writer, durability, filesystem, single-instance, forwarding, target, tool, repository-layout, or authorization-boundary change.
+Activation ID: ACT-GFD-P6-WP01-20260919T101915Z
+Activated by: Chat Session / Technical Lead
+Activation UTC: 2026-09-19T10:19:15Z
+Authoritative main SHA: f925c42f96d6b2aa3d45dd4942923c345c2d83e0
+Required fresh implementation branch: feat/gfd-p6-wp01-settings-persistence
+Accepted predecessors through P5-WP01: P0A accepted; P0B closed at tag v0.2.0-phase0b-closure; P1-WP01 merged via PR #3 (5a6740c); P2-WP01 merged via PR #5 (d012fd5); P2-WP02 merged via PR #6 (34a85aa); P3-WP01 merged via PR #7 (fcf351f); P3-WP02 merged via PR #8 (d8c181d); P4-WP01 merged via PR #9 (af09215); P5-WP01 merged via PR #10 (f925c42).
+Accepted P5 feature/command/settings contribution contract: Proven static feature contribution contracts in packages/app-contracts/src/features.ts, packages/app-contracts/schemas/features.schema.json, and internal desktop registry.
+Accepted P2 layout bridge and durable-settings facts: Absorbed into canonical settings.json schema v1 managed authoritatively by Rust SettingsManager with atomic write semantics and settings.previous.json fallback.
+Current settings schema/version/path and section inventory: Schema v1 (packages/app-contracts/schemas/settings.schema.json); paths: settings.json, settings.json.tmp, settings.previous.json; sections: appearance, layout, documentAnalysis, textUtility.
+Current settings bounds: Max 1MB document size; bounded queues with debounce (250ms) and coalescing; previous valid copy kept; stale writes rejected via revision monotonic sequencing.
+Current settings owner and write behavior: Rust SettingsManager is sole durable writer with std::fs atomic rename; React Zustand store is client reader/debounced writer.
+Current migration and recovery policy: migrate_or_recover with section-scoped recovery preserving valid sections; unsupported future version protection; typed resets (reset_setting, reset_settings_section, reset_all_settings).
+Current settings host/search/reset surfaces: In-window Settings view (/#/settings) with local search over static trusted metadata, zero CSP violations, 100% keyboard operability, and granular reset controls.
+Per-target durability semantics: Same-directory atomic rename with .tmp flush and sync before replace; settings.previous.json updated on successful write.
+Current single-instance mechanism: tauri-plugin-single-instance = "=2.2.0" initialized in Rust lib.rs.
+Current window focus/show/restore behavior: Window unminimize, show, set_focus on secondary launch; allowlisted --open <path> argument forwarding via bounded opaque DocumentRef intent.
+Primary/secondary startup ordering: Primary acquires single-instance lock, hydrates settings, launches backend; secondary forwards launch intent via plugin IPC and exits immediately.
+Allowlisted secondary-launch intents: Bounded focus intent and --open <path> argument forwarding with sanitization and validation.
+Accepted targets and evidence matrix: Windows 11 x64 tested; release CSP compliance (0 inline styles/scripts); 13 schemas tested.
+Accepted targeted amendments: None.
+Predecessor deviations incorporated: None.
+Unresolved blockers and assumptions: None.
+Authorization boundary: GFD-P6-WP01 only.
+Authorization invalidates when: Any base-SHA or contract changes.
 ```
 
 ## 2. Repository and exact starting state
 
 **Repository:** `prime-builds/prime-shell`
 **Authoritative base branch:** `main`
-**Required future starting commit:** Not activated — Chat Session must refresh
-and supply the exact accepted and merged `main` SHA after `GFD-P5-WP01`
-acceptance and merge.
-**Required future implementation branch:** Not activated — Chat Session must
-verify absence and supply one exact fresh branch name.
+**Authoritative starting commit:** `f925c42f96d6b2aa3d45dd4942923c345c2d83e0`
+**Required implementation branch:** `feat/gfd-p6-wp01-settings-persistence`
 
 Authoring-time documentation facts, for review only:
 

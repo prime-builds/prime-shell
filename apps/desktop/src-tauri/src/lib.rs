@@ -1,5 +1,7 @@
 pub mod backend;
+pub mod instance;
 pub mod layout;
+pub mod settings;
 pub mod theme;
 
 use std::{
@@ -359,6 +361,58 @@ fn revoke_document_ref(
     references.revoke(&id)
 }
 
+#[tauri::command]
+fn get_settings(
+    settings: State<'_, settings::SettingsManager>,
+) -> AppResult<settings::SettingsDocument> {
+    Ok(settings.get_document())
+}
+
+#[tauri::command]
+fn save_settings(
+    expected_revision: u64,
+    document: settings::SettingsDocument,
+    settings: State<'_, settings::SettingsManager>,
+) -> AppResult<settings::SettingsDocument> {
+    let trace_id = format!("save-settings-{}", std::process::id());
+    settings
+        .save_document(expected_revision, document)
+        .map_err(|e| AppError::validation(&e, &trace_id))
+}
+
+#[tauri::command]
+fn reset_setting(
+    section: String,
+    key: String,
+    settings: State<'_, settings::SettingsManager>,
+) -> AppResult<settings::SettingsDocument> {
+    let trace_id = format!("reset-setting-{}", std::process::id());
+    settings
+        .reset_setting(&section, &key)
+        .map_err(|e| AppError::validation(&e, &trace_id))
+}
+
+#[tauri::command]
+fn reset_settings_section(
+    section: String,
+    settings: State<'_, settings::SettingsManager>,
+) -> AppResult<settings::SettingsDocument> {
+    let trace_id = format!("reset-section-{}", std::process::id());
+    settings
+        .reset_section(&section)
+        .map_err(|e| AppError::validation(&e, &trace_id))
+}
+
+#[tauri::command]
+fn reset_all_settings(
+    settings: State<'_, settings::SettingsManager>,
+) -> AppResult<settings::SettingsDocument> {
+    let trace_id = format!("reset-all-settings-{}", std::process::id());
+    settings
+        .reset_all()
+        .map_err(|e| AppError::validation(&e, &trace_id))
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     #[allow(unused_mut)]
@@ -368,6 +422,8 @@ pub fn run() {
     {
         builder = builder.plugin(tauri_plugin_wdio_webdriver::init());
     }
+
+    builder = builder.plugin(instance::init_plugin());
 
     builder
         .setup(|app| {
@@ -389,6 +445,11 @@ pub fn run() {
                 client: Mutex::new(client),
             });
             app.manage(ReferenceRegistry::new());
+
+            let settings_manager = settings::SettingsManager::new(app.handle())
+                .map_err(|e| Box::new(std::io::Error::new(std::io::ErrorKind::Other, e)) as Box<dyn std::error::Error>)?;
+            app.manage(settings_manager);
+
             theme::apply_initial_window_theme(app.handle());
             Ok(())
         })
@@ -414,7 +475,12 @@ pub fn run() {
             theme::sync_native_window_theme,
             layout::get_shell_layout_preferences,
             layout::save_shell_layout_preferences,
-            layout::reset_shell_layout_preferences
+            layout::reset_shell_layout_preferences,
+            get_settings,
+            save_settings,
+            reset_setting,
+            reset_settings_section,
+            reset_all_settings
         ])
         .run(tauri::generate_context!())
         .expect("error while running Prime Shell Lifecycle Spike");

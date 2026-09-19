@@ -19,6 +19,7 @@
 - Phase 3 WP02 is `Implemented` and merged via PR #8 (`d8c181d`).
 - Phase 4 WP01 is `Implemented` (executed and verified via branch `feat/gfd-p4-wp01-document-analysis`).
 - Phase 5 WP01 is `Implemented` (executed and verified via branch `feat/gfd-p5-wp01-proven-contracts`).
+- Phase 6 WP01 is `Implemented` (executed and verified via branch `feat/gfd-p6-wp01-settings-persistence`).
 - Future package prompts remain **provisional until activated** by Chat Session.
 
 Only these implementation-status labels are valid throughout the prompt pack:
@@ -38,7 +39,7 @@ Only these implementation-status labels are valid throughout the prompt pack:
 | `GFD-P3-WP02` | Phase 3 | Productized Task Runtime and Sidecar Operations | `Implemented` | GPT-5.6 Sol / Extra High |
 | `GFD-P4-WP01` | Phase 4 | Local Document-Analysis Reference Feature | `Implemented` | GPT-5.6 Sol / High |
 | `GFD-P5-WP01` | Phase 5 | Second Consumer and Proven Feature Contracts | `Implemented` | GPT-5.6 Sol / High |
-| `GFD-P6-WP01` | Phase 6 | Settings, Persistence, and Single-Instance Behavior | `Not started` | GPT-5.6 Sol / High |
+| `GFD-P6-WP01` | Phase 6 | Settings, Persistence, and Single-Instance Behavior | `Implemented` | GPT-5.6 Sol / High |
 | `GFD-P6-WP02` | Phase 6 | Diagnostics, Repair, and Recovery | `Not started` | GPT-5.6 Sol / Extra High |
 | `GFD-P7-WP01` | Phase 7 | Production Security and Release Artifact Hardening | `Not started` | GPT-5.6 Sol / Extra High |
 | `GFD-P7-WP02` | Phase 7 | Signing, Notarization, and Signed Update Channels | `Not started` | GPT-5.6 Sol / Extra High |

@@ -56,5 +56,13 @@ identifier = "allow-document-analysis"
 description = "Allows the main window to invoke document analysis tasks."
 commands.allow = ["start_document_analysis_task"]
 
-
-
+[[permission]]
+identifier = "allow-settings"
+description = "Allows the main window to query, persist, and reset canonical application settings."
+commands.allow = [
+  "get_settings",
+  "save_settings",
+  "reset_setting",
+  "reset_settings_section",
+  "reset_all_settings"
+]
