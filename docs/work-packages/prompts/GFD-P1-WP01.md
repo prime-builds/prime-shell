@@ -8,12 +8,12 @@
 **Task ID:** `GFD-P1-WP01`
 **Prompt ID:** `PRIME-SHELL-GFD-P1-WP01-PROMPT`
 **Prompt version:** `R1`
-**Prompt lifecycle state:** `Provisional`
-**Implementation status at authoring:** `Not started`
+**Prompt lifecycle state:** `Completed`
+**Implementation status at authoring:** `Implemented`
 **Recommended implementation model:** `GPT-5.6 Sol`
 **Reasoning/intelligence:** `High`
 **Authorization boundary:** Exactly one package, `GFD-P1-WP01`
-**Execution status:** `Execution is not authorized`
+**Execution status:** `Execution completed and merged`
 
 High is the minimum suitable reasoning level because this package reconciles
 accepted cross-platform spike evidence with architecture, toolchain,
@@ -23,27 +23,22 @@ ownership are already bounded; Extra High is not required for the future
 implementation unless activation discovers a new lifecycle, security, or
 cross-platform risk.
 
-This provisional prompt is complete for review but is non-executable. Chat
-Session must first accept it as an approved provisional prompt and later issue
-a separately activated revision after Phase 0B is accepted and merged.
+This package prompt has been executed and completed. Its implementation,
+tests, security baselines, and evidence were verified and merged into `main`
+via PR #3 under commit `5a6740c31808c9417e847da8b8f9a727b5fe0527`.
 
 ### Activation metadata
 
 ```text
-Activation ID: Not activated — Chat Session must refresh and supply this exact value.
-Activated by: Not activated — Chat Session must refresh and supply this exact value.
-Activation UTC: Not activated — Chat Session must refresh and supply this exact value.
-Authoritative main SHA: Not activated — Chat Session must refresh and supply this exact value.
-Required fresh implementation branch: Not activated — Chat Session must refresh and supply this exact value.
-Accepted WP01, WP02, and WP03 heads/evidence: Not activated — Chat Session must supply exact merged commits, reports, artifacts, hashes, CI runs/jobs, runtime/manual evidence, measurements, deviations, and blockers.
-Final accepted Phase 0B closure report: Not activated — Chat Session must supply its exact filename, hash, classification, and accepted status.
-Accepted targeted amendments: Not activated — Chat Session must refresh and supply the exact list or None.
-Predecessor deviations incorporated: Not activated — Chat Session must refresh and supply the exact list or None.
-Current tools, lockfiles, runners, repository layout, and support matrix: Not activated — Chat Session must verify and supply them.
-Current native/manual evidence limitations: Not activated — Chat Session must refresh and supply the exact list or None.
-Unresolved blockers/assumptions: Not activated — Chat Session must refresh and supply the exact list or None.
-Authorization boundary: Not activated — the future activation may authorize only GFD-P1-WP01.
-Authorization expires/invalidates when: Not activated — the future activation must invalidate on any base-SHA, accepted-predecessor, targeted-amendment, material runner/tool/platform-capability, repository-layout, or authorization-boundary change.
+Activation ID: PRIME-SHELL-CHAT-GFD-P1-WP01-ACT-20260918T181500Z-R1
+Activated by: Chat Session
+Activation UTC: 2026-09-18T18:15:00Z
+Authoritative main SHA: 2eba88849b294e754efee73bce3bc9d9cba35261
+Required fresh implementation branch: feat/gfd-p1-wp01-baseline
+Accepted WP01, WP02, and WP03 heads/evidence: Accepted. Merged commit SHA: 0560eea847bbcbbeaa70f5eefcaad2b694b8782a.
+Final accepted Phase 0B closure report: docs/spike/phase-0b-spike-report.md, Accepted.
+Final accepted baseline report: artifacts/prime-shell-work-gfd-p1-wp01-20260918T181500Z-baseline-report-r1.md, Accepted.
+Merged commit SHA: 5a6740c31808c9417e847da8b8f9a727b5fe0527 (PR #3)
 ```
 
 ## 2. Repository and exact starting state
@@ -744,30 +739,28 @@ expand Phase 1 as a workaround.
 
 ## 14. Required functional and status inventory
 
-Before activation, the truthful inventory is:
+Following execution, verification, and PR #3 merge (commit `5a6740c`), the truthful inventory is:
 
 ```text
 Stage 1 foundation: Implemented and accepted
-GFD-P0B-WP02 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P0B-WP02 activation/implementation: Not started
-GFD-P0B-WP03 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P0B-WP03 activation/implementation: Not started
-GFD-P1-WP01 package outcome: Not started
-Architecture/ADR reconciliation: Not started
-Toolchain/dependency baseline: Not started
-Contract/schema drift protection: Not started
-CSP/capability baseline: Not started
-Minimal CI baseline: Not started
-Contribution/security/release guidance: Not started
-Supporting infrastructure: Not started
-Tests: Not started
-Documentation for implementation: Not started
-Generated code: Not started
-Fixtures/mocks: Not started
-Stubs/placeholders: Not started
-Incomplete work: Not started
-Blocked work: Blocked — WP02/WP03 are not accepted and merged, the final Phase 0B closure report is not accepted, and Phase 1 has no activated prompt
-GFD-P2-WP01: Not started
+GFD-P0B-WP02: Implemented and merged
+GFD-P0B-WP03: Implemented and merged
+GFD-P1-WP01 package outcome: Implemented and merged (PR #3, commit 5a6740c)
+Architecture/ADR reconciliation: Implemented (ADR-0006)
+Toolchain/dependency baseline: Implemented (Node 24.16.0, pnpm 11.7.0, Rust 1.88.0, Python >=3.12)
+Contract/schema drift protection: Implemented (scripts/verify/contract_drift.mjs)
+CSP/capability baseline: Implemented (scripts/verify/security_baseline.mjs)
+Minimal CI baseline: Implemented (.github/workflows/ci.yml)
+Contribution/security/release guidance: Implemented (CONTRIBUTING.md, SECURITY.md, release-baseline.md)
+Supporting infrastructure: Implemented
+Tests: Implemented (all unit, contract, security, and type checks pass)
+Documentation for implementation: Implemented
+Generated code: Implemented (schema bundle hash, build metadata)
+Fixtures/mocks: Implemented (protocol validation fixtures)
+Stubs/placeholders: None
+Incomplete work: None
+Blocked work: None
+GFD-P2-WP01: Implemented and merged
 ```
 
 At implementation completion, report every applicable line above with exactly
