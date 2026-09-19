@@ -1,0 +1,6 @@
+{
+  "id": "doc-leak",
+  "displayName": "secret.txt",
+  "size": 512,
+  "path": "/etc/passwd"
+}

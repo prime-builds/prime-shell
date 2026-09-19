@@ -1,0 +1,10 @@
+{
+  "protocol": "generic-app",
+  "kind": "error",
+  "requestId": "request-1",
+  "traceId": "trace-100-1",
+  "error": {
+    "code": "AUTHORIZATION_ERROR",
+    "message": "The requested operation is not authorized."
+  }
+}

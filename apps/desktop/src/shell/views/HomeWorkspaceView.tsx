@@ -32,15 +32,20 @@ import {
   getBackendStatus,
   getRuntimeProbeConfig,
   listenToTaskEvents,
+  openDocumentIntent,
+  readDocumentContent,
   resetBackend,
+  revokeDocumentRef,
+  saveDocumentIntent,
   startCountTask,
   toSafeError,
   triggerCrash,
   triggerHang,
   triggerLargeRejected,
+  writeDocumentContent,
   writeRuntimeEvidence,
 } from "../../backend";
-import type { BackendStatus, TaskEvent, TaskState } from "../../contracts";
+import type { BackendStatus, DocumentRef, TaskEvent, TaskState } from "../../contracts";
 import { useThemeController } from "../../theme/ThemeContext";
 import { useShellStore } from "../state/useShellStore";
 
@@ -101,6 +106,13 @@ export const HomeWorkspaceView: React.FC = () => {
   // Fault Operations (Phase 0B)
   const [faultAction, setFaultAction] = useState("");
   const [faultError, setFaultError] = useState("");
+
+  // Native Document Intent & Opaque Reference Boundary (Phase 3 WP01)
+  const [documentRef, setDocumentRef] = useState<DocumentRef | null>(null);
+  const [documentContent, setDocumentContent] = useState("");
+  const [documentError, setDocumentError] = useState("");
+  const [pickerStatus, setPickerStatus] = useState<"idle" | "picking" | "selected" | "cancelled">("idle");
+  const [documentBusy, setDocumentBusy] = useState(false);
 
   // Probe & CSP
   const runtimeProbeStarted = useRef(false);
@@ -302,6 +314,80 @@ export const HomeWorkspaceView: React.FC = () => {
     }
     setSeedError("");
     setAccentMode({ mode: "custom", seedColor: customSeedInput });
+  }
+
+  async function handleOpenDocument() {
+    setDocumentError("");
+    setPickerStatus("picking");
+    try {
+      const doc = await openDocumentIntent();
+      if (doc) {
+        setDocumentRef(doc);
+        setPickerStatus("selected");
+        setDocumentContent("");
+      } else {
+        setPickerStatus("cancelled");
+      }
+    } catch (err) {
+      setDocumentError(toSafeError(err).message);
+      setPickerStatus("idle");
+    }
+  }
+
+  async function handleSaveDocument() {
+    setDocumentError("");
+    setPickerStatus("picking");
+    try {
+      const doc = await saveDocumentIntent("untitled.txt");
+      if (doc) {
+        setDocumentRef(doc);
+        setPickerStatus("selected");
+      } else {
+        setPickerStatus("cancelled");
+      }
+    } catch (err) {
+      setDocumentError(toSafeError(err).message);
+      setPickerStatus("idle");
+    }
+  }
+
+  async function handleReadContent() {
+    if (!documentRef) return;
+    setDocumentBusy(true);
+    setDocumentError("");
+    try {
+      const text = await readDocumentContent(documentRef.id);
+      setDocumentContent(text);
+    } catch (err) {
+      setDocumentError(toSafeError(err).message);
+    } finally {
+      setDocumentBusy(false);
+    }
+  }
+
+  async function handleWriteContent() {
+    if (!documentRef) return;
+    setDocumentBusy(true);
+    setDocumentError("");
+    try {
+      await writeDocumentContent(documentRef.id, documentContent);
+      setDocumentError("");
+    } catch (err) {
+      setDocumentError(toSafeError(err).message);
+    } finally {
+      setDocumentBusy(false);
+    }
+  }
+
+  async function handleRevokeReference() {
+    if (!documentRef) return;
+    try {
+      await revokeDocumentRef(documentRef.id);
+    } finally {
+      setDocumentRef(null);
+      setDocumentContent("");
+      setPickerStatus("idle");
+    }
   }
 
   // Runtime probe runner
@@ -934,6 +1020,116 @@ export const HomeWorkspaceView: React.FC = () => {
         {statusError && (
           <div className="error" role="alert">
             Status error: {statusError}
+          </div>
+        )}
+      </Card>
+
+      {/* 5. Native Document Intent & Opaque Reference Boundary (Phase 3 WP01) Card */}
+      <Card className="card" role="region" aria-label="Native Document Intent and Reference Boundary">
+        <Title2 as="h2">Native Document Intent &amp; Opaque Reference Boundary</Title2>
+        <Text className="subtitle">
+          Rust-owned native file intent, path secrecy, and bounded opaque DocumentRef mediation.
+        </Text>
+
+        <div className="task-actions">
+          <Button
+            appearance="primary"
+            onClick={() => void handleOpenDocument()}
+            data-testid="open-document-btn"
+            disabled={documentBusy}
+          >
+            Open Document...
+          </Button>
+          <Button
+            appearance="secondary"
+            onClick={() => void handleSaveDocument()}
+            data-testid="save-document-btn"
+            disabled={documentBusy}
+          >
+            Save Document...
+          </Button>
+          {documentRef && (
+            <Button
+              appearance="subtle"
+              onClick={() => void handleRevokeReference()}
+              data-testid="revoke-document-btn"
+              disabled={documentBusy}
+            >
+              Revoke Reference
+            </Button>
+          )}
+        </div>
+
+        {pickerStatus === "picking" && (
+          <div className="task-message" role="status">
+            <Spinner size="tiny" label="Waiting for native file picker..." />
+          </div>
+        )}
+
+        {pickerStatus === "cancelled" && (
+          <div className="task-message" role="status" data-testid="picker-cancelled-msg">
+            <Text size={200}>File selection cancelled by user.</Text>
+          </div>
+        )}
+
+        {documentRef && (
+          <div className="result" aria-live="polite" data-testid="document-ref-details">
+            <div className="document-details">
+              <div>
+                <Text weight="semibold">Display Name: </Text>
+                <span data-testid="document-display-name">{documentRef.displayName}</span>
+              </div>
+              <div>
+                <Text weight="semibold">Opaque Reference ID: </Text>
+                <code data-testid="document-id">{documentRef.id}</code>
+              </div>
+              <div>
+                <Text weight="semibold">Size: </Text>
+                <span data-testid="document-size">{documentRef.size} bytes</span>
+              </div>
+              {documentRef.mediaType && (
+                <div>
+                  <Text weight="semibold">Media Type: </Text>
+                  <span data-testid="document-media-type">{documentRef.mediaType}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="task-actions">
+              <Button
+                appearance="secondary"
+                onClick={() => void handleReadContent()}
+                data-testid="read-content-btn"
+                disabled={documentBusy}
+              >
+                Read Content
+              </Button>
+              <Button
+                appearance="secondary"
+                onClick={() => void handleWriteContent()}
+                data-testid="write-content-btn"
+                disabled={documentBusy}
+              >
+                Save Content
+              </Button>
+            </div>
+
+            <Field label="Document Content (Bounded Text Viewer/Editor)">
+              <textarea
+                value={documentContent}
+                onChange={(e) => setDocumentContent(e.target.value)}
+                rows={4}
+                className="document-textarea"
+                data-testid="document-content-textarea"
+                aria-label="Document content text editor"
+              />
+            </Field>
+          </div>
+        )}
+
+        {documentError && (
+          <div className="error" role="alert" data-testid="document-error">
+            Error: {documentError}
           </div>
         )}
       </Card>

@@ -25,7 +25,12 @@
             "BACKEND_UNAVAILABLE",
             "TASK_CANCELLED",
             "TASK_TIMED_OUT",
-            "TASK_INTERRUPTED"
+            "TASK_INTERRUPTED",
+            "AUTHORIZATION_ERROR",
+            "VERSION_MISMATCH",
+            "REFERENCE_NOT_FOUND",
+            "PICKER_CANCELLED",
+            "IO_ERROR"
           ]
         },
         "message": { "type": "string", "minLength": 1, "maxLength": 256 }
@@ -33,4 +38,3 @@
     }
   }
 }
-

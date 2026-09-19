@@ -54,6 +54,32 @@ body {
   }
 }
 
+@media (forced-colors: active) {
+  .theme-toggle-btn {
+    border: 1px solid ButtonText;
+  }
+}
+
+.document-details {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 6px;
+}
+
+.document-textarea {
+  width: 100%;
+  font-family: monospace;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid var(--colorNeutralStroke1, #D1D1D1);
+  background-color: var(--colorNeutralBackground1, #FFFFFF);
+  color: var(--colorNeutralForeground1, #242424);
+  resize: vertical;
+}
+
 .status {
   text-align: right;
 }

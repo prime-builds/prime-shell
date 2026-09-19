@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://prime-shell.local/schemas/references.schema.json",
+  "title": "Prime Shell Opaque Resource References",
+  "$defs": {
+    "documentRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "displayName", "size"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "size": { "type": "integer", "minimum": 0, "maximum": 10485760 },
+        "mediaType": { "type": "string", "maxLength": 64 }
+      }
+    },
+    "artifactRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "displayName", "size", "kind"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "size": { "type": "integer", "minimum": 0, "maximum": 10485760 },
+        "kind": { "type": "string", "maxLength": 64 }
+      }
+    }
+  }
+}

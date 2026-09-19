@@ -2,6 +2,7 @@ import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
+import { router } from "./shell/routes";
 
 const { invoke, listen } = vi.hoisted(() => ({
   invoke: vi.fn(),
@@ -11,7 +12,9 @@ const { invoke, listen } = vi.hoisted(() => ({
 vi.mock("@tauri-apps/api/core", () => ({ invoke }));
 vi.mock("@tauri-apps/api/event", () => ({ listen }));
 
-beforeEach(() => {
+beforeEach(async () => {
+  window.location.hash = "#/";
+  await router.navigate("/");
   invoke.mockReset();
   listen.mockReset();
   listen.mockResolvedValue(() => {});
@@ -467,5 +470,125 @@ describe("Phase 2 — Responsive Application Shell (GFD-P2-WP02)", () => {
     });
     expect(await screen.findByText("Layout preferences reset to default values.")).toBeInTheDocument();
   });
+
+  describe("Native Document Intent & Opaque Reference Boundary (Phase 3 WP01)", () => {
+    it("handles document selection, content reading, writing, and revocation", async () => {
+      invoke.mockImplementation((command: string, args?: Record<string, unknown>) => {
+        if (command === "runtime_probe_config") {
+          return Promise.resolve({ enabled: false, evidencePath: null });
+        }
+        if (command === "open_document_intent") {
+          return Promise.resolve({
+            id: "doc-12345678",
+            displayName: "report.txt",
+            size: 1024,
+            mediaType: "text/plain",
+          });
+        }
+        if (command === "read_document_content") {
+          expect(args).toEqual({ id: "doc-12345678" });
+          return Promise.resolve("Sample document content from Rust authority");
+        }
+        if (command === "write_document_content") {
+          expect(args).toEqual({
+            id: "doc-12345678",
+            content: "Updated document content",
+          });
+          return Promise.resolve();
+        }
+        if (command === "revoke_document_ref") {
+          expect(args).toEqual({ id: "doc-12345678" });
+          return Promise.resolve(true);
+        }
+        return Promise.resolve();
+      });
+
+      render(<App />);
+
+      const openBtn = await screen.findByTestId("open-document-btn");
+      await userEvent.click(openBtn);
+
+      // Verify DocumentRef details displayed
+      expect(await screen.findByTestId("document-display-name")).toHaveTextContent("report.txt");
+      expect(screen.getByTestId("document-id")).toHaveTextContent("doc-12345678");
+      expect(screen.getByTestId("document-size")).toHaveTextContent("1024 bytes");
+      expect(screen.getByTestId("document-media-type")).toHaveTextContent("text/plain");
+
+      // Read Content
+      const readBtn = screen.getByTestId("read-content-btn");
+      await userEvent.click(readBtn);
+
+      const textarea = await screen.findByTestId("document-content-textarea");
+      expect(textarea).toHaveValue("Sample document content from Rust authority");
+
+      // Edit Content and Save
+      await userEvent.clear(textarea);
+      await userEvent.type(textarea, "Updated document content");
+      const saveBtn = screen.getByTestId("write-content-btn");
+      await userEvent.click(saveBtn);
+
+      await waitFor(() => {
+        expect(invoke).toHaveBeenCalledWith("write_document_content", {
+          id: "doc-12345678",
+          content: "Updated document content",
+        });
+      });
+
+      // Revoke Reference
+      const revokeBtn = screen.getByTestId("revoke-document-btn");
+      await userEvent.click(revokeBtn);
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("document-ref-details")).not.toBeInTheDocument();
+      });
+    });
+
+    it("handles file picker cancellation cleanly", async () => {
+      invoke.mockImplementation((command: string) => {
+        if (command === "runtime_probe_config") {
+          return Promise.resolve({ enabled: false, evidencePath: null });
+        }
+        if (command === "open_document_intent") {
+          return Promise.resolve(null);
+        }
+        return Promise.resolve();
+      });
+
+      render(<App />);
+
+      const openBtn = await screen.findByTestId("open-document-btn");
+      await userEvent.click(openBtn);
+
+      expect(await screen.findByTestId("picker-cancelled-msg")).toHaveTextContent("File selection cancelled by user.");
+      expect(screen.queryByTestId("document-ref-details")).not.toBeInTheDocument();
+    });
+
+    it("handles native intent error safely without path leakage", async () => {
+      invoke.mockImplementation((command: string) => {
+        if (command === "runtime_probe_config") {
+          return Promise.resolve({ enabled: false, evidencePath: null });
+        }
+        if (command === "open_document_intent") {
+          return Promise.reject({
+            code: "AUTHORIZATION_ERROR",
+            message: "The requested document is not accessible.",
+            traceId: "trace-auth-err",
+          });
+        }
+        return Promise.resolve();
+      });
+
+      render(<App />);
+
+      const openBtn = await screen.findByTestId("open-document-btn");
+      await userEvent.click(openBtn);
+
+      expect(await screen.findByTestId("document-error")).toHaveTextContent(
+        "Error: The requested document is not accessible.",
+      );
+      expect(screen.queryByTestId("document-ref-details")).not.toBeInTheDocument();
+    });
+  });
 });
+
 

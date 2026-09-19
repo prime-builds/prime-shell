@@ -11,8 +11,10 @@ use std::{
 };
 
 use backend::{
+    pick_document_dialog, save_document_dialog,
     protocol::{AckEnvelope, BackendLifecycleState},
-    AppError, AppResult, BackendClient, BackendStatus, EchoResponse, LaunchSpec,
+    AppError, AppResult, BackendClient, BackendStatus, DocumentRef, EchoResponse, LaunchSpec,
+    ReferenceRegistry,
 };
 use serde::Serialize;
 use tauri::{AppHandle, Emitter, Manager, State};
@@ -225,6 +227,65 @@ fn write_runtime_evidence(evidence: serde_json::Value, app: AppHandle) -> AppRes
     Ok(())
 }
 
+#[tauri::command]
+fn open_document_intent(
+    references: State<'_, ReferenceRegistry>,
+) -> AppResult<Option<DocumentRef>> {
+    let trace_id = format!("open-intent-{}", std::process::id());
+    let path = pick_document_dialog();
+    match path {
+        Some(path) => {
+            let doc_ref = references.register_document(&path, &trace_id)?;
+            Ok(Some(doc_ref))
+        }
+        None => Ok(None),
+    }
+}
+
+#[tauri::command]
+fn save_document_intent(
+    default_name: Option<String>,
+    references: State<'_, ReferenceRegistry>,
+) -> AppResult<Option<DocumentRef>> {
+    let trace_id = format!("save-intent-{}", std::process::id());
+    let name = default_name.unwrap_or_else(|| "untitled.txt".to_owned());
+    let path = save_document_dialog(&name);
+    match path {
+        Some(path) => {
+            let doc_ref = references.register_save_target(&path, Some("text/plain".to_owned()), &trace_id)?;
+            Ok(Some(doc_ref))
+        }
+        None => Ok(None),
+    }
+}
+
+#[tauri::command]
+fn read_document_content(
+    id: String,
+    references: State<'_, ReferenceRegistry>,
+) -> AppResult<String> {
+    let trace_id = format!("read-doc-{}", std::process::id());
+    references.read_content(&id, &trace_id)
+}
+
+#[tauri::command]
+fn write_document_content(
+    id: String,
+    content: String,
+    references: State<'_, ReferenceRegistry>,
+) -> AppResult<()> {
+    let trace_id = format!("write-doc-{}", std::process::id());
+    references.write_content(&id, &content, &trace_id)
+}
+
+#[tauri::command]
+fn revoke_document_ref(
+    id: String,
+    references: State<'_, ReferenceRegistry>,
+) -> bool {
+    references.revoke(&id)
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     #[allow(unused_mut)]
@@ -254,6 +315,7 @@ pub fn run() {
             app.manage(BackendState {
                 client: Mutex::new(client),
             });
+            app.manage(ReferenceRegistry::new());
             theme::apply_initial_window_theme(app.handle());
             Ok(())
         })
@@ -268,6 +330,11 @@ pub fn run() {
             reset_backend,
             runtime_probe_config,
             write_runtime_evidence,
+            open_document_intent,
+            save_document_intent,
+            read_document_content,
+            write_document_content,
+            revoke_document_ref,
             theme::get_theme_state,
             theme::sync_native_window_theme,
             layout::get_shell_layout_preferences,

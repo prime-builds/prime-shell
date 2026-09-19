@@ -108,4 +108,36 @@ impl AppError {
             trace_id: trace_id.into(),
         }
     }
+
+    pub fn authorization(message: impl Into<String>, trace_id: impl Into<String>) -> Self {
+        Self {
+            code: "AUTHORIZATION_ERROR",
+            message: message.into(),
+            trace_id: trace_id.into(),
+        }
+    }
+
+    pub fn version_mismatch(message: impl Into<String>, trace_id: impl Into<String>) -> Self {
+        Self {
+            code: "VERSION_MISMATCH",
+            message: message.into(),
+            trace_id: trace_id.into(),
+        }
+    }
+
+    pub fn reference_not_found(message: impl Into<String>, trace_id: impl Into<String>) -> Self {
+        Self {
+            code: "REFERENCE_NOT_FOUND",
+            message: message.into(),
+            trace_id: trace_id.into(),
+        }
+    }
+
+    pub fn picker_cancelled(trace_id: impl Into<String>) -> Self {
+        Self {
+            code: "PICKER_CANCELLED",
+            message: "The file selection was cancelled.".to_owned(),
+            trace_id: trace_id.into(),
+        }
+    }
 }

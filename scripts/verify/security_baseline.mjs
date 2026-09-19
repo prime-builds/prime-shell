@@ -48,6 +48,7 @@ const allowedPermissions = new Set([
   "allow-runtime-probe",
   "allow-theme-state",
   "allow-layout-preferences",
+  "allow-native-intent",
 ]);
 
 for (const perm of capability.permissions || []) {

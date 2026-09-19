@@ -1,0 +1,10 @@
+{
+  "protocol": "generic-app",
+  "kind": "error",
+  "requestId": "request-1",
+  "traceId": "trace-100-1",
+  "error": {
+    "code": "UNRECOGNIZED_CODE",
+    "message": "Invalid code."
+  }
+}
