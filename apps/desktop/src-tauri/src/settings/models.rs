@@ -120,13 +120,17 @@ impl ShellLayoutPreferencesV1 {
         if !self.sidebar_width.is_finite() {
             self.sidebar_width = DEFAULT_SIDEBAR_WIDTH;
         } else {
-            self.sidebar_width = self.sidebar_width.clamp(MIN_SIDEBAR_WIDTH, MAX_SIDEBAR_WIDTH);
+            self.sidebar_width = self
+                .sidebar_width
+                .clamp(MIN_SIDEBAR_WIDTH, MAX_SIDEBAR_WIDTH);
         }
 
         if !self.inspector_width.is_finite() {
             self.inspector_width = DEFAULT_INSPECTOR_WIDTH;
         } else {
-            self.inspector_width = self.inspector_width.clamp(MIN_INSPECTOR_WIDTH, MAX_INSPECTOR_WIDTH);
+            self.inspector_width = self
+                .inspector_width
+                .clamp(MIN_INSPECTOR_WIDTH, MAX_INSPECTOR_WIDTH);
         }
 
         if !self.bottom_panel_height_ratio.is_finite() {

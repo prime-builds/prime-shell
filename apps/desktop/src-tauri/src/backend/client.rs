@@ -162,7 +162,7 @@ impl BackendProcess {
                     line.to_vec()
                 };
                 if let Ok(text) = std::str::from_utf8(&truncated) {
-                    eprintln!("[sidecar:stderr] {}", text);
+                    eprintln!("[sidecar:stderr] {text}");
                 }
                 buffer.clear();
             }
@@ -603,7 +603,8 @@ impl BackendClient {
                 *self.state.write().unwrap() = BackendLifecycleState::Ready;
                 *self.active_task.write().unwrap() = None;
                 *self.cancelling_task.write().unwrap() = None;
-                self.task_store.complete_task(task_id, TaskState::Succeeded, None);
+                self.task_store
+                    .complete_task(task_id, TaskState::Succeeded, None);
                 let completed = incoming
                     .payload
                     .and_then(|p| p.get("completed").and_then(|v| v.as_u64()))
@@ -628,7 +629,8 @@ impl BackendClient {
                 } else {
                     TaskState::Failed
                 };
-                self.task_store.complete_task(task_id, final_status, Some(msg.clone()));
+                self.task_store
+                    .complete_task(task_id, final_status, Some(msg.clone()));
                 if code == "TASK_CANCELLED" {
                     return Err(AppError::cancelled(trace_id));
                 }
@@ -641,6 +643,7 @@ impl BackendClient {
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub fn analyze_document<F>(
         &self,
         text: &str,
@@ -874,11 +877,14 @@ impl BackendClient {
                 *self.state.write().unwrap() = BackendLifecycleState::Ready;
                 *self.active_task.write().unwrap() = None;
                 *self.cancelling_task.write().unwrap() = None;
-                self.task_store.complete_task(task_id, TaskState::Succeeded, None);
+                self.task_store
+                    .complete_task(task_id, TaskState::Succeeded, None);
                 let result_payload: DocAnalyzeResultPayload = incoming
                     .payload
                     .and_then(|p| serde_json::from_value(p).ok())
-                    .ok_or_else(|| AppError::protocol("Invalid doc.analyze result payload.", trace_id))?;
+                    .ok_or_else(|| {
+                        AppError::protocol("Invalid doc.analyze result payload.", trace_id)
+                    })?;
                 return Ok(result_payload.metrics);
             } else if incoming.kind == "error" {
                 *self.state.write().unwrap() = BackendLifecycleState::Ready;
@@ -899,7 +905,8 @@ impl BackendClient {
                 } else {
                     TaskState::Failed
                 };
-                self.task_store.complete_task(task_id, final_status, Some(msg.clone()));
+                self.task_store
+                    .complete_task(task_id, final_status, Some(msg.clone()));
                 if code == "TASK_CANCELLED" {
                     return Err(AppError::cancelled(trace_id));
                 }

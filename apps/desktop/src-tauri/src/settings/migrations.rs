@@ -118,7 +118,9 @@ pub fn migrate_or_recover(value: Value) -> Result<MigrationOutcome, String> {
         doc.status = Some(SettingsStatus {
             state: "section_recovered".to_string(),
             recovered_section: Some(section.clone()),
-            message: Some(format!("Recovered invalid section '{section}' to defaults.")),
+            message: Some(format!(
+                "Recovered invalid section '{section}' to defaults."
+            )),
         });
         Ok(MigrationOutcome::SectionRecovered {
             document: doc,

@@ -4,6 +4,12 @@ pub struct Crc32 {
     table: [u32; 256],
 }
 
+impl Default for Crc32 {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Crc32 {
     pub const fn new() -> Self {
         let mut table = [0u32; 256];
@@ -163,7 +169,8 @@ mod tests {
         let mut buffer = Vec::new();
         let mut zip = ZipWriter::new(&mut buffer);
         zip.add_file("test.txt", b"hello world").unwrap();
-        zip.add_file("nested/data.json", b"{\"key\":\"val\"}").unwrap();
+        zip.add_file("nested/data.json", b"{\"key\":\"val\"}")
+            .unwrap();
         zip.finish().unwrap();
 
         // Check ZIP signature

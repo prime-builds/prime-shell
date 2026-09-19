@@ -6,7 +6,7 @@ pub mod settings;
 pub mod theme;
 
 use std::{
-    env, fs,
+    env,
     sync::{
         atomic::{AtomicU64, Ordering},
         Mutex,
@@ -14,10 +14,10 @@ use std::{
 };
 
 use backend::{
-    pick_document_dialog, save_document_dialog,
+    pick_document_dialog,
     protocol::{AckEnvelope, BackendLifecycleState},
-    AppError, AppResult, BackendClient, BackendStatus, DocumentRef, EchoResponse, LaunchSpec,
-    ReferenceRegistry, TaskSnapshot,
+    save_document_dialog, AppError, AppResult, BackendClient, BackendStatus, DocumentRef,
+    EchoResponse, LaunchSpec, ReferenceRegistry, TaskSnapshot,
 };
 use serde::Serialize;
 use tauri::{AppHandle, Emitter, Manager, State};
@@ -208,6 +208,7 @@ fn get_task_snapshot(
     }
 }
 
+#[cfg(any(debug_assertions, feature = "test-fault-injection"))]
 #[tauri::command]
 fn trigger_crash(state: State<'_, BackendState>) -> AppResult<()> {
     let sequence = REQUEST_SEQUENCE.fetch_add(1, Ordering::Relaxed);
@@ -226,6 +227,7 @@ fn trigger_crash(state: State<'_, BackendState>) -> AppResult<()> {
     client.crash(&request_id, &trace_id)
 }
 
+#[cfg(any(debug_assertions, feature = "test-fault-injection"))]
 #[tauri::command]
 fn trigger_hang(state: State<'_, BackendState>) -> AppResult<()> {
     let sequence = REQUEST_SEQUENCE.fetch_add(1, Ordering::Relaxed);
@@ -244,6 +246,7 @@ fn trigger_hang(state: State<'_, BackendState>) -> AppResult<()> {
     client.hang(&request_id, &trace_id)
 }
 
+#[cfg(any(debug_assertions, feature = "test-fault-injection"))]
 #[tauri::command]
 fn trigger_large_rejected(state: State<'_, BackendState>) -> AppResult<()> {
     let sequence = REQUEST_SEQUENCE.fetch_add(1, Ordering::Relaxed);
@@ -286,6 +289,7 @@ fn runtime_probe_config() -> RuntimeProbeConfig {
     }
 }
 
+#[cfg(any(debug_assertions, feature = "test-fault-injection"))]
 #[tauri::command]
 fn write_runtime_evidence(evidence: serde_json::Value, app: AppHandle) -> AppResult<()> {
     let trace = "runtime-evidence";
@@ -298,7 +302,7 @@ fn write_runtime_evidence(evidence: serde_json::Value, app: AppHandle) -> AppRes
     let path = env::var("PRIME_SHELL_RUNTIME_EVIDENCE")
         .map_err(|_| AppError::validation("Runtime evidence path is not configured.", trace))?;
     let bytes = serde_json::to_vec_pretty(&evidence).map_err(|_| AppError::internal(trace))?;
-    fs::write(path, bytes).map_err(|_| AppError::io(trace))?;
+    std::fs::write(path, bytes).map_err(|_| AppError::io(trace))?;
     app.exit(0);
     Ok(())
 }
@@ -328,7 +332,8 @@ fn save_document_intent(
     let path = save_document_dialog(&name);
     match path {
         Some(path) => {
-            let doc_ref = references.register_save_target(&path, Some("text/plain".to_owned()), &trace_id)?;
+            let doc_ref =
+                references.register_save_target(&path, Some("text/plain".to_owned()), &trace_id)?;
             Ok(Some(doc_ref))
         }
         None => Ok(None),
@@ -355,10 +360,7 @@ fn write_document_content(
 }
 
 #[tauri::command]
-fn revoke_document_ref(
-    id: String,
-    references: State<'_, ReferenceRegistry>,
-) -> bool {
+fn revoke_document_ref(id: String, references: State<'_, ReferenceRegistry>) -> bool {
     references.revoke(&id)
 }
 
@@ -448,7 +450,7 @@ pub fn run() {
             app.manage(ReferenceRegistry::new());
 
             let settings_manager = settings::SettingsManager::new(app.handle())
-                .map_err(|e| Box::new(std::io::Error::new(std::io::ErrorKind::Other, e)) as Box<dyn std::error::Error>)?;
+                .map_err(|e| Box::new(std::io::Error::other(e)) as Box<dyn std::error::Error>)?;
             app.manage(settings_manager);
 
             let log_dir = app.path().app_data_dir().ok();
@@ -458,41 +460,80 @@ pub fn run() {
             theme::apply_initial_window_theme(app.handle());
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![
-            backend_status,
-            echo_text,
-            start_count_task,
-            start_document_analysis_task,
-            cancel_task,
-            get_task_snapshot,
-            trigger_crash,
-            trigger_hang,
-            trigger_large_rejected,
-            reset_backend,
-            runtime_probe_config,
-            write_runtime_evidence,
-            open_document_intent,
-            save_document_intent,
-            read_document_content,
-            write_document_content,
-            revoke_document_ref,
-            theme::get_theme_state,
-            theme::sync_native_window_theme,
-            layout::get_shell_layout_preferences,
-            layout::save_shell_layout_preferences,
-            layout::reset_shell_layout_preferences,
-            get_settings,
-            save_settings,
-            reset_setting,
-            reset_settings_section,
-            reset_all_settings,
-            diagnostics::get_diagnostics_summary,
-            diagnostics::get_recent_safe_errors,
-            diagnostics::get_export_preview,
-            diagnostics::export_diagnostics,
-            diagnostics::recover_backend,
-            diagnostics::repair_settings_section
-        ])
+        .invoke_handler({
+            #[cfg(any(debug_assertions, feature = "test-fault-injection"))]
+            {
+                tauri::generate_handler![
+                    backend_status,
+                    echo_text,
+                    start_count_task,
+                    start_document_analysis_task,
+                    cancel_task,
+                    get_task_snapshot,
+                    trigger_crash,
+                    trigger_hang,
+                    trigger_large_rejected,
+                    reset_backend,
+                    runtime_probe_config,
+                    write_runtime_evidence,
+                    open_document_intent,
+                    save_document_intent,
+                    read_document_content,
+                    write_document_content,
+                    revoke_document_ref,
+                    theme::get_theme_state,
+                    theme::sync_native_window_theme,
+                    layout::get_shell_layout_preferences,
+                    layout::save_shell_layout_preferences,
+                    layout::reset_shell_layout_preferences,
+                    get_settings,
+                    save_settings,
+                    reset_setting,
+                    reset_settings_section,
+                    reset_all_settings,
+                    diagnostics::get_diagnostics_summary,
+                    diagnostics::get_recent_safe_errors,
+                    diagnostics::get_export_preview,
+                    diagnostics::export_diagnostics,
+                    diagnostics::recover_backend,
+                    diagnostics::repair_settings_section
+                ]
+            }
+            #[cfg(not(any(debug_assertions, feature = "test-fault-injection")))]
+            {
+                tauri::generate_handler![
+                    backend_status,
+                    echo_text,
+                    start_count_task,
+                    start_document_analysis_task,
+                    cancel_task,
+                    get_task_snapshot,
+                    reset_backend,
+                    runtime_probe_config,
+                    open_document_intent,
+                    save_document_intent,
+                    read_document_content,
+                    write_document_content,
+                    revoke_document_ref,
+                    theme::get_theme_state,
+                    theme::sync_native_window_theme,
+                    layout::get_shell_layout_preferences,
+                    layout::save_shell_layout_preferences,
+                    layout::reset_shell_layout_preferences,
+                    get_settings,
+                    save_settings,
+                    reset_setting,
+                    reset_settings_section,
+                    reset_all_settings,
+                    diagnostics::get_diagnostics_summary,
+                    diagnostics::get_recent_safe_errors,
+                    diagnostics::get_export_preview,
+                    diagnostics::export_diagnostics,
+                    diagnostics::recover_backend,
+                    diagnostics::repair_settings_section
+                ]
+            }
+        })
         .run(tauri::generate_context!())
-        .expect("error while running Prime Shell Lifecycle Spike");
+        .expect("error while running Prime Shell Desktop");
 }

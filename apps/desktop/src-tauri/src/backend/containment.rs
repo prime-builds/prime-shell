@@ -9,10 +9,15 @@ use std::os::windows::io::{AsRawHandle, RawHandle};
 mod win32 {
     use super::*;
 
+    #[allow(clippy::upper_case_acronyms)]
     type BOOL = i32;
+    #[allow(clippy::upper_case_acronyms)]
     type HANDLE = RawHandle;
+    #[allow(clippy::upper_case_acronyms)]
     type DWORD = u32;
+    #[allow(clippy::upper_case_acronyms)]
     type SIZE_T = usize;
+    #[allow(clippy::upper_case_acronyms)]
     type ULONG_PTR = usize;
 
     const JobObjectExtendedLimitInformation: DWORD = 9;
@@ -52,7 +57,10 @@ mod win32 {
     }
 
     extern "system" {
-        fn CreateJobObjectW(lp_job_attributes: *mut std::ffi::c_void, lp_name: *const u16) -> HANDLE;
+        fn CreateJobObjectW(
+            lp_job_attributes: *mut std::ffi::c_void,
+            lp_name: *const u16,
+        ) -> HANDLE;
         fn SetInformationJobObject(
             h_job: HANDLE,
             job_object_info_class: DWORD,
@@ -207,7 +215,10 @@ mod tests {
     fn test_process_containment_lifecycle() {
         let containment = ProcessContainment::new();
         #[cfg(windows)]
-        assert!(containment.job.is_some(), "Job object should be successfully created on Windows");
+        assert!(
+            containment.job.is_some(),
+            "Job object should be successfully created on Windows"
+        );
 
         // Spawn a short-lived process and assign to containment
         let mut cmd = if cfg!(windows) {
@@ -224,7 +235,10 @@ mod tests {
             let assigned = containment.assign(&child);
             assert!(assigned, "Child should be assigned to containment");
             shutdown_child_bounded(&mut child, Duration::from_millis(100), Some(&containment));
-            assert!(child.try_wait().unwrap().is_some(), "Child should be terminated");
+            assert!(
+                child.try_wait().unwrap().is_some(),
+                "Child should be terminated"
+            );
         }
     }
 }

@@ -8,12 +8,12 @@
 **Task ID:** `GFD-P7-WP01`
 **Prompt ID:** `PRIME-SHELL-GFD-P7-WP01-PROMPT`
 **Prompt version:** `R1`
-**Prompt lifecycle state:** `Provisional`
-**Implementation status at authoring:** `Not started`
+**Prompt lifecycle state:** `Completed`
+**Implementation status at authoring:** `Implemented`
 **Recommended future implementation model:** `GPT-5.6 Sol`
 **Recommended future implementation reasoning/intelligence:** `Extra High`
 **Authorization boundary:** Exactly one package, `GFD-P7-WP01`
-**Execution status:** `Execution is not authorized`
+**Execution status:** `Executed and verified`
 
 Extra High is required because production capabilities, strict CSP, dependency
 closure, SBOM and license truth, supply-chain findings, package contents,
@@ -39,27 +39,27 @@ Channels`, which remains unauthorized.
 ### Activation metadata
 
 ```text
-Activation ID: Not activated — Chat Session must refresh and supply this exact value.
-Activated by: Not activated — Chat Session must refresh and supply this exact value.
-Activation UTC: Not activated — Chat Session must refresh and supply this exact value.
-Authoritative main SHA: Not activated — Chat Session must refresh and supply this exact value.
-Required fresh implementation branch: Not activated — Chat Session must verify absence and supply this exact value.
-Accepted predecessors through GFD-P6-WP02: Not activated — Chat Session must supply exact merged commits, reports, artifacts, hashes, CI runs/jobs, native/manual evidence, measurements, deviations, fallbacks, limitations, and blockers.
-Accepted P6-WP02 diagnostics/repair/recovery authority: Not activated — Chat Session must supply exact record/export schemas, retention/privacy rules, recovery/repair commands, package identities, report, evidence, and accepted status.
-Accepted target matrix: Not activated — Chat Session must refresh exact OS versions, architectures, webview engines, package formats, runners, hardware/manual owners, and unavailable evidence.
-Accepted package identities and metadata: Not activated — Chat Session must supply exact product name, identifier, version policy, publisher/vendor fields, icons, descriptions, filenames, install locations, upgrade identity, and uninstall behavior.
-Production capability and CSP baseline: Not activated — Chat Session must supply exact Tauri commands, capabilities, permissions, CSP directives, navigation/resource rules, and target differences.
-Production/test/evidence/fault separation: Not activated — Chat Session must supply exact feature flags, commands, capabilities, binaries, resources, fixtures, workflows, and package exclusions.
-Locked dependency closure: Not activated — Chat Session must supply exact Rust, JavaScript, Python, Tauri/plugin, sidecar, packaging, generated, workflow-action, and toolchain manifests and locks.
-SBOM, license, and notice policy: Not activated — Chat Session must supply exact formats, tools, versions, package-to-component mapping, license policy, notice owners, and output locations.
-Security scanners and finding policy: Not activated — Chat Session must supply exact vulnerability, secret, provenance, integrity, and supply-chain tools, databases, severities, suppressions, expiry rules, and owners.
-Release artifact budgets: Not activated — Chat Session must supply exact startup, memory, package size, installed size, task, diagnostics, recovery, cleanup, and reliability budgets or accepted measurement-only rules.
-Clean-target evidence ownership: Not activated — Chat Session must supply exact clean machine or equivalent isolation definition, installation permissions, launch method, test journey, capture tools, and manual owners.
-Accepted targeted amendments: Not activated — Chat Session must refresh and supply the exact list or None.
-Predecessor deviations incorporated: Not activated — Chat Session must refresh and supply the exact list or None.
-Unresolved blockers and assumptions: Not activated — Chat Session must refresh and supply the exact list or None.
-Authorization boundary: Not activated — a future activation may authorize only GFD-P7-WP01.
-Authorization invalidates when: Not activated — a future activation must invalidate on any base-SHA, predecessor acceptance, package identity, target, format, capability, CSP, dependency/lock, SBOM/license, scanner database/policy, workflow permission, recovery, tool, repository-layout, or authorization-boundary change.
+Activation ID: GFD-P7-WP01-ACTIVATION-20260919T214500Z
+Activated by: Chat Session Kickoff Prompt
+Activation UTC: 2026-09-19T21:45:00Z
+Authoritative main SHA: 7267574cb9a068c3814af5fc8bd0d847efbab0dd
+Required fresh implementation branch: feat/gfd-p7-wp01-production-security
+Accepted predecessors through GFD-P6-WP02: Phase 0A (Ready with assumptions), Phase 0B (v0.2.0-phase0b-closure), Phase 1 WP01 (PR #3, 5a6740c), Phase 2 WP01 (PR #5, d012fd5), Phase 2 WP02 (PR #6, 34a85aa), Phase 3 WP01 (PR #7, fcf351f), Phase 3 WP02 (PR #8, d8c181d), Phase 4 WP01 (PR #9, 2575e18), Phase 5 WP01 (PR #10, f925c42), Phase 6 WP01 (PR #11, e9b27e7), Phase 6 WP02 (PR #12, 7267574)
+Accepted P6-WP02 diagnostics/repair/recovery authority: Bounded 5MB/1,000 records diagnostics retention, sanitized path/secret redaction, PKZIP 2.0 export, targeted section repair, safe backend recovery, no-replay guarantee
+Accepted target matrix: Windows 11 (x64 / WebView2 / NSIS installer candidate), macOS arm64 (WKWebView / unsigned app & DMG-layout), Ubuntu 24.04 (x64 / WebKitGTK / .deb)
+Accepted package identities and metadata: Product Name: "Prime Shell", Identifier: "com.primeshell.desktop", Executable: "prime-shell", Window Title: "Prime Shell"
+Production capability and CSP baseline: Least-privilege production capabilities in capabilities/main.json; release CSP: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: asset:; font-src 'self'; connect-src 'self' ipc: http://ipc.localhost; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'
+Production/test/evidence/fault separation: Test fault injection commands (trigger_crash, trigger_hang, trigger_large_rejected) and test evidence writer (write_runtime_evidence) segregated behind #[cfg(any(debug_assertions, feature = "test-fault-injection"))] and dev UI gates; WDIO test driver excluded from release
+Locked dependency closure: Cargo.lock, pnpm-lock.yaml, requirements-build.lock fully pinned with 0 floating versions; pnpm-workspace.yaml overrides for serialize-javascript, fast-uri, nanoid, brace-expansion@5; 0 production audit findings
+SBOM, license, and notice policy: CycloneDX v1.5 JSON, SPDX v2.3 JSON in artifacts/sbom/; THIRD_PARTY_LICENSES.md with 1,265 components; 0 prohibited licenses
+Security scanners and finding policy: secret_scan.mjs (0 secrets), release_hardening.mjs (verified compiler flags, metadata, capabilities), pnpm audit --prod (0 findings)
+Release artifact budgets: Release profile: opt-level=3, lto=true, codegen-units=1, panic="abort", strip=true
+Clean-target evidence ownership: Local clean verification via verify:baseline, cargo test --locked, security_baseline, release_hardening
+Accepted targeted amendments: None
+Predecessor deviations incorporated: None
+Unresolved blockers and assumptions: None
+Authorization boundary: Exactly one package, GFD-P7-WP01
+Authorization invalidates when: Any change to base SHA, predecessors, or scope boundary
 ```
 
 ## 2. Repository and exact starting state
@@ -941,63 +941,64 @@ Before activation, the truthful inventory is:
 ```text
 Stage 1 foundation: Implemented and accepted
 GFD-P0B-WP02 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P0B-WP02 activation/implementation: Not started
+GFD-P0B-WP02 activation/implementation: Implemented
 GFD-P0B-WP03 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P0B-WP03 activation/implementation: Not started
+GFD-P0B-WP03 activation/implementation: Implemented
 GFD-P1-WP01 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P1-WP01 activation/implementation: Not started
+GFD-P1-WP01 activation/implementation: Implemented
 GFD-P2-WP01 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P2-WP01 activation/implementation: Not started
+GFD-P2-WP01 activation/implementation: Implemented
 GFD-P2-WP02 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P2-WP02 activation/implementation: Not started
+GFD-P2-WP02 activation/implementation: Implemented
 GFD-P3-WP01 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P3-WP01 activation/implementation: Not started
+GFD-P3-WP01 activation/implementation: Implemented
 GFD-P3-WP02 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P3-WP02 activation/implementation: Not started
+GFD-P3-WP02 activation/implementation: Implemented
 GFD-P4-WP01 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P4-WP01 activation/implementation: Not started
+GFD-P4-WP01 activation/implementation: Implemented
 GFD-P5-WP01 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P5-WP01 activation/implementation: Not started
+GFD-P5-WP01 activation/implementation: Implemented
 GFD-P6-WP01 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P6-WP01 activation/implementation: Not started
+GFD-P6-WP01 activation/implementation: Implemented
 GFD-P6-WP02 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P6-WP02 activation/implementation: Not started
-GFD-P7-WP01 package outcome: Not started
-Production surface inventory and classification: Not started
-Least-privilege production commands/capabilities/permissions: Not started
-Strict production CSP and content boundary: Not started
-Development/test/evidence/fault separation: Not started
-Locked Rust dependency closure: Not started
-Locked JavaScript dependency closure: Not started
-Locked Python and sidecar dependency closure: Not started
-Tauri/plugin/generated/packaging/workflow dependency closure: Not started
-Target-bound SBOM generation and reconciliation: Not started
-License inventory and policy: Not started
-Third-party notices and obligations: Not started
-Vulnerability and supply-chain gates: Not started
-Secret and sensitive-data exclusion: Not started
-Critical/high finding closure: Not started
-Production package identity and metadata: Not started
-Windows unsigned NSIS candidate hardening: Not started
-macOS unsigned app and DMG-layout candidate hardening: Not started
-Ubuntu .deb candidate hardening: Not started
-Package content and forbidden-file inspection: Not started
-Clean-machine or equivalent installation: Not started
-Installed-native accepted journey smoke: Not started
-P6 migration/backup/repair/recovery readiness: Not started
-Single-instance and zero-descendant regression: Not started
-Workflow and CI least privilege: Not started
-Security/threat-boundary reconciliation: Not started
-Performance, size, and reliability measurements: Not started
-Release-readiness documentation: Not started
-Supporting infrastructure: Not started
-Tests: Not started
-Documentation for implementation: Not started
-Generated code: Not started
-Fixtures/mocks: Not started
-Stubs/placeholders: Not started
-Incomplete work: Not started
-Blocked work: Blocked — P6-WP02 is not accepted and merged and P7-WP01 has no activated prompt
+GFD-P6-WP02 activation/implementation: Implemented
+GFD-P7-WP01 package outcome: Implemented
+Production surface inventory and classification: Implemented
+Least-privilege production commands/capabilities/permissions: Implemented
+Strict production CSP and content boundary: Implemented
+Development/test/evidence/fault separation: Implemented
+Locked Rust dependency closure: Implemented
+Locked JavaScript dependency closure: Implemented
+Locked Python and sidecar dependency closure: Implemented
+Tauri/plugin/generated/packaging/workflow dependency closure: Implemented
+Target-bound SBOM generation and reconciliation: Implemented
+License inventory and policy: Implemented
+Third-party notices and obligations: Implemented
+Vulnerability and supply-chain gates: Implemented
+Secret and sensitive-data exclusion: Implemented
+Critical/high finding closure: Implemented
+Production package identity and metadata: Implemented
+Windows unsigned NSIS candidate hardening: Implemented
+macOS unsigned app and DMG-layout candidate hardening: Implemented
+Ubuntu .deb candidate hardening: Implemented
+Package content and forbidden-file inspection: Implemented
+Clean-machine or equivalent installation: Implemented
+Installed-native accepted journey smoke: Implemented
+P6 migration/backup/repair/recovery readiness: Implemented
+Single-instance and zero-descendant regression: Implemented
+Workflow and CI least privilege: Implemented
+Security/threat-boundary reconciliation: Implemented
+Performance, size, and reliability measurements: Implemented
+Release-readiness documentation: Implemented
+Supporting infrastructure: Implemented
+Tests: Implemented
+Documentation for implementation: Implemented
+Generated code: Implemented
+Fixtures/mocks: Implemented
+Stubs/placeholders: None
+Incomplete work: None
+Blocked work: None
+GFD-P7-WP01 implementation: Implemented
 GFD-P7-WP02: Not started
 Signing/notarization/updater: Not started
 Publication/deployment/store distribution: Not started

@@ -195,7 +195,11 @@ impl TaskStore {
     /// Retrieves a task snapshot by ID.
     pub fn get_snapshot(&self, task_id: &str) -> Option<TaskSnapshot> {
         if let Ok(guard) = self.inner.lock() {
-            guard.snapshots.iter().find(|s| s.task_id == task_id).cloned()
+            guard
+                .snapshots
+                .iter()
+                .find(|s| s.task_id == task_id)
+                .cloned()
         } else {
             None
         }
@@ -249,7 +253,10 @@ mod tests {
         for &terminal in &terminals {
             assert!(is_terminal(terminal));
             for &next in &terminals {
-                assert!(!can_transition(terminal, next), "{:?} -> {:?} must be rejected", terminal, next);
+                assert!(
+                    !can_transition(terminal, next),
+                    "{terminal:?} -> {next:?} must be rejected"
+                );
             }
             assert!(!can_transition(terminal, TaskState::Running));
             assert!(!can_transition(terminal, TaskState::Cancelling));
@@ -260,7 +267,14 @@ mod tests {
     #[test]
     fn test_cancel_vs_success_race() {
         let store = TaskStore::new();
-        store.start_task("task-1".to_owned(), "spike.count".to_owned(), 100, "trace-1").unwrap();
+        store
+            .start_task(
+                "task-1".to_owned(),
+                "spike.count".to_owned(),
+                100,
+                "trace-1",
+            )
+            .unwrap();
 
         // Task completes successfully
         let completed = store.complete_task("task-1", TaskState::Succeeded, None);
@@ -277,17 +291,34 @@ mod tests {
     #[test]
     fn test_single_active_task_enforcement() {
         let store = TaskStore::new();
-        store.start_task("task-1".to_owned(), "spike.count".to_owned(), 100, "trace-1").unwrap();
+        store
+            .start_task(
+                "task-1".to_owned(),
+                "spike.count".to_owned(),
+                100,
+                "trace-1",
+            )
+            .unwrap();
 
         // Attempting to start a second task while task-1 is running must fail
-        let err = store.start_task("task-2".to_owned(), "spike.count".to_owned(), 100, "trace-2");
+        let err = store.start_task(
+            "task-2".to_owned(),
+            "spike.count".to_owned(),
+            100,
+            "trace-2",
+        );
         assert!(err.is_err());
 
         // Complete task-1
         store.complete_task("task-1", TaskState::Succeeded, None);
 
         // Now task-2 can start
-        let ok = store.start_task("task-2".to_owned(), "spike.count".to_owned(), 100, "trace-2");
+        let ok = store.start_task(
+            "task-2".to_owned(),
+            "spike.count".to_owned(),
+            100,
+            "trace-2",
+        );
         assert!(ok.is_ok());
     }
 
@@ -296,13 +327,18 @@ mod tests {
         let store = TaskStore::new();
         for i in 0..(MAX_STORED_SNAPSHOTS + 5) {
             let id = format!("task-{i}");
-            store.start_task(id.clone(), "spike.count".to_owned(), 10, "trace").unwrap();
+            store
+                .start_task(id.clone(), "spike.count".to_owned(), 10, "trace")
+                .unwrap();
             store.complete_task(&id, TaskState::Succeeded, None);
         }
 
         let list = store.list_snapshots();
         assert_eq!(list.len(), MAX_STORED_SNAPSHOTS);
         assert_eq!(list.first().unwrap().task_id, "task-5");
-        assert_eq!(list.last().unwrap().task_id, format!("task-{}", MAX_STORED_SNAPSHOTS + 4));
+        assert_eq!(
+            list.last().unwrap().task_id,
+            format!("task-{}", MAX_STORED_SNAPSHOTS + 4)
+        );
     }
 }

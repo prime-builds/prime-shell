@@ -1,20 +1,22 @@
+use sha2::{Digest, Sha256};
 use std::collections::{HashMap, VecDeque};
 use std::fs::{self, File, OpenOptions};
 use std::io::{BufWriter, Write};
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use std::time::{SystemTime, UNIX_EPOCH};
-use sha2::{Digest, Sha256};
 
-use crate::backend::protocol::BackendStatus;
-use crate::settings::models::SettingsStatus;
 use super::models::{
     DiagnosticComponent, DiagnosticEventCode, DiagnosticLevel, DiagnosticRecord,
-    DiagnosticsSummary, ExportManifest, ExportManifestEntry, ExportPreview,
-    ExportPreviewEntry, SafeErrorRecord,
+    DiagnosticsSummary, ExportManifest, ExportManifestEntry, ExportPreview, ExportPreviewEntry,
+    SafeErrorRecord,
 };
-use super::redaction::{redact_text, truncate_string, verify_no_leaks, MAX_DETAIL_STR_LEN, MAX_HINT_LEN};
+use super::redaction::{
+    redact_text, truncate_string, verify_no_leaks, MAX_DETAIL_STR_LEN, MAX_HINT_LEN,
+};
 use super::zip_writer::ZipWriter;
+use crate::backend::protocol::BackendStatus;
+use crate::settings::models::SettingsStatus;
 
 pub const MAX_MEMORY_RECORDS: usize = 1000;
 pub const MAX_MEMORY_ERRORS: usize = 50;
@@ -39,7 +41,11 @@ pub fn iso_now() -> String {
     let mut y = 1970i64;
     let mut d = days as i64;
     loop {
-        let leap = if (y % 4 == 0 && y % 100 != 0) || (y % 400 == 0) { 1 } else { 0 };
+        let leap = if (y % 4 == 0 && y % 100 != 0) || (y % 400 == 0) {
+            1
+        } else {
+            0
+        };
         let days_in_year = 365 + leap;
         if d < days_in_year {
             break;
@@ -47,7 +53,11 @@ pub fn iso_now() -> String {
         d -= days_in_year;
         y += 1;
     }
-    let leap = if (y % 4 == 0 && y % 100 != 0) || (y % 400 == 0) { 1 } else { 0 };
+    let leap = if (y % 4 == 0 && y % 100 != 0) || (y % 400 == 0) {
+        1
+    } else {
+        0
+    };
     let month_days = [31, 28 + leap, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
     let mut m = 1;
     for &md in &month_days {
@@ -59,10 +69,7 @@ pub fn iso_now() -> String {
     }
     let day = d + 1;
 
-    format!(
-        "{:04}-{:02}-{:02}T{:02}:{:02}:{:02}.{:03}Z",
-        y, m, day, hours, mins, s, millis
-    )
+    format!("{y:04}-{m:02}-{day:02}T{hours:02}:{mins:02}:{s:02}.{millis:03}Z")
 }
 
 pub struct DiagnosticsManager {
@@ -134,7 +141,11 @@ impl DiagnosticsManager {
                 }
             }
 
-            if let Ok(file) = OpenOptions::new().create(true).append(true).open(&current_log) {
+            if let Ok(file) = OpenOptions::new()
+                .create(true)
+                .append(true)
+                .open(&current_log)
+            {
                 let mut writer = BufWriter::new(file);
                 if let Ok(json_line) = serde_json::to_string(&record) {
                     let _ = writeln!(writer, "{json_line}");
@@ -236,7 +247,9 @@ impl DiagnosticsManager {
         let errors = self.safe_errors.lock().unwrap();
 
         let diag_bytes = records.iter().fold(0u64, |acc, r| {
-            acc + serde_json::to_string(r).map(|s| s.len() as u64 + 1).unwrap_or(100)
+            acc + serde_json::to_string(r)
+                .map(|s| s.len() as u64 + 1)
+                .unwrap_or(100)
         });
         let errors_bytes = serde_json::to_string(&*errors)
             .map(|s| s.len() as u64)
@@ -318,7 +331,8 @@ impl DiagnosticsManager {
 
         // 1. Freeze snapshot
         let records: Vec<DiagnosticRecord> = self.records.lock().unwrap().iter().cloned().collect();
-        let errors: Vec<SafeErrorRecord> = self.safe_errors.lock().unwrap().iter().cloned().collect();
+        let errors: Vec<SafeErrorRecord> =
+            self.safe_errors.lock().unwrap().iter().cloned().collect();
 
         // 2. Prepare diagnostics.ndjson
         let mut diag_bytes = Vec::new();
@@ -371,10 +385,34 @@ impl DiagnosticsManager {
 
         // 6. Build Manifest Entries
         let entries_meta = vec![
-            ("diagnostics.ndjson", "diagnostic_records", diag_bytes.len(), sha256_hex(&diag_bytes), records.len() as u64),
-            ("safe_errors.json", "safe_error_records", errors_bytes.len(), sha256_hex(&errors_bytes), errors.len() as u64),
-            ("system_summary.json", "system_summary", system_bytes.len(), sha256_hex(&system_bytes), 1),
-            ("settings_summary.json", "settings_summary", settings_bytes.len(), sha256_hex(&settings_bytes), 1),
+            (
+                "diagnostics.ndjson",
+                "diagnostic_records",
+                diag_bytes.len(),
+                sha256_hex(&diag_bytes),
+                records.len() as u64,
+            ),
+            (
+                "safe_errors.json",
+                "safe_error_records",
+                errors_bytes.len(),
+                sha256_hex(&errors_bytes),
+                errors.len() as u64,
+            ),
+            (
+                "system_summary.json",
+                "system_summary",
+                system_bytes.len(),
+                sha256_hex(&system_bytes),
+                1,
+            ),
+            (
+                "settings_summary.json",
+                "settings_summary",
+                settings_bytes.len(),
+                sha256_hex(&settings_bytes),
+                1,
+            ),
         ];
 
         let mut manifest_entries: Vec<ExportManifestEntry> = entries_meta
@@ -412,13 +450,16 @@ impl DiagnosticsManager {
         let manifest_json = serde_json::to_string_pretty(&manifest).map_err(|e| e.to_string())?;
         let manifest_bytes = manifest_json.into_bytes();
 
-        manifest_entries.insert(0, ExportManifestEntry {
-            name: "manifest.json".to_string(),
-            role: "export_manifest".to_string(),
-            size_bytes: manifest_bytes.len() as u64,
-            sha256: sha256_hex(&manifest_bytes),
-            record_count: 1,
-        });
+        manifest_entries.insert(
+            0,
+            ExportManifestEntry {
+                name: "manifest.json".to_string(),
+                role: "export_manifest".to_string(),
+                size_bytes: manifest_bytes.len() as u64,
+                sha256: sha256_hex(&manifest_bytes),
+                record_count: 1,
+            },
+        );
         manifest.entries = manifest_entries;
 
         // Re-serialize final manifest
@@ -522,7 +563,9 @@ mod tests {
         assert!(preview.redaction_verified);
 
         let export_path = test_dir.join("bundle.zip");
-        let manifest = mgr.export_bundle(&export_path, &backend_status, None).unwrap();
+        let manifest = mgr
+            .export_bundle(&export_path, &backend_status, None)
+            .unwrap();
         assert_eq!(manifest.entries.len(), 5);
         assert!(manifest.redaction_verified);
         assert!(export_path.exists());

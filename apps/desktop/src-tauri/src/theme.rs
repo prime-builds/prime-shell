@@ -54,7 +54,9 @@ pub fn detect_platform_materials() -> MaterialCapabilities {
             transparency_enabled: false,
             forced_colors: false,
             reduced_transparency: false,
-            reason: Some("Mica materials are exclusively supported on Windows 11+ DWM surfaces.".to_string()),
+            reason: Some(
+                "Mica materials are exclusively supported on Windows 11+ DWM surfaces.".to_string(),
+            ),
         }
     }
 }
@@ -90,13 +92,12 @@ pub fn sync_native_window_theme(
     window: Window,
 ) -> AppResult<()> {
     let trace = "sync-window-theme";
-    let color = hex_to_color(&background_hex).ok_or_else(|| {
-        AppError::validation("Invalid hex color for window background", trace)
-    })?;
+    let color = hex_to_color(&background_hex)
+        .ok_or_else(|| AppError::validation("Invalid hex color for window background", trace))?;
 
     window
         .set_background_color(Some(color))
-        .map_err(|e| AppError::internal(&format!("{trace}: {e}")))?;
+        .map_err(|e| AppError::internal(format!("{trace}: {e}")))?;
 
     let tauri_theme = match effective_theme.as_str() {
         "dark" => Some(Theme::Dark),

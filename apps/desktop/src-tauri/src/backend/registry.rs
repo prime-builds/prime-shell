@@ -49,17 +49,11 @@ impl BackendOperation {
     }
 
     pub const fn cancellable(self) -> bool {
-        match self {
-            Self::SpikeCount | Self::DocAnalyze => true,
-            _ => false,
-        }
+        matches!(self, Self::SpikeCount | Self::DocAnalyze)
     }
 
     pub const fn idempotent(self) -> bool {
-        match self {
-            Self::SpikeEcho | Self::DocAnalyze => true,
-            _ => false,
-        }
+        matches!(self, Self::SpikeEcho | Self::DocAnalyze)
     }
 
     pub const fn destination(self) -> &'static str {

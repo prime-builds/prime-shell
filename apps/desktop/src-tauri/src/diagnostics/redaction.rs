@@ -11,10 +11,20 @@ pub fn redact_text(input: &str) -> String {
 
     while i < len {
         // 1. Check for file URI: file://
-        if i + 7 <= len && chars[i..i + 7].iter().collect::<String>().to_ascii_lowercase() == "file://" {
+        if i + 7 <= len
+            && chars[i..i + 7]
+                .iter()
+                .collect::<String>()
+                .eq_ignore_ascii_case("file://")
+        {
             result.push_str("[REDACTED_PATH]");
             i += 7;
-            while i < len && !chars[i].is_whitespace() && chars[i] != '"' && chars[i] != '\'' && chars[i] != ')' {
+            while i < len
+                && !chars[i].is_whitespace()
+                && chars[i] != '"'
+                && chars[i] != '\''
+                && chars[i] != ')'
+            {
                 i += 1;
             }
             continue;
@@ -28,18 +38,37 @@ pub fn redact_text(input: &str) -> String {
         {
             result.push_str("[REDACTED_PATH]");
             i += 3;
-            while i < len && !chars[i].is_whitespace() && chars[i] != '"' && chars[i] != '\'' && chars[i] != ')' {
+            while i < len
+                && !chars[i].is_whitespace()
+                && chars[i] != '"'
+                && chars[i] != '\''
+                && chars[i] != ')'
+            {
                 i += 1;
             }
             continue;
         }
 
         // 3. Check for Unix standard paths: /home/, /Users/, /usr/, /etc/, /var/, /tmp/, /private/
-        let unix_prefixes = ["/home/", "/users/", "/usr/", "/etc/", "/var/", "/tmp/", "/private/"];
+        let unix_prefixes = [
+            "/home/",
+            "/users/",
+            "/usr/",
+            "/etc/",
+            "/var/",
+            "/tmp/",
+            "/private/",
+        ];
         let mut matched_prefix_len = 0;
         for prefix in &unix_prefixes {
             let p_len = prefix.len();
-            if i + p_len <= len && chars[i..i + p_len].iter().collect::<String>().to_ascii_lowercase() == *prefix {
+            if i + p_len <= len
+                && chars[i..i + p_len]
+                    .iter()
+                    .collect::<String>()
+                    .to_ascii_lowercase()
+                    == *prefix
+            {
                 matched_prefix_len = p_len;
                 break;
             }
@@ -47,14 +76,24 @@ pub fn redact_text(input: &str) -> String {
         if matched_prefix_len > 0 {
             result.push_str("[REDACTED_PATH]");
             i += matched_prefix_len;
-            while i < len && !chars[i].is_whitespace() && chars[i] != '"' && chars[i] != '\'' && chars[i] != ')' {
+            while i < len
+                && !chars[i].is_whitespace()
+                && chars[i] != '"'
+                && chars[i] != '\''
+                && chars[i] != ')'
+            {
                 i += 1;
             }
             continue;
         }
 
         // 4. Check for Bearer token: "bearer "
-        if i + 7 <= len && chars[i..i + 7].iter().collect::<String>().to_ascii_lowercase() == "bearer " {
+        if i + 7 <= len
+            && chars[i..i + 7]
+                .iter()
+                .collect::<String>()
+                .eq_ignore_ascii_case("bearer ")
+        {
             result.push_str("Bearer [REDACTED_TOKEN]");
             i += 7;
             while i < len && !chars[i].is_whitespace() && chars[i] != '"' && chars[i] != '\'' {
@@ -65,17 +104,38 @@ pub fn redact_text(input: &str) -> String {
 
         // 5. Check for secrets/passwords/tokens/api_keys
         let secret_keywords = [
-            "password=", "password:", "password = ", "password : ",
-            "secret=", "secret:", "secret = ", "secret : ",
-            "token=", "token:", "token = ", "token : ",
-            "api_key=", "api_key:", "api_key = ", "api_key : ",
-            "apikey=", "apikey:", "apikey = ", "apikey : ",
+            "password=",
+            "password:",
+            "password = ",
+            "password : ",
+            "secret=",
+            "secret:",
+            "secret = ",
+            "secret : ",
+            "token=",
+            "token:",
+            "token = ",
+            "token : ",
+            "api_key=",
+            "api_key:",
+            "api_key = ",
+            "api_key : ",
+            "apikey=",
+            "apikey:",
+            "apikey = ",
+            "apikey : ",
         ];
         let mut matched_secret_len = 0;
         let mut keyword_name = "";
         for kw in &secret_keywords {
             let kw_len = kw.len();
-            if i + kw_len <= len && chars[i..i + kw_len].iter().collect::<String>().to_ascii_lowercase() == *kw {
+            if i + kw_len <= len
+                && chars[i..i + kw_len]
+                    .iter()
+                    .collect::<String>()
+                    .to_ascii_lowercase()
+                    == *kw
+            {
                 matched_secret_len = kw_len;
                 keyword_name = kw;
                 break;
@@ -86,11 +146,19 @@ pub fn redact_text(input: &str) -> String {
             result.push_str("[REDACTED_SECRET]");
             i += matched_secret_len;
             // skip spaces and opening quotes
-            while i < len && (chars[i] == ' ' || chars[i] == '\t' || chars[i] == '"' || chars[i] == '\'') {
+            while i < len
+                && (chars[i] == ' ' || chars[i] == '\t' || chars[i] == '"' || chars[i] == '\'')
+            {
                 i += 1;
             }
             // skip the actual secret token
-            while i < len && !chars[i].is_whitespace() && chars[i] != '"' && chars[i] != '\'' && chars[i] != ',' && chars[i] != '}' {
+            while i < len
+                && !chars[i].is_whitespace()
+                && chars[i] != '"'
+                && chars[i] != '\''
+                && chars[i] != ','
+                && chars[i] != '}'
+            {
                 i += 1;
             }
             continue;
@@ -101,7 +169,12 @@ pub fn redact_text(input: &str) -> String {
             let slice: String = chars[i..i + 30].iter().collect();
             if slice.contains('.') {
                 result.push_str("[REDACTED_TOKEN]");
-                while i < len && (chars[i].is_ascii_alphanumeric() || chars[i] == '_' || chars[i] == '-' || chars[i] == '.') {
+                while i < len
+                    && (chars[i].is_ascii_alphanumeric()
+                        || chars[i] == '_'
+                        || chars[i] == '-'
+                        || chars[i] == '.')
+                {
                     i += 1;
                 }
                 continue;
@@ -133,7 +206,10 @@ pub fn verify_no_leaks(text: &str) -> bool {
 
     // Check Windows Drive Path
     for i in 0..len.saturating_sub(2) {
-        if chars[i].is_ascii_alphabetic() && chars[i + 1] == ':' && (chars[i + 2] == '\\' || chars[i + 2] == '/') {
+        if chars[i].is_ascii_alphabetic()
+            && chars[i + 1] == ':'
+            && (chars[i + 2] == '\\' || chars[i + 2] == '/')
+        {
             return false;
         }
     }
