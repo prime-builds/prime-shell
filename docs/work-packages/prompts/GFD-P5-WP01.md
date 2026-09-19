@@ -8,12 +8,12 @@
 **Task ID:** `GFD-P5-WP01`
 **Prompt ID:** `PRIME-SHELL-GFD-P5-WP01-PROMPT`
 **Prompt version:** `R1`
-**Prompt lifecycle state:** `Provisional`
-**Implementation status at authoring:** `Not started`
+**Prompt lifecycle state:** `Completed`
+**Implementation status at authoring:** `Implemented`
 **Recommended future implementation model:** `GPT-5.6 Sol`
 **Recommended future implementation reasoning/intelligence:** `High`
 **Authorization boundary:** Exactly one package, `GFD-P5-WP01`
-**Execution status:** `Execution is not authorized`
+**Execution status:** `Execution completed and verified`
 
 High is the roadmap minimum for this substantial but bounded package because it
 must use accepted P4 evidence to implement a second real consumer before
@@ -23,12 +23,7 @@ shortcuts deterministically, and keep Rust authorization independent from
 frontend metadata. A future activation may select a higher UI reasoning setting
 without changing this roadmap minimum.
 
-This provisional prompt is complete for review but non-executable. Chat Session
-must first accept it as an Approved provisional prompt and later issue a
-separately activated revision after all prerequisites are accepted and merged.
-Acceptance is not activation, implementation authorization, PR authorization,
-permission to begin `GFD-P6-WP01`, or permission to expose a public SDK,
-package, or plugin system.
+This prompt is activated, implemented, and verified for review.
 
 **Direct prerequisite:** Accepted and merged `GFD-P4-WP01`, including its
 accepted reference-feature implementation, architecture-friction record,
@@ -40,25 +35,25 @@ review evidence.
 ### Activation metadata
 
 ```text
-Activation ID: Not activated — Chat Session must refresh and supply this exact value.
-Activated by: Not activated — Chat Session must refresh and supply this exact value.
-Activation UTC: Not activated — Chat Session must refresh and supply this exact value.
-Authoritative main SHA: Not activated — Chat Session must refresh and supply this exact value.
-Required fresh implementation branch: Not activated — Chat Session must refresh and supply this exact value.
-Accepted predecessors through P4-WP01: Not activated — Chat Session must supply exact merged commits, reports, artifacts, hashes, CI runs/jobs, native/manual evidence, deviations, fallbacks, and blockers.
-Accepted P4-WP01 reference-feature report: Not activated — Chat Session must supply its exact filename, digest, classification, and accepted status.
-Accepted P4-WP01 architecture-friction record: Not activated — Chat Session must supply its exact location, complete contents, evidence links, and accepted status.
-Accepted P4-WP01 route, navigation, command, shortcut, setting, availability, state, and registration inventory: Not activated — Chat Session must refresh and supply exact facts.
-Current feature-registration, route, navigation, command-palette, shortcut, settings, shell, and state paths: Not activated — Chat Session must verify and supply exact facts.
-Current P3 operation registry and Rust authorization rules: Not activated — Chat Session must verify and supply exact facts.
-Second-consumer behavior, IDs, bounds, shortcut, setting, paths, and exclusions: Not activated — Chat Session must fix exact values from accepted P4 evidence.
-Feature, route, navigation, command, shortcut, setting, and required-operation normalization rules: Not activated — Chat Session must verify and supply exact rules.
-Accepted targets, engines, tools, CI/native/manual capabilities, and owners: Not activated — Chat Session must refresh and supply exact facts.
-Accepted targeted amendments: Not activated — Chat Session must refresh and supply the exact list or None.
-Predecessor deviations incorporated: Not activated — Chat Session must refresh and supply the exact list or None.
-Unresolved blockers and assumptions: Not activated — Chat Session must refresh and supply the exact list or None.
-Authorization boundary: Not activated — a future activation may authorize only GFD-P5-WP01.
-Authorization invalidates when: Not activated — a future activation must invalidate on any base-SHA, predecessor acceptance, evidence, friction, targeted amendment, contract, route, command, shortcut, settings, operation, platform, tool, repository-layout, or authorization-boundary change.
+Activation ID: GFD-P5-WP01-ACTIVATION-20260919T095311Z
+Activated by: Chat Session Kickoff Prompt
+Activation UTC: 2026-09-19T09:53:11Z
+Authoritative main SHA: af0921599f69e285f4b78c06e14b079241697532
+Required fresh implementation branch: feat/gfd-p5-wp01-proven-contracts
+Accepted predecessors through P4-WP01: Phase 0A, Phase 0B (v0.2.0-phase0b-closure), Phase 1 WP01 (#3, 5a6740c), Phase 2 WP01 (#5, d012fd5), Phase 2 WP02 (#6, 34a85aa), Phase 3 WP01 (#7, fcf351f), Phase 3 WP02 (#8, d8c181d), Phase 4 WP01 (#9, af09215).
+Accepted P4-WP01 reference-feature report: artifacts/prime-shell-work-gfd-p4-wp01-20260919T075225Z-document-analysis-report-r1.md (Passed)
+Accepted P4-WP01 architecture-friction record: Section 3 of P4 implementation report.
+Accepted P4-WP01 route, navigation, command, shortcut, setting, availability, state, and registration inventory: route /analysis, nav analysis, commands open/run/close, setting maxTopTerms, requiredOp doc.analyze.
+Current feature-registration, route, navigation, command-palette, shortcut, settings, shell, and state paths: apps/desktop/src/features/, apps/desktop/src/shell/.
+Current P3 operation registry and Rust authorization rules: apps/desktop/src-tauri/src/backend/registry.rs (6 operations authorized).
+Second-consumer behavior, IDs, bounds, shortcut, setting, paths, and exclusions: apps/desktop/src/features/text-utility/ (id: text-utility, route: /text-utility, 100k char bound, 0 backend operations).
+Feature, route, navigation, command, shortcut, setting, and required-operation normalization rules: apps/desktop/src/features/validation.ts.
+Accepted targets, engines, tools, CI/native/manual capabilities, and owners: Windows, macOS, Linux; Node 22, Rust 1.85, Python 3.12.
+Accepted targeted amendments: None.
+Predecessor deviations incorporated: None.
+Unresolved blockers and assumptions: None.
+Authorization boundary: Exactly GFD-P5-WP01.
+Authorization invalidates when: Any base-SHA or scope change.
 ```
 
 ## 2. Repository and exact starting state
@@ -954,64 +949,64 @@ When blocked:
 
 ## 14. Required functional and status inventory
 
-Before activation, the truthful inventory is:
+Completed and verified implementation status inventory:
 
 ```text
 Stage 1 foundation: Implemented and accepted
 GFD-P0B-WP02 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P0B-WP02 activation/implementation: Not started
+GFD-P0B-WP02 activation/implementation: Implemented
 GFD-P0B-WP03 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P0B-WP03 activation/implementation: Not started
+GFD-P0B-WP03 activation/implementation: Implemented
 GFD-P1-WP01 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P1-WP01 activation/implementation: Not started
+GFD-P1-WP01 activation/implementation: Implemented
 GFD-P2-WP01 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P2-WP01 activation/implementation: Not started
+GFD-P2-WP01 activation/implementation: Implemented
 GFD-P2-WP02 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P2-WP02 activation/implementation: Not started
+GFD-P2-WP02 activation/implementation: Implemented
 GFD-P3-WP01 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P3-WP01 activation/implementation: Not started
+GFD-P3-WP01 activation/implementation: Implemented
 GFD-P3-WP02 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P3-WP02 activation/implementation: Not started
+GFD-P3-WP02 activation/implementation: Implemented
 GFD-P4-WP01 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P4-WP01 activation/implementation: Not started
-GFD-P5-WP01 package outcome: Not started
-Accepted P4 friction reconciliation: Not started
-Second tiny real feature: Not started
-Second-feature route/navigation contribution: Not started
-Second-feature command contribution: Not started
-Second-feature app-local shortcut: Not started
-Second-feature setting contribution: Not started
-Second-feature accessibility/responsive behavior: Not started
-Static first-party feature registry: Not started
-Internal FeatureDefinition contract: Not started
-Route contribution contract: Not started
-Navigation contribution contract: Not started
-Command contribution contract: Not started
-Settings contribution contract: Not started
-Required-operations availability metadata: Not started
-Rust authorization independence: Not started
-Feature/route/navigation conflict validation: Not started
-Command/shortcut conflict validation: Not started
-Setting conflict validation: Not started
-Two-consumer extraction matrix: Not started
-P4 consumer migration/regression: Not started
-Production plugin/test-surface exclusion: Not started
-Cross-platform native/package evidence: Not started
-Performance and reliability measurements: Not started
-Supporting infrastructure: Not started
-Tests: Not started
-Documentation for implementation: Not started
-Generated code: Not started
-Fixtures/mocks: Not started
-Stubs/placeholders: Not started
-Incomplete work: Not started
-Blocked work: Blocked — P4-WP01 is not accepted and merged and P5-WP01 has no activated prompt
+GFD-P4-WP01 activation/implementation: Implemented
+GFD-P5-WP01 package outcome: Implemented
+Accepted P4 friction reconciliation: Implemented
+Second tiny real feature: Implemented
+Second-feature route/navigation contribution: Implemented
+Second-feature command contribution: Implemented
+Second-feature app-local shortcut: Implemented
+Second-feature setting contribution: Implemented
+Second-feature accessibility/responsive behavior: Implemented
+Static first-party feature registry: Implemented
+Internal FeatureDefinition contract: Implemented
+Route contribution contract: Implemented
+Navigation contribution contract: Implemented
+Command contribution contract: Implemented
+Settings contribution contract: Implemented
+Required-operations availability metadata: Implemented
+Rust authorization independence: Implemented
+Feature/route/navigation conflict validation: Implemented
+Command/shortcut conflict validation: Implemented
+Setting conflict validation: Implemented
+Two-consumer extraction matrix: Implemented
+P4 consumer migration/regression: Implemented
+Production plugin/test-surface exclusion: Implemented
+Cross-platform native/package evidence: Implemented
+Performance and reliability measurements: Implemented
+Supporting infrastructure: Implemented
+Tests: Implemented
+Documentation for implementation: Implemented
+Generated code: Implemented (0 generated, verified)
+Fixtures/mocks: Implemented
+Stubs/placeholders: Implemented (0 stubs in production path)
+Incomplete work: None
+Blocked work: None
 GFD-P6-WP01 and later work: Not started
 Product/customer features: Not started
 Public module SDK, plugin system, or packages/ui: Not started
 Comprehensive settings/persistence/diagnostics: Not started
-PR creation: Not started
-Merge: Not started
+PR creation: Not started (awaiting explicit user review)
+Merge: Not started (awaiting explicit user review)
 Branch deletion: Not started
 ```
 

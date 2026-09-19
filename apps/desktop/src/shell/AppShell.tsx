@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { makeStyles, tokens, Text, Badge } from "@fluentui/react-components";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { TitleBarAdapter } from "./layout/TitleBarAdapter";
@@ -10,6 +10,8 @@ import { BottomPanelHost } from "./layout/BottomPanelHost";
 import { StatusBar } from "./layout/StatusBar";
 import { Splitter } from "./layout/Splitter";
 import { ToastRegion } from "./layout/ToastRegion";
+import { CommandPalette, useCommandShortcuts } from "./components/CommandPalette";
+import { featureRegistry } from "../features";
 import { useShellStore } from "./state/useShellStore";
 import {
   BOTTOM_PANEL_MAX_RATIO,
@@ -103,15 +105,14 @@ export const AppShell: React.FC = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, [setWindowDimensions]);
 
-  // Sync activeNavId with current route path
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+
+  // Set up command shortcut listener and command palette trigger
+  useCommandShortcuts(useCallback(() => setIsCommandPaletteOpen(true), []));
+
+  // Sync activeNavId with current route path using feature registry
   useEffect(() => {
-    if (location.pathname === "/settings") {
-      setActiveNavId("settings");
-    } else if (location.pathname === "/analysis") {
-      setActiveNavId("analysis");
-    } else {
-      setActiveNavId("workspace");
-    }
+    setActiveNavId(featureRegistry.getActiveNavId(location.pathname));
   }, [location.pathname, setActiveNavId]);
 
   // Global Keyboard Shortcuts
@@ -171,12 +172,7 @@ export const AppShell: React.FC = () => {
     Math.round(availableCenterHeight * bottomPanelHeightRatio),
   );
 
-  const viewName =
-    location.pathname === "/settings"
-      ? "Settings"
-      : location.pathname === "/analysis"
-        ? "Document Analysis"
-        : "Workspace";
+  const viewName = featureRegistry.getRouteTitle(location.pathname) || "Workspace";
 
   return (
     <div className={styles.root} data-testid="prime-app-shell">
@@ -190,6 +186,7 @@ export const AppShell: React.FC = () => {
           activeId={activeNavId}
           onNavigate={handleNavigate}
           onToggleSidebar={toggleSidebar}
+          onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
         />
 
         {/* Context Sidebar */}
@@ -333,6 +330,12 @@ export const AppShell: React.FC = () => {
 
       {/* 4. Global Toast Notifications */}
       <ToastRegion />
+
+      {/* 5. Command Palette Modal */}
+      <CommandPalette
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+      />
     </div>
   );
 };
