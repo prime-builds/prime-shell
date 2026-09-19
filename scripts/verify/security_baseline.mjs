@@ -51,6 +51,7 @@ const allowedPermissions = new Set([
   "allow-native-intent",
   "allow-document-analysis",
   "allow-settings",
+  "allow-diagnostics",
 ]);
 
 for (const perm of capability.permissions || []) {

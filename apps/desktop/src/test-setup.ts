@@ -27,6 +27,14 @@ if (typeof (globalThis as unknown as GlobalWithNodeFilter).NodeFilter === "undef
   };
 }
 
+if (typeof globalThis.ResizeObserver === "undefined") {
+  globalThis.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+}
+
 afterEach(() => {
   cleanup();
 });

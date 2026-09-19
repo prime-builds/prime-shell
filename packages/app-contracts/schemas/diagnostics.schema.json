@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://prime-shell.local/schemas/diagnostics.schema.json",
+  "title": "Prime Shell Diagnostics and Recovery Schema",
+  "$defs": {
+    "diagnosticLevel": {
+      "type": "string",
+      "enum": ["trace", "debug", "info", "warn", "error"]
+    },
+    "diagnosticComponent": {
+      "type": "string",
+      "enum": ["shell", "backend", "sidecar", "settings", "diagnostics", "task"]
+    },
+    "diagnosticEventCode": {
+      "type": "string",
+      "enum": [
+        "APP_START",
+        "APP_EXIT",
+        "BACKEND_SPAWN",
+        "BACKEND_READY",
+        "BACKEND_FAULT",
+        "BACKEND_RESTART",
+        "TASK_START",
+        "TASK_PROGRESS",
+        "TASK_COMPLETE",
+        "TASK_CANCEL",
+        "TASK_INTERRUPT",
+        "SETTINGS_LOAD",
+        "SETTINGS_SAVE",
+        "SETTINGS_RECOVER",
+        "SETTINGS_RESET",
+        "DIAGNOSTICS_EXPORT",
+        "DIAGNOSTICS_PRUNE",
+        "SAFE_ERROR_RECORDED"
+      ]
+    },
+    "diagnosticRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["timestamp", "level", "component", "eventCode", "message"],
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$"
+        },
+        "level": { "$ref": "#/$defs/diagnosticLevel" },
+        "component": { "$ref": "#/$defs/diagnosticComponent" },
+        "eventCode": { "$ref": "#/$defs/diagnosticEventCode" },
+        "traceId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_-]{1,64}$"
+        },
+        "message": {
+          "type": "string",
+          "maxLength": 256
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": false,
+          "maxProperties": 8,
+          "patternProperties": {
+            "^[a-zA-Z0-9_]{1,32}$": {
+              "oneOf": [
+                { "type": "string", "maxLength": 64 },
+                { "type": "number" },
+                { "type": "boolean" }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "safeErrorRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message", "timestamp"],
+      "properties": {
+        "code": { "type": "string", "maxLength": 64 },
+        "message": { "type": "string", "maxLength": 256 },
+        "timestamp": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$"
+        },
+        "traceId": { "type": "string", "maxLength": 64 },
+        "component": { "$ref": "#/$defs/diagnosticComponent" },
+        "userRecoveryHint": { "type": "string", "maxLength": 256 }
+      }
+    },
+    "exportPreview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["totalEstimatedBytes", "entryCount", "entries", "redactionVerified", "generatedAt"],
+      "properties": {
+        "totalEstimatedBytes": { "type": "integer", "minimum": 0 },
+        "entryCount": { "type": "integer", "minimum": 0 },
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "role", "estimatedBytes", "recordCount"],
+            "properties": {
+              "name": { "type": "string", "maxLength": 64 },
+              "role": { "type": "string", "maxLength": 64 },
+              "estimatedBytes": { "type": "integer", "minimum": 0 },
+              "recordCount": { "type": "integer", "minimum": 0 }
+            }
+          }
+        },
+        "redactionVerified": { "type": "boolean" },
+        "generatedAt": { "type": "string" }
+      }
+    },
+    "exportManifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["manifestVersion", "appVersion", "targetOs", "targetArch", "createdAt", "entries", "redactionVerified"],
+      "properties": {
+        "manifestVersion": { "type": "integer", "const": 1 },
+        "appVersion": { "type": "string", "maxLength": 32 },
+        "backendVersion": { "type": "string", "maxLength": 32 },
+        "targetOs": { "type": "string", "maxLength": 32 },
+        "targetArch": { "type": "string", "maxLength": 32 },
+        "createdAt": { "type": "string" },
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "role", "sizeBytes", "sha256", "recordCount"],
+            "properties": {
+              "name": { "type": "string", "maxLength": 64 },
+              "role": { "type": "string", "maxLength": 64 },
+              "sizeBytes": { "type": "integer", "minimum": 0 },
+              "sha256": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$" },
+              "recordCount": { "type": "integer", "minimum": 0 }
+            }
+          }
+        },
+        "excludedCategories": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "redactionVerified": { "type": "boolean" }
+      }
+    }
+  },
+  "$ref": "#/$defs/diagnosticRecord"
+}

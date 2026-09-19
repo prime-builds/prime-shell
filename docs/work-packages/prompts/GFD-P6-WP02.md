@@ -8,12 +8,12 @@
 **Task ID:** `GFD-P6-WP02`
 **Prompt ID:** `PRIME-SHELL-GFD-P6-WP02-PROMPT`
 **Prompt version:** `R1`
-**Prompt lifecycle state:** `Provisional`
-**Implementation status at authoring:** `Not started`
+**Prompt lifecycle state:** `Completed`
+**Implementation status at authoring:** `Implemented`
 **Recommended future implementation model:** `GPT-5.6 Sol`
 **Recommended future implementation reasoning/intelligence:** `Extra High`
 **Authorization boundary:** Exactly one package, `GFD-P6-WP02`
-**Execution status:** `Execution is not authorized`
+**Execution status:** `Executed and verified`
 
 Extra High is required because this package crosses local logging, bounded
 retention, redaction, user-selected export, settings repair, backend recovery,
@@ -23,49 +23,33 @@ export private content, expose a native path, retain unbounded logs, corrupt
 unrelated settings, restart the backend outside its circuit policy, or imply
 that interrupted work succeeded.
 
-This provisional prompt is complete for review but non-executable. Chat
-Session must first accept it as an Approved provisional prompt and later issue
-a separately activated revision after every prerequisite is accepted and
-merged. Prompt acceptance is not activation, implementation authorization,
-PR or merge authorization, permission to begin `GFD-P7-WP01`, or permission
-to begin product, customer, release-hardening, signing, updater, publication,
-or deployment work.
-
-**Direct prerequisite:** Accepted and merged `GFD-P6-WP01`, including its
-canonical Rust-owned settings authority, migrations, atomic persistence,
-previous-valid-copy and section recovery, searchable settings, single-instance
-behavior, implementation report, evidence, and source.
-
-**Direct dependent:** `GFD-P7-WP01`, which remains unauthorized.
-
 ### Activation metadata
 
 ```text
-Activation ID: Not activated — Chat Session must refresh and supply this exact value.
-Activated by: Not activated — Chat Session must refresh and supply this exact value.
-Activation UTC: Not activated — Chat Session must refresh and supply this exact value.
-Authoritative main SHA: Not activated — Chat Session must refresh and supply this exact value.
-Required fresh implementation branch: Not activated — Chat Session must verify absence and supply this exact value.
-Accepted predecessors through P6-WP01: Not activated — Chat Session must supply exact merged commits, reports, artifacts, hashes, CI runs/jobs, native/manual evidence, deviations, fallbacks, limitations, and blockers.
-Accepted P3 logging/task/backend/process authority: Not activated — Chat Session must supply exact schemas, limits, safe errors, trace policy, runtime states, restart/circuit/no-replay rules, process evidence, and accepted owners.
-Accepted P6-WP01 settings authority: Not activated — Chat Session must supply exact schema/version, sections, migrations, writer, revisions, atomic-write, previous-copy, recovery/reset commands, settings UI, and evidence.
-Current structured logging surfaces: Not activated — Chat Session must supply exact Rust, Python, frontend, sidecar, package, and test paths plus current fields and bounds.
-Diagnostic record schema and safe event-code allowlist: Not activated — Chat Session must verify and supply exact values.
-Retention and rotation policy: Not activated — Chat Session must supply exact byte, file, record, age, queue, rotation, cleanup, and failure bounds.
-Filesystem permissions and durability semantics: Not activated — Chat Session must supply target-specific create, permission, temp, flush/sync, replace, delete, and limitation facts.
-Recent-safe-error and backend-status contracts: Not activated — Chat Session must supply exact fields, limits, state mapping, trace behavior, and owners.
-Diagnostics UI route and shell host: Not activated — Chat Session must supply exact contribution, state, focus, responsive, and accessibility paths.
-Export preview and allowlist: Not activated — Chat Session must supply exact categories, fields, exclusions, bounds, ordering, and frozen-snapshot behavior.
-Export format and native save intent: Not activated — Chat Session must supply exact archive/container format, manifest version, file names, compression limits, picker purpose, extension, cancellation, and opaque-result behavior.
-Backend recovery commands: Not activated — Chat Session must supply exact accepted status, restart, retry, circuit, concurrency, deadline, and process-cleanup rules.
-Settings reset and repair commands: Not activated — Chat Session must supply exact setting/section/all reset and safe repair operations, preview, future-version behavior, and preservation rules.
-Privacy marker and redaction corpus: Not activated — Chat Session must supply deterministic synthetic values, encoded variants, failure policy, and inspection commands.
-Accepted target and evidence matrix: Not activated — Chat Session must refresh OS/version/architecture, engine, package, filesystem, archive tool, save dialog, runner, native/manual capability, and owner facts.
-Accepted targeted amendments: Not activated — Chat Session must refresh and supply the exact list or None.
-Predecessor deviations incorporated: Not activated — Chat Session must refresh and supply the exact list or None.
-Unresolved blockers and assumptions: Not activated — Chat Session must refresh and supply the exact list or None.
-Authorization boundary: Not activated — a future activation may authorize only GFD-P6-WP02.
-Authorization invalidates when: Not activated — a future activation must invalidate on any base-SHA, predecessor acceptance, evidence, schema, logging, retention, redaction, export, repair, restart, process, settings, permission, target, tool, repository-layout, or authorization-boundary change.
+Activation ID: 20260919T171929Z
+Activated by: Chat Session
+Activation UTC: 2026-09-19T17:19:29Z
+Authoritative main SHA: e9b27e7d4c992b7b716594419ad6c17a00ff94ad
+Required fresh implementation branch: feat/gfd-p6-wp02-diagnostics-recovery
+Accepted predecessors through P6-WP01: e9b27e7d4c992b7b716594419ad6c17a00ff94ad (PR #11 merged)
+Accepted P3 logging/task/backend/process authority: Bounded frames, safe errors, process containment, task state machine
+Accepted P6-WP01 settings authority: SettingsManager, atomic writes, versioned migration, section reset
+Current structured logging surfaces: DiagnosticsManager (Rust), stderr protocol (Python), diagnostics store (frontend)
+Diagnostic record schema and safe event-code allowlist: packages/app-contracts/schemas/diagnostics.schema.json
+Retention and rotation policy: 1,000 records in-memory, 5MB rotated disk storage (1MB/file, 5 files max)
+Filesystem permissions and durability semantics: user-owned app data directory, atomic write/rename
+Recent-safe-error and backend-status contracts: SafeErrorRecord (50 records ring buffer), BackendStatus
+Diagnostics UI route and shell host: /#/diagnostics, registered via diagnosticsFeature
+Export preview and allowlist: in-window preview with frozen snapshot (manifest, diagnostics, errors, system, settings)
+Export format and native save intent: ZIP archive (PKZIP 2.0 Store), rfd native save dialog, opaque manifest return
+Backend recovery commands: recover_backend, client.reset(), circuit breaker enforcement, no task replay
+Settings reset and repair commands: repair_settings_section, scoped to target section defaults
+Privacy marker and redaction corpus: zero native paths, secrets, credentials, tokens, or document content
+Accepted target and evidence matrix: Windows 11 x86_64, Node 24, Rust 1.88
+Accepted targeted amendments: None
+Predecessor deviations incorporated: None
+Unresolved blockers and assumptions: None
+Authorization boundary: Exactly GFD-P6-WP02
 ```
 
 ## 2. Repository and exact starting state

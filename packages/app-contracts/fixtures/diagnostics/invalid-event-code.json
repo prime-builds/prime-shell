@@ -1,0 +1,7 @@
+{
+  "timestamp": "2026-09-19T17:19:29Z",
+  "level": "warn",
+  "component": "backend",
+  "eventCode": "UNAUTHORIZED_UNKNOWN_EVENT",
+  "message": "Attempted to emit an unallowlisted event code"
+}
