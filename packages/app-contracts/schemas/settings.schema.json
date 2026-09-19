@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://prime-shell.local/schemas/settings.schema.json",
+  "title": "Prime Shell Canonical Settings Document",
+  "$defs": {
+    "accentMode": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mode"],
+          "properties": {
+            "mode": { "enum": ["default", "system"] }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mode", "seedColor"],
+          "properties": {
+            "mode": { "const": "custom" },
+            "seedColor": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" }
+          }
+        }
+      ]
+    },
+    "appearanceSettings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["themeMode", "accentMode", "density", "materialPreference"],
+      "properties": {
+        "themeMode": { "type": "string", "enum": ["system", "light", "dark"] },
+        "accentMode": { "$ref": "#/$defs/accentMode" },
+        "density": { "type": "string", "enum": ["comfortable", "compact"] },
+        "materialPreference": { "type": "string", "enum": ["system", "mica", "acrylic", "none"] }
+      }
+    },
+    "layoutSettings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "sidebarWidth",
+        "sidebarCollapsed",
+        "inspectorWidth",
+        "inspectorOpen",
+        "bottomPanelHeightRatio",
+        "bottomPanelOpen"
+      ],
+      "properties": {
+        "schemaVersion": { "type": "integer", "const": 1 },
+        "sidebarWidth": { "type": "number", "minimum": 220, "maximum": 400 },
+        "sidebarCollapsed": { "type": "boolean" },
+        "inspectorWidth": { "type": "number", "minimum": 280, "maximum": 480 },
+        "inspectorOpen": { "type": "boolean" },
+        "bottomPanelHeightRatio": { "type": "number", "minimum": 0.20, "maximum": 0.50 },
+        "bottomPanelOpen": { "type": "boolean" },
+        "activeNavigationId": { "type": "string", "maxLength": 64 }
+      }
+    },
+    "documentAnalysisSettings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxTopTerms"],
+      "properties": {
+        "maxTopTerms": { "type": "integer", "enum": [10, 20, 50] }
+      }
+    },
+    "textUtilitySettings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["defaultMode"],
+      "properties": {
+        "defaultMode": {
+          "type": "string",
+          "enum": ["uppercase", "lowercase", "titlecase", "normalize-whitespace"]
+        }
+      }
+    },
+    "settingsStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state"],
+      "properties": {
+        "state": {
+          "type": "string",
+          "enum": [
+            "healthy",
+            "recovered_from_previous_copy",
+            "section_recovered",
+            "reset_to_defaults",
+            "unsupported_future_version"
+          ]
+        },
+        "recoveredSection": { "type": "string" },
+        "message": { "type": "string" }
+      }
+    },
+    "settingsDocument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "revision",
+        "appearance",
+        "layout",
+        "documentAnalysis",
+        "textUtility"
+      ],
+      "properties": {
+        "schemaVersion": { "type": "integer", "const": 1 },
+        "revision": { "type": "integer", "minimum": 0 },
+        "appearance": { "$ref": "#/$defs/appearanceSettings" },
+        "layout": { "$ref": "#/$defs/layoutSettings" },
+        "documentAnalysis": { "$ref": "#/$defs/documentAnalysisSettings" },
+        "textUtility": { "$ref": "#/$defs/textUtilitySettings" },
+        "status": { "$ref": "#/$defs/settingsStatus" }
+      }
+    }
+  }
+}

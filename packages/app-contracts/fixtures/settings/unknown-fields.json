@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "revision": 3,
+  "appearance": {
+    "themeMode": "system",
+    "accentMode": {
+      "mode": "default"
+    },
+    "density": "comfortable",
+    "materialPreference": "system",
+    "unknownAppearanceField": "ignored"
+  },
+  "layout": {
+    "schemaVersion": 1,
+    "sidebarWidth": 280.0,
+    "sidebarCollapsed": false,
+    "inspectorWidth": 340.0,
+    "inspectorOpen": true,
+    "bottomPanelHeightRatio": 0.30,
+    "bottomPanelOpen": false,
+    "activeNavigationId": "workspace"
+  },
+  "documentAnalysis": {
+    "maxTopTerms": 20
+  },
+  "textUtility": {
+    "defaultMode": "uppercase"
+  },
+  "unrecognizedTopLevelField": 12345
+}

@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "revision": 2,
+  "appearance": {
+    "themeMode": "dark",
+    "accentMode": {
+      "mode": "default"
+    },
+    "density": "compact",
+    "materialPreference": "mica"
+  },
+  "layout": {
+    "schemaVersion": 1,
+    "sidebarWidth": 300.0,
+    "sidebarCollapsed": false,
+    "inspectorWidth": 350.0,
+    "inspectorOpen": true,
+    "bottomPanelHeightRatio": 0.35,
+    "bottomPanelOpen": true,
+    "activeNavigationId": "analysis"
+  },
+  "documentAnalysis": {
+    "maxTopTerms": 999
+  },
+  "textUtility": {
+    "defaultMode": "lowercase"
+  }
+}

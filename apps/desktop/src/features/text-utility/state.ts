@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { applyTransform, inspectText, MAX_INPUT_CHARS, type TextInspectionMetrics, type TextTransformMode } from "./transform";
+import { useSettingsStore } from "../../shell/state/useSettingsStore";
 
 interface TextUtilityState {
   inputText: string;
@@ -39,6 +40,7 @@ export const useTextUtilityStore = create<TextUtilityState>((set, get) => ({
 
   setDefaultMode: (defaultMode: TextTransformMode) => {
     set({ defaultMode, mode: defaultMode });
+    useSettingsStore.getState().updateTextUtility({ defaultMode });
   },
 
   apply: () => {
@@ -66,3 +68,11 @@ export const useTextUtilityStore = create<TextUtilityState>((set, get) => ({
     set({ copyFeedback });
   },
 }));
+
+useSettingsStore.subscribe((settingsState) => {
+  const mode = settingsState.document.textUtility.defaultMode as TextTransformMode;
+  if (mode && mode !== useTextUtilityStore.getState().defaultMode) {
+    useTextUtilityStore.setState({ defaultMode: mode, mode });
+  }
+});
+

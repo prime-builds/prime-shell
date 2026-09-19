@@ -13,6 +13,7 @@ import type {
   TaskEvent,
   TaskState,
 } from "../../contracts";
+import { useSettingsStore } from "./useSettingsStore";
 
 export const DEFAULT_MAX_TOP_TERMS = 20;
 
@@ -194,10 +195,12 @@ export const useDocumentAnalysisStore = create<DocumentAnalysisState>((set, get)
   setMaxTopTerms: (count: number) => {
     const clamped = Math.max(1, Math.min(100, Math.round(count)));
     set({ maxTopTerms: clamped });
+    useSettingsStore.getState().updateDocumentAnalysis({ maxTopTerms: clamped });
   },
 
   resetSetting: () => {
     set({ maxTopTerms: DEFAULT_MAX_TOP_TERMS });
+    useSettingsStore.getState().resetSetting("documentAnalysis", "maxTopTerms");
   },
 
   reset: () => {
@@ -249,3 +252,11 @@ export const useDocumentAnalysisStore = create<DocumentAnalysisState>((set, get)
     }
   },
 }));
+
+useSettingsStore.subscribe((settingsState) => {
+  const terms = settingsState.document.documentAnalysis.maxTopTerms;
+  if (terms && terms !== useDocumentAnalysisStore.getState().maxTopTerms) {
+    useDocumentAnalysisStore.setState({ maxTopTerms: terms });
+  }
+});
+
