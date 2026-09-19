@@ -4,6 +4,7 @@ pub mod instance;
 pub mod layout;
 pub mod settings;
 pub mod theme;
+pub mod update;
 
 use std::{
     env,
@@ -457,6 +458,9 @@ pub fn run() {
             let diagnostics_manager = diagnostics::DiagnosticsManager::new(log_dir);
             app.manage(diagnostics_manager);
 
+            let update_manager = update::UpdateManager::new();
+            app.manage(update_manager);
+
             theme::apply_initial_window_theme(app.handle());
             Ok(())
         })
@@ -496,7 +500,10 @@ pub fn run() {
                     diagnostics::get_export_preview,
                     diagnostics::export_diagnostics,
                     diagnostics::recover_backend,
-                    diagnostics::repair_settings_section
+                    diagnostics::repair_settings_section,
+                    update::get_update_status,
+                    update::set_update_channel,
+                    update::check_for_updates
                 ]
             }
             #[cfg(not(any(debug_assertions, feature = "test-fault-injection")))]
@@ -530,7 +537,10 @@ pub fn run() {
                     diagnostics::get_export_preview,
                     diagnostics::export_diagnostics,
                     diagnostics::recover_backend,
-                    diagnostics::repair_settings_section
+                    diagnostics::repair_settings_section,
+                    update::get_update_status,
+                    update::set_update_channel,
+                    update::check_for_updates
                 ]
             }
         })

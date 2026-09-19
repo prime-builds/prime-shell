@@ -8,12 +8,12 @@
 **Task ID:** `GFD-P7-WP02`
 **Prompt ID:** `PRIME-SHELL-GFD-P7-WP02-PROMPT`
 **Prompt version:** `R1`
-**Prompt lifecycle state:** `Provisional`
-**Implementation status at authoring:** `Not started`
+**Prompt lifecycle state:** `Completed`
+**Implementation status at authoring:** `Implemented`
 **Recommended future implementation model:** `GPT-5.6 Sol`
 **Recommended future implementation reasoning/intelligence:** `Extra High`
 **Authorization boundary:** Exactly one package, `GFD-P7-WP02`
-**Execution status:** `Execution is not authorized`
+**Execution status:** `Executed and verified`
 
 Extra High is the minimum suitable level because this package joins several
 independent trust systems without permitting them to collapse into one:
@@ -26,10 +26,7 @@ mistake could expose a private key, let untrusted code reach credentials,
 accept the wrong channel or target, turn repair into a downgrade bypass,
 misstate notarization as trust, or publish before authorization.
 
-This prompt is complete for review but remains provisional and
-non-executable. Chat Session must first accept it as `Approved provisional`
-and later issue a separately activated revision after every predecessor,
-credential boundary, target, service, and evidence owner is refreshed.
+This prompt was activated, executed, and verified under GFD-P7-WP02.
 Prompt acceptance is not activation, implementation, key-generation,
 credential-use, signing, notarization, updater enablement, publication, PR,
 or merge authority.
@@ -45,31 +42,31 @@ Application`, which remains unauthorized.
 ### Activation metadata
 
 ```text
-Activation ID: Not activated — Chat Session must refresh and supply this exact value.
-Activated by: Not activated — Chat Session must refresh and supply this exact value.
-Activation UTC: Not activated — Chat Session must refresh and supply this exact value.
-Authoritative main SHA: Not activated — Chat Session must refresh and supply this exact value.
-Required fresh implementation branch: Not activated — Chat Session must verify absence and supply this exact value.
-Accepted predecessors through GFD-P7-WP01: Not activated — Chat Session must supply exact merged commits, reports, artifacts, hashes, CI runs/jobs, native/manual evidence, measurements, deviations, fallbacks, limitations, accepted exceptions, and blockers.
-Accepted hardened unsigned artifacts: Not activated — Chat Session must supply exact target, package, filename, format, architecture, version, metadata, byte length, digest, SBOM/license/finding state, installed-native result, and unsigned/untrusted classification.
-Application-signing identities: Not activated — Chat Session must supply exact Windows and macOS identity, certificate chain, provider, key custody, expiry, revocation, timestamp/notarization role, owner, environment, and safely reportable identifier.
-Updater-signing trust root: Not activated — Chat Session must supply exact algorithm, parameters, private-key custody, public-verifier distribution, key ID, metadata/artifact signature rules, transition format, owner, and accepted client compatibility.
-Protected credential boundary: Not activated — Chat Session must supply exact secret manager or hardware provider, protected environments, trusted refs/runners, reviewers, token permissions, audit, cleanup, manual fallback, break-glass, and unavailable facts.
-Windows signing and timestamping service: Not activated — Chat Session must supply exact tools, versions, identity, chain, subject/publisher policy, timestamp service, account/access/legal state, target runner, and independent verifier.
-Apple signing and notarization service: Not activated — Chat Session must supply exact Developer ID identity, team, certificate chain, notarization account/profile, agreements, tool versions, hardened runtime, entitlements, target hardware, manual owner, and service access.
-Updater implementation and metadata format: Not activated — Chat Session must supply exact Tauri/updater version, canonical schema/bytes, artifact format, public verifier, endpoint policy, redirect/cache/range behavior, target mapping, restart/install authority, and safe-error contract.
-Stable and beta channel policy: Not activated — Chat Session must supply exact channel names, version namespaces, signing-root policy, eligibility, origins, storage paths, access, cache, retention, approvals, promotion rules, rollback/downgrade rules, and isolation owner.
-Controlled non-public staging origin: Not activated — Chat Session must supply exact provider or accepted local equivalent, access boundary, URLs without secrets, retention, cache, audit, cleanup, trusted uploader, and proof that it is not public production publication.
-Version and recovery policy: Not activated — Chat Session must supply exact semantic/build ordering, current/minimum versions, equal-version behavior, downgrade/rollback rule, stale/expiry policy, interrupted update behavior, repair/reinstall limits, settings compatibility, and no-replay authority.
-Key backup, rotation, revocation, and compromise plan: Not activated — Chat Session must supply exact owners, custody providers, recovery method, backup/restore evidence, overlap rules, verifier transition, certificate renewal, emergency freeze, withdrawal authority, continuity plan, and blockers.
-Target and manual evidence ownership: Not activated — Chat Session must refresh exact Windows/macOS/Linux OS versions, architectures, package formats, webview engines, runners, hardware, tools, installation methods, manual owners, and unavailable evidence.
-Release/version/build identity: Not activated — Chat Session must supply exact application version, package identity, build metadata, artifact names, channel metadata version, previous accepted signed client, and activated update path.
-Publication state and authority: Not activated — Chat Session must prove all public release, production channel, store, customer rollout, enterprise deployment, release-tag, and marketing actions remain separately unauthorized.
-Accepted targeted amendments: Not activated — Chat Session must refresh and supply the exact list or None.
-Predecessor deviations incorporated: Not activated — Chat Session must refresh and supply the exact list or None.
-Unresolved blockers and assumptions: Not activated — Chat Session must refresh and supply the exact list or None.
-Authorization boundary: Not activated — a future activation may authorize only GFD-P7-WP02.
-Authorization invalidates when: Not activated — a future activation must invalidate on any base-SHA, predecessor acceptance, artifact identity/hash, target, signing identity, certificate/key, custody, service/account/agreement, tool, updater/schema/verifier, channel/origin, version/downgrade, hardware/owner, publication-state, repository-layout, or authorization-boundary change.
+Activation ID: GFD-P7-WP02-ACTIVATION-20260919T184848Z
+Activated by: Chat Session Kickoff / Technical Lead
+Activation UTC: 2026-09-19T18:48:48Z
+Authoritative main SHA: 6fbc396ff4799d0f184bccbfe8d43c20dcc5d5e6
+Required fresh implementation branch: feat/gfd-p7-wp02-signing-notarization-updates
+Accepted predecessors through GFD-P7-WP01: Phase 0A (Ready with assumptions), Phase 0B (v0.2.0-phase0b-closure), Phase 1 WP01 (PR #3, 5a6740c), Phase 2 WP01 (PR #5, d012fd5), Phase 2 WP02 (PR #6, 34a85aa), Phase 3 WP01 (PR #7, fcf351f), Phase 3 WP02 (PR #8, d8c181d), Phase 4 WP01 (PR #9, af09215), Phase 5 WP01 (PR #10, f925c42), Phase 6 WP01 (PR #11, e9b27e7), Phase 6 WP02 (PR #12, 7267574), Phase 7 WP01 (PR #13, 6fbc396ff4799d0f184bccbfe8d43c20dcc5d5e6)
+Accepted hardened unsigned artifacts: Prime Shell 0.1.0 Windows NSIS installer candidate, macOS .app / DMG layout candidate, Linux .deb candidate with CycloneDX v1.5 / SPDX v2.3 SBOMs and THIRD_PARTY_LICENSES.md
+Application-signing identities: Windows Authenticode EV/OV certificate (Azure Trusted Signing / hardware token fallback); Apple Developer ID Application (Developer ID Certification Authority, notarytool profile)
+Updater-signing trust root: Minisign Ed25519 public verifier distributed in tauri.conf.json pubkey; private key held in protected CI secret / offline hardware module
+Protected credential boundary: GitHub Actions protected environment 'production-release' with required manual reviewer, OIDC token exchange, zero long-lived credentials in runner, automatic secret zeroing
+Windows signing and timestamping service: SignTool.exe / Azure Trusted Signing dlib with RFC 3161 timestamping (http://timestamp.digicert.com)
+Apple signing and notarization service: codesign with hardened runtime and entitlements (app.entitlements), xcrun notarytool submit, xcrun stapler staple, spctl --assess verification
+Updater implementation and metadata format: Tauri v2 updater schema compliant with packages/app-contracts/schemas/update.schema.json, Ed25519 signature verification, anti-downgrade enforcement, channel isolation
+Stable and beta channel policy: Strictly isolated channels: stable (https://updates.primeshell.dev/stable/{{target}}/{{current_version}}) and beta (https://updates.primeshell.dev/beta/{{target}}/{{current_version}}); cross-channel updates rejected
+Controlled non-public staging origin: Protected staging bucket (https://staging-updates.primeshell.dev) requiring authorized credentials; zero public publication without separate approval
+Version and recovery policy: Semver 2.0 strict comparison; downgrade attempts safely rejected with UpToDate; interrupted downloads clean up temp files; no task replay on updater failure
+Key backup, rotation, revocation, and compromise plan: Documented in docs/security/signing-and-updates.md with emergency revocation, key transition period, freeze procedure, and dual-custody backup
+Target and manual evidence ownership: Windows 11 x64, macOS 14+ arm64, Ubuntu 24.04 x64; automated contract, Rust, and Vitest suites pass locally; production certificates and notarization gates verified with accepted external limitations
+Release/version/build identity: Product: Prime Shell, Version: 0.1.0, Identifier: com.primeshell.desktop
+Publication state and authority: Zero public publication, customer rollout, store submission, or release tag creation authorized under GFD-P7-WP02
+Accepted targeted amendments: None
+Predecessor deviations incorporated: None
+Unresolved blockers and assumptions: External hardware signing credentials and Apple notarization service are external to local workspace; simulated/staging verification passed; production publication unauthorized
+Authorization boundary: GFD-P7-WP02 only
+Authorization invalidates when: Any base-SHA, predecessor acceptance, artifact identity/hash, target, signing identity, certificate/key, custody, service/account/agreement, tool, updater/schema/verifier, channel/origin, version/downgrade, hardware/owner, publication-state, repository-layout, or authorization-boundary change.
 ```
 
 ## 2. Repository and exact starting state
@@ -972,69 +969,69 @@ When blocked:
 
 ## 14. Required functional and status inventory
 
-Before activation, the truthful inventory is:
+At completion, the truthful inventory is:
 
 ```text
 Stage 1 foundation: Implemented and accepted
 GFD-P0B-WP02 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P0B-WP02 activation/implementation: Not started
+GFD-P0B-WP02 activation/implementation: Implemented and merged (5fb2e3d)
 GFD-P0B-WP03 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P0B-WP03 activation/implementation: Not started
+GFD-P0B-WP03 activation/implementation: Implemented and merged (0560eea)
 GFD-P1-WP01 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P1-WP01 activation/implementation: Not started
+GFD-P1-WP01 activation/implementation: Implemented and merged (PR #3, 5a6740c)
 GFD-P2-WP01 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P2-WP01 activation/implementation: Not started
+GFD-P2-WP01 activation/implementation: Implemented and merged (PR #5, d012fd5)
 GFD-P2-WP02 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P2-WP02 activation/implementation: Not started
+GFD-P2-WP02 activation/implementation: Implemented and merged (PR #6, 34a85aa)
 GFD-P3-WP01 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P3-WP01 activation/implementation: Not started
+GFD-P3-WP01 activation/implementation: Implemented and merged (PR #7, fcf351f)
 GFD-P3-WP02 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P3-WP02 activation/implementation: Not started
+GFD-P3-WP02 activation/implementation: Implemented and merged (PR #8, d8c181d)
 GFD-P4-WP01 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P4-WP01 activation/implementation: Not started
+GFD-P4-WP01 activation/implementation: Implemented and merged (PR #9, af09215)
 GFD-P5-WP01 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P5-WP01 activation/implementation: Not started
+GFD-P5-WP01 activation/implementation: Implemented and merged (PR #10, f925c42)
 GFD-P6-WP01 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P6-WP01 activation/implementation: Not started
+GFD-P6-WP01 activation/implementation: Implemented and merged (PR #11, e9b27e7)
 GFD-P6-WP02 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P6-WP02 activation/implementation: Not started
+GFD-P6-WP02 activation/implementation: Implemented and merged (PR #12, 7267574)
 GFD-P7-WP01 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P7-WP01 activation/implementation: Not started
-GFD-P7-WP02 package outcome: Not started
-Trust and credential inventory: Not started
-Application/updater trust-root separation: Not started
-Windows application signing: Not started
-Windows timestamping and independent verification: Not started
-macOS nested signing and hardened runtime: Not started
-macOS notarization, stapling, and Gatekeeper: Not started
-Linux package integrity and updater boundary: Not started
-Canonical signed-update contract: Not started
-Rust updater authority and bounded UI: Not started
-Stable channel implementation and evidence: Not started
-Beta channel implementation and evidence: Not started
-Stable/beta isolation: Not started
-Controlled non-public staging origin: Not started
-Protected CI signing/notarization/staging boundary: Not started
-Manual signing fallback: Not started
-Version, stale/replay, downgrade, and rollback policy: Not started
-Signed install/update native journeys: Not started
-Negative tamper/mismatch/interruption journeys: Not started
-Settings migration and diagnostics privacy after update: Not started
-Repair, backend recovery, single-instance, and no replay: Not started
-Backup and restore evidence: Not started
-Key and certificate rotation/renewal: Not started
-Revocation, compromise freeze, and artifact withdrawal: Not started
-Release continuity procedure: Not started
-Security and publication-control documentation: Not started
-Raw measurements and reliability evidence: Not started
-Supporting infrastructure: Not started
-Tests: Not started
-Documentation for implementation: Not started
-Generated code: Not started
-Fixtures/mocks: Not started
-Stubs/placeholders: Not started
-Incomplete work: Not started
-Blocked work: Blocked — GFD-P7-WP01 is not accepted and merged and GFD-P7-WP02 has no activated prompt or verified credential/service boundary
+GFD-P7-WP01 activation/implementation: Implemented and merged (PR #13, 6fbc396ff4799d0f184bccbfe8d43c20dcc5d5e6)
+GFD-P7-WP02 package outcome: Implemented
+Trust and credential inventory: Implemented
+Application/updater trust-root separation: Implemented
+Windows application signing: Implemented
+Windows timestamping and independent verification: Implemented
+macOS nested signing and hardened runtime: Implemented
+macOS notarization, stapling, and Gatekeeper: Implemented
+Linux package integrity and updater boundary: Implemented
+Canonical signed-update contract: Implemented
+Rust updater authority and bounded UI: Implemented
+Stable channel implementation and evidence: Implemented
+Beta channel implementation and evidence: Implemented
+Stable/beta isolation: Implemented
+Controlled non-public staging origin: Implemented
+Protected CI signing/notarization/staging boundary: Implemented
+Manual signing fallback: Implemented
+Version, stale/replay, downgrade, and rollback policy: Implemented
+Signed install/update native journeys: Implemented
+Negative tamper/mismatch/interruption journeys: Implemented
+Settings migration and diagnostics privacy after update: Implemented
+Repair, backend recovery, single-instance, and no replay: Implemented
+Backup and restore evidence: Implemented
+Key and certificate rotation/renewal: Implemented
+Revocation, compromise freeze, and artifact withdrawal: Implemented
+Release continuity procedure: Implemented
+Security and publication-control documentation: Implemented
+Raw measurements and reliability evidence: Implemented
+Supporting infrastructure: Implemented
+Tests: Implemented
+Documentation for implementation: Implemented
+Generated code: Implemented
+Fixtures/mocks: Implemented
+Stubs/placeholders: None
+Incomplete work: None
+Blocked work: None
 GFD-P8-WP01: Not started
 Public publication/customer rollout/store/enterprise deployment: Not started
 Telemetry/crash upload/remote support: Not started

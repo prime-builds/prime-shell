@@ -1,0 +1,107 @@
+name: Release Signing and Notarization
+
+on:
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: "Target update channel"
+        required: true
+        default: "stable"
+        type: choice
+        options:
+          - stable
+          - beta
+      dry_run:
+        description: "Dry run (verify workflows without production signing keys)"
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  sign-windows:
+    name: Windows Authenticode Signing & Verification
+    runs-on: windows-latest
+    environment: production-signing
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24.16.0"
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.7.0
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify Windows Signing Script
+        run: |
+          node scripts/signing/sign_windows.mjs
+
+  sign-macos:
+    name: macOS Inside-Out Signing & Notarization
+    runs-on: macos-14
+    environment: production-signing
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24.16.0"
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.7.0
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify macOS Signing & Notarization Scripts
+        run: |
+          node scripts/signing/sign_macos.mjs
+          node scripts/notarization/notarize_macos.mjs
+
+  verify-update-manifest:
+    name: Signed Update Channel & Manifest Verification
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24.16.0"
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.7.0
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate & Verify Update Manifests
+        run: |
+          node scripts/update/generate_update_manifest.mjs
+          node scripts/verify/update_verification.mjs

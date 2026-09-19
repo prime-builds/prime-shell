@@ -89,3 +89,13 @@ commands.allow = [
   "recover_backend",
   "repair_settings_section"
 ]
+
+[[permission]]
+identifier = "allow-update"
+description = "Allows the main window to query update status, change release channels, and check for updates."
+commands.allow = [
+  "get_update_status",
+  "set_update_channel",
+  "check_for_updates"
+]
+

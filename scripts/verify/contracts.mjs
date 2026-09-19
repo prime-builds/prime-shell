@@ -52,6 +52,12 @@ const validateSettingsDocument = ajv.getSchema(
 const validateDiagnosticRecord = ajv.getSchema(
   "https://prime-shell.local/schemas/diagnostics.schema.json#/$defs/diagnosticRecord",
 );
+const validateUpdateManifest = ajv.getSchema(
+  "https://prime-shell.local/schemas/update.schema.json#/$defs/updateManifest",
+);
+const validateUpdateStatus = ajv.getSchema(
+  "https://prime-shell.local/schemas/update.schema.json#/$defs/updateStatus",
+);
 if (
   !validateHandshake ||
   !validateEnvelope ||
@@ -60,7 +66,9 @@ if (
   !validateArtifactRef ||
   !validateTaskSnapshot ||
   !validateSettingsDocument ||
-  !validateDiagnosticRecord
+  !validateDiagnosticRecord ||
+  !validateUpdateManifest ||
+  !validateUpdateStatus
 ) {
   throw new Error("contract validators were not compiled");
 }
@@ -83,6 +91,9 @@ const validCases = [
   [validateSettingsDocument, "settings/valid-v1.json"],
   [validateDiagnosticRecord, "diagnostics/valid-record.json"],
   [validateDiagnosticRecord, "diagnostics/redacted-record.json"],
+  [validateUpdateManifest, "update/valid-stable-manifest.json"],
+  [validateUpdateManifest, "update/valid-beta-manifest.json"],
+  [validateUpdateStatus, "update/valid-status.json"],
 ];
 
 for (const [validate, name] of validCases) {
@@ -102,6 +113,8 @@ const invalidCases = [
   [validateSettingsDocument, "settings/future-version-v99.json"],
   [validateSettingsDocument, "settings/unknown-fields.json"],
   [validateDiagnosticRecord, "diagnostics/invalid-event-code.json"],
+  [validateUpdateManifest, "update/invalid-channel.json"],
+  [validateUpdateManifest, "update/invalid-version.json"],
 ];
 
 for (const [validate, name] of invalidCases) {
