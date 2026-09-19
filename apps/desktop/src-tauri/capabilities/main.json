@@ -8,6 +8,7 @@
     "allow-backend-status",
     "allow-echo-text",
     "allow-task-lifecycle",
-    "allow-runtime-probe"
+    "allow-runtime-probe",
+    "allow-theme-state"
   ]
 }

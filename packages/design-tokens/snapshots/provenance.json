@@ -1,0 +1,19 @@
+{
+  "fluentUiVersion": "9.74.4",
+  "architectureAuthority": "docs/authority/generic-fluent-desktop-app-architecture-v0.2.md",
+  "schemaVersion": "1.0.0",
+  "snapshotHashes": {
+    "light.json": "sha256:c27947668305691611e7f8427d8a79d7c4380a08f1a5f73a2e42b4efd2ce0067",
+    "dark.json": "sha256:148a1db84fd712929e8ebfd04b8b06968dfa9ae3b66a75530a0e273ed5d31257"
+  },
+  "reviewedExemptions": {
+    "disabledText": {
+      "criterion": "WCAG 2.2 SC 1.4.3 Contrast (Minimum)",
+      "rationale": "Inactive user interface components are explicitly exempt under WCAG 2.2 Success Criterion 1.4.3."
+    },
+    "subtleDivider": {
+      "criterion": "WCAG 2.2 SC 1.4.11 Non-text Contrast",
+      "rationale": "Purely decorative divider lines separating already whitespace-delimited regions are non-essential and exempt."
+    }
+  }
+}

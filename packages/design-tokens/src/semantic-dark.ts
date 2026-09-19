@@ -1,0 +1,50 @@
+import type { ThemeTokens } from "./contract";
+
+export const semanticDarkTokens: ThemeTokens = {
+  surfaces: {
+    appShell: "#1F1F1F",
+    titleBar: "#1F1F1F",
+    navigationRail: "#1F1F1F",
+    contextSidebar: "#1F1F1F",
+    mainWorkspace: "#292929",
+    inspector: "#1F1F1F",
+    bottomPanel: "#141414",
+    cardElevated: "#333333",
+    codeTerminal: "#141414",
+    panelBorder: "#525252",
+    subtleDivider: "#3D3D3D",
+    overlay: "rgba(0,0,0,0.50)",
+  },
+  text: {
+    primaryText: "#FFFFFF",
+    secondaryText: "#D6D6D6",
+    tertiaryText: "#ADADAD",
+    disabledText: "#5C5C5C",
+  },
+  interaction: {
+    subtleHover: "#383838",
+    subtlePressed: "#2E2E2E",
+    subtleSelected: "#333333",
+    workspaceHover: "#3D3D3D",
+    workspacePressed: "#1F1F1F",
+    disabledSurface: "#141414",
+  },
+  accent: {
+    accentBackground: "#115EA3",
+    accentBackgroundHover: "#0F6CBD",
+    accentBackgroundPressed: "#0C3B5E",
+    onAccentForeground: "#FFFFFF",
+    accentLinkForeground: "#479EF5",
+    accentSubtleBackground: "#082338",
+    focusStrokeInner: "#000000",
+    focusStrokeOuter: "#FFFFFF",
+  },
+  status: {
+    dangerForeground: "#DC626D",
+    dangerSubtleBackground: "#3B0509",
+    successForeground: "#54B054",
+    successSubtleBackground: "#052505",
+    warningForeground: "#FAA06B",
+    warningSubtleBackground: "#4A1E04",
+  },
+};

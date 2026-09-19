@@ -1,4 +1,5 @@
 pub mod backend;
+pub mod theme;
 
 use std::{
     env, fs,
@@ -252,6 +253,7 @@ pub fn run() {
             app.manage(BackendState {
                 client: Mutex::new(client),
             });
+            theme::apply_initial_window_theme(app.handle());
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -264,7 +266,9 @@ pub fn run() {
             trigger_large_rejected,
             reset_backend,
             runtime_probe_config,
-            write_runtime_evidence
+            write_runtime_evidence,
+            theme::get_theme_state,
+            theme::sync_native_window_theme
         ])
         .run(tauri::generate_context!())
         .expect("error while running Prime Shell Lifecycle Spike");

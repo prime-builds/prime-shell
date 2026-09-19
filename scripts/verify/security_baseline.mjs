@@ -46,6 +46,7 @@ const allowedPermissions = new Set([
   "allow-echo-text",
   "allow-task-lifecycle",
   "allow-runtime-probe",
+  "allow-theme-state",
 ]);
 
 for (const perm of capability.permissions || []) {
