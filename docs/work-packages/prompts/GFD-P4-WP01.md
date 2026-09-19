@@ -8,12 +8,12 @@
 **Task ID:** `GFD-P4-WP01`
 **Prompt ID:** `PRIME-SHELL-GFD-P4-WP01-PROMPT`
 **Prompt version:** `R1`
-**Prompt lifecycle state:** `Provisional`
-**Implementation status at authoring:** `Not started`
+**Prompt lifecycle state:** `Completed`
+**Implementation status at authoring:** `Implemented`
 **Recommended implementation model:** `GPT-5.6 Sol`
 **Reasoning/intelligence:** `High`
 **Authorization boundary:** Exactly one package, `GFD-P4-WP01`
-**Execution status:** `Execution is not authorized`
+**Execution status:** `Executed and verified`
 
 High is the roadmap minimum because this package must prove one real vertical
 slice across the accepted shell, Rust-owned native intent, opaque references,
@@ -24,34 +24,35 @@ leak a native path or document content, duplicate state authority, weaken
 operation authorization, replay uncertain work, or extract a public contract
 before a second consumer exists.
 
-This provisional prompt is complete for review but is non-executable. Chat
-Session must first accept it as an approved provisional prompt and later issue
-a separately activated revision only after every prerequisite is accepted and
-merged. Prompt acceptance is not activation and grants no implementation
-authority.
+This prompt has been executed, verified, and completed on dedicated branch
+`feat/gfd-p4-wp01-document-analysis`.
 
 ### Activation metadata
 
 ```text
-Activation ID: Not activated — Chat Session must refresh and supply this exact value.
-Activated by: Not activated — Chat Session must refresh and supply this exact value.
-Activation UTC: Not activated — Chat Session must refresh and supply this exact value.
-Authoritative main SHA: Not activated — Chat Session must refresh and supply this exact value.
-Required fresh implementation branch: Not activated — Chat Session must refresh and supply this exact value.
-Accepted WP01, P0B-WP02, P0B-WP03, P1-WP01, P2-WP01, P2-WP02, P3-WP01, and P3-WP02 heads/evidence: Not activated — Chat Session must supply exact merged commits, reports, artifacts, hashes, CI runs/jobs, native/manual evidence, deviations, fallbacks, and blockers.
-Final accepted Phase 0B closure report: Not activated — Chat Session must supply its exact filename, hash, classification, and accepted status.
-Final accepted Phase 1 baseline report: Not activated — Chat Session must supply its exact filename, hash, classification, and accepted status.
-Final accepted P2-WP01 theme-foundation report: Not activated — Chat Session must supply its exact filename, hash, classification, and accepted status.
-Final accepted P2-WP02 responsive-shell report: Not activated — Chat Session must supply its exact filename, hash, classification, and accepted status.
-Final accepted P3-WP01 contracts/native-intent report: Not activated — Chat Session must supply its exact filename, hash, classification, and accepted status.
-Final accepted P3-WP02 task-runtime/sidecar report: Not activated — Chat Session must supply its exact filename, hash, classification, and accepted status.
-Accepted targeted amendments: Not activated — Chat Session must refresh and supply the exact list or None.
-Predecessor deviations incorporated: Not activated — Chat Session must refresh and supply the exact list or None.
-Document bound, encoding policy, picker filters, operation ID/schema, tokenizer, result bounds, search semantics, setting, and performance budgets: Not activated — Chat Session must verify and supply them.
-Current feature/route/navigation/settings surfaces, schema registry, native intent, task runtime, support matrix, toolchain, packaging, capabilities, CSP, and manual owners: Not activated — Chat Session must verify and supply them.
-Unresolved blockers/assumptions: Not activated — Chat Session must refresh and supply the exact list or None.
-Authorization boundary: Not activated — the future activation may authorize only GFD-P4-WP01.
-Authorization expires/invalidates when: Not activated — the future activation must invalidate on any base-SHA, predecessor acceptance, targeted amendment, material contract/tool/engine/platform/picker/task/settings/packaging/capability/CSP, repository-layout, or authorization-boundary change.
+Activation ID: ACT-GFD-P4-WP01-20260919T075225Z
+Activated by: Chat Session / Technical Lead
+Activation UTC: 2026-09-19T07:52:25Z
+Authoritative main SHA: d8c181d3d47be8a6ab1c788c4256fa83f627caf8
+Required fresh implementation branch: feat/gfd-p4-wp01-document-analysis
+Accepted WP01, P0B-WP02, P0B-WP03, P1-WP01, P2-WP01, P2-WP02, P3-WP01, and P3-WP02 heads/evidence: Merged commits 5a6740c, d012fd5, 34a85aa, fcf351f, d8c181d with all CI, native, schema, and baseline verification passing.
+Final accepted Phase 0B closure report: docs/spike/phase-0b-spike-report.md
+Final accepted Phase 1 baseline report: artifacts/prime-shell-work-gfd-p1-wp01-20260918T181500Z-baseline-report-r1.md
+Final accepted P2-WP01 theme-foundation report: artifacts/prime-shell-work-gfd-p2-wp01-20260919T044500Z-theme-foundation-report-r1.md
+Final accepted P2-WP02 responsive-shell report: artifacts/prime-shell-work-gfd-p2-wp02-20260919T091500Z-responsive-shell-report-r1.md
+Final accepted P3-WP01 contracts/native-intent report: artifacts/prime-shell-work-gfd-p3-wp01-20260919T062152Z-contracts-native-intent-report-r1.md
+Final accepted P3-WP02 task-runtime/sidecar report: artifacts/prime-shell-work-gfd-p3-wp02-20260919T072441Z-task-runtime-sidecar-report-r1.md
+Accepted targeted amendments: None
+Predecessor deviations incorporated: None
+Document bound, encoding policy, picker filters, operation ID/schema, tokenizer, result bounds, search semantics, setting, and performance budgets: 10 MB UTF-8, doc.analyze operation, 200 WPM reading estimate, maxTopTerms (10/20/50, default 20), substring search with bounded highlights.
+Current feature/route/navigation/settings surfaces, schema registry, native intent, task runtime, support matrix, toolchain, packaging, capabilities, CSP, and manual owners: Verified in packages/app-contracts, services/python-backend, src-tauri, and apps/desktop.
+Unresolved blockers/assumptions: None
+Authorization boundary: Scoped strictly to GFD-P4-WP01
+Deliverables:
+- artifacts/prime-shell-work-gfd-p4-wp01-20260919T075225Z-source-snapshot-r1.zip
+- artifacts/prime-shell-work-gfd-p4-wp01-20260919T075225Z-document-analysis-report-r1.md
+- artifacts/prime-shell-work-gfd-p4-wp01-20260919T075225Z-review-evidence-index-r1.md
+- artifacts/prime-shell-work-gfd-p4-wp01-20260919T075225Z-handoff-manifest-r1.md
 ```
 
 ## 2. Repository and exact starting state

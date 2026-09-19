@@ -90,6 +90,52 @@ pub struct CountPayload<'a> {
 }
 
 #[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DocAnalyzePayload<'a> {
+    pub text: &'a str,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub query: Option<&'a str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_top_terms: Option<usize>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub task_id: Option<&'a str>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct TermFrequencyItem {
+    pub term: String,
+    pub count: u64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct KeywordMatchItem {
+    pub term: String,
+    pub count: u64,
+    pub positions: Vec<usize>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct DocumentAnalysisMetrics {
+    pub word_count: u64,
+    pub character_count: u64,
+    pub line_count: u64,
+    pub sentence_count: u64,
+    pub reading_time_seconds: f64,
+    pub lexical_diversity: f64,
+    pub top_terms: Vec<TermFrequencyItem>,
+    pub keyword_matches: Vec<KeywordMatchItem>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct DocAnalyzeResultPayload {
+    pub metrics: DocumentAnalysisMetrics,
+}
+
+#[derive(Debug, Serialize)]
 pub struct EmptyPayload {}
 
 #[derive(Debug, Serialize)]
@@ -220,6 +266,7 @@ pub fn validate_hello(
         "spike.crash",
         "spike.hang",
         "spike.largeRejected",
+        "doc.analyze",
     ];
     if hello.python_version.is_empty() || hello.supported_operations != expected_ops {
         return Err(AppError::mismatch(
@@ -264,6 +311,7 @@ mod tests {
                 "spike.crash".to_owned(),
                 "spike.hang".to_owned(),
                 "spike.largeRejected".to_owned(),
+                "doc.analyze".to_owned(),
             ],
         }
     }

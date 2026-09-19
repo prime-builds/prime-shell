@@ -1,0 +1,13 @@
+{
+  "protocol": "generic-app",
+  "kind": "request",
+  "requestId": "request-doc-analyze-1",
+  "traceId": "trace-doc-analyze-1",
+  "operation": "doc.analyze",
+  "payload": {
+    "text": "The quick brown fox jumps over the lazy dog. Quick foxes are swift and graceful.",
+    "query": "quick",
+    "maxTopTerms": 10,
+    "taskId": "task-doc-analyze-1"
+  }
+}

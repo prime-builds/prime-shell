@@ -107,6 +107,8 @@ export const AppShell: React.FC = () => {
   useEffect(() => {
     if (location.pathname === "/settings") {
       setActiveNavId("settings");
+    } else if (location.pathname === "/analysis") {
+      setActiveNavId("analysis");
     } else {
       setActiveNavId("workspace");
     }
@@ -169,7 +171,12 @@ export const AppShell: React.FC = () => {
     Math.round(availableCenterHeight * bottomPanelHeightRatio),
   );
 
-  const viewName = location.pathname === "/settings" ? "Settings" : "Workspace";
+  const viewName =
+    location.pathname === "/settings"
+      ? "Settings"
+      : location.pathname === "/analysis"
+        ? "Document Analysis"
+        : "Workspace";
 
   return (
     <div className={styles.root} data-testid="prime-app-shell">

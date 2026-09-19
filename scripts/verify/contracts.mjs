@@ -69,6 +69,9 @@ const validCases = [
   [validateArtifactRef, "valid/artifact-ref.json"],
   [validateErrors, "valid/error-envelope.json"],
   [validateTaskSnapshot, "valid/task-snapshot.json"],
+  [validateEnvelope, "valid/doc-analyze-request.json"],
+  [validateEnvelope, "valid/doc-analyze-result.json"],
+  [validateEnvelope, "valid/doc-analyze-event.json"],
 ];
 
 for (const [validate, name] of validCases) {
@@ -83,6 +86,7 @@ const invalidCases = [
   [validateEnvelope, "invalid/echo-extra-property.json"],
   [validateDocumentRef, "invalid/document-ref-leak-path.json"],
   [validateErrors, "invalid/invalid-error-code.json"],
+  [validateEnvelope, "invalid/doc-analyze-oversized.json"],
 ];
 
 for (const [validate, name] of invalidCases) {

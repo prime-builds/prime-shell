@@ -52,7 +52,7 @@ class ProtocolUnitTests(unittest.TestCase):
         response = handle_request(request)
         self.assertEqual(response["error"]["code"], "VALIDATION_ERROR")
 
-    def test_handshake_has_all_five_operations(self) -> None:
+    def test_handshake_has_all_six_operations(self) -> None:
         value = hello()
         self.assertEqual(value["kind"], "hello")
         self.assertEqual(
@@ -63,6 +63,7 @@ class ProtocolUnitTests(unittest.TestCase):
                 "spike.crash",
                 "spike.hang",
                 "spike.largeRejected",
+                "doc.analyze",
             ],
         )
 
@@ -173,7 +174,7 @@ class ProtocolUnitTests(unittest.TestCase):
         hello_line = process.stdout.readline()
         hello_data = json.loads(hello_line)
         self.assertEqual(hello_data["kind"], "hello")
-        self.assertEqual(len(hello_data["supportedOperations"]), 5)
+        self.assertEqual(len(hello_data["supportedOperations"]), 6)
 
         # Start a count task with 10 steps, 100ms delay
         req = {

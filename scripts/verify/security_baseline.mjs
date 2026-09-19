@@ -49,6 +49,7 @@ const allowedPermissions = new Set([
   "allow-theme-state",
   "allow-layout-preferences",
   "allow-native-intent",
+  "allow-document-analysis",
 ]);
 
 for (const perm of capability.permissions || []) {

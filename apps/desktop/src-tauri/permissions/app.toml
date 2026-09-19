@@ -51,4 +51,10 @@ commands.allow = [
   "revoke_document_ref"
 ]
 
+[[permission]]
+identifier = "allow-document-analysis"
+description = "Allows the main window to invoke document analysis tasks."
+commands.allow = ["start_document_analysis_task"]
+
+
 

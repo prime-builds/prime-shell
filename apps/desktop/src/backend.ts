@@ -36,6 +36,19 @@ export async function startCountTask(
   return String(result);
 }
 
+export async function startDocumentAnalysisTask(
+  documentId: string,
+  query?: string,
+  maxTopTerms?: number,
+): Promise<string> {
+  const result = await invoke("start_document_analysis_task", {
+    documentId,
+    query: query || null,
+    maxTopTerms: maxTopTerms || null,
+  });
+  return String(result);
+}
+
 export async function cancelTask(taskId: string): Promise<AckEnvelope> {
   return ackEnvelopeSchema.parse(
     await invoke("cancel_task", { taskId }),

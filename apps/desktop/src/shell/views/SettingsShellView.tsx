@@ -17,12 +17,14 @@ import {
   ArrowReset20Regular,
   Color20Regular,
   Desktop20Regular,
+  DocumentSearch20Regular,
   Info20Regular,
 } from "@fluentui/react-icons";
 import { useNavigate } from "react-router-dom";
 import { validateCustomSeed } from "@prime-shell/design-tokens";
 import { useThemeController } from "../../theme/ThemeContext";
 import { useShellStore } from "../state/useShellStore";
+import { useDocumentAnalysisStore } from "../state/useDocumentAnalysisStore";
 import {
   BOTTOM_PANEL_MAX_RATIO,
   BOTTOM_PANEL_MIN_RATIO,
@@ -59,6 +61,9 @@ export const SettingsShellView: React.FC = () => {
   const band = useShellStore((s) => s.band);
   const windowWidth = useShellStore((s) => s.windowWidth);
   const windowHeight = useShellStore((s) => s.windowHeight);
+
+  const maxTopTerms = useDocumentAnalysisStore((s) => s.maxTopTerms);
+  const setMaxTopTerms = useDocumentAnalysisStore((s) => s.setMaxTopTerms);
 
   const [customSeedInput, setCustomSeedInput] = useState("#0078D4");
   const [seedError, setSeedError] = useState("");
@@ -131,6 +136,9 @@ export const SettingsShellView: React.FC = () => {
         </Tab>
         <Tab value="layout" icon={<Desktop20Regular />} data-testid="tab-layout">
           Layout &amp; Shell
+        </Tab>
+        <Tab value="analysis" icon={<DocumentSearch20Regular />} data-testid="tab-analysis">
+          Document Analysis
         </Tab>
         <Tab value="system" icon={<Info20Regular />} data-testid="tab-system">
           System Info
@@ -316,6 +324,66 @@ export const SettingsShellView: React.FC = () => {
                   {resetFeedback}
                 </Text>
               )}
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* DOCUMENT ANALYSIS TAB */}
+      {selectedTab === "analysis" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <Card role="region" aria-label="Document Analysis Settings">
+            <Title2 as="h2">Document Analysis Configuration</Title2>
+            <Text size={300} style={{ marginBottom: "16px" }}>
+              Configure parameters for the local document analysis reference feature.
+            </Text>
+
+            <div>
+              <Text weight="semibold" data-testid="terms-limit-display">
+                Top Terms Limit (maxTopTerms): {maxTopTerms}
+              </Text>
+              <Text size={200} style={{ display: "block", color: "var(--colorNeutralForeground3)", marginBottom: "8px" }}>
+                Maximum number of frequent terms to extract and rank in analysis histograms (default: 20).
+              </Text>
+              <div style={{ display: "flex", gap: "8px" }} role="group" aria-label="Top Terms Limit">
+                <Button
+                  appearance={maxTopTerms === 10 ? "primary" : "secondary"}
+                  onClick={() => setMaxTopTerms(10)}
+                  aria-pressed={maxTopTerms === 10}
+                  data-testid="terms-limit-10-btn"
+                >
+                  10 terms
+                </Button>
+                <Button
+                  appearance={maxTopTerms === 20 ? "primary" : "secondary"}
+                  onClick={() => setMaxTopTerms(20)}
+                  aria-pressed={maxTopTerms === 20}
+                  data-testid="terms-limit-20-btn"
+                >
+                  20 terms (Default)
+                </Button>
+                <Button
+                  appearance={maxTopTerms === 50 ? "primary" : "secondary"}
+                  onClick={() => setMaxTopTerms(50)}
+                  aria-pressed={maxTopTerms === 50}
+                  data-testid="terms-limit-50-btn"
+                >
+                  50 terms
+                </Button>
+              </div>
+            </div>
+
+            <Divider style={{ margin: "16px 0" }} />
+
+            <div>
+              <Button
+                appearance="secondary"
+                icon={<ArrowReset20Regular />}
+                onClick={() => setMaxTopTerms(20)}
+                data-testid="reset-analysis-settings-btn"
+              >
+                Reset to Default (20)
+              </Button>
             </div>
           </Card>
         </div>

@@ -1,0 +1,11 @@
+{
+  "protocol": "generic-app",
+  "kind": "request",
+  "requestId": "request-doc-analyze-invalid",
+  "traceId": "trace-doc-analyze-invalid",
+  "operation": "doc.analyze",
+  "payload": {
+    "text": "valid text",
+    "maxTopTerms": 999999
+  }
+}

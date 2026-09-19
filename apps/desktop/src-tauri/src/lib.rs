@@ -115,6 +115,56 @@ fn start_count_task(
 }
 
 #[tauri::command]
+fn start_document_analysis_task(
+    document_id: String,
+    query: Option<String>,
+    max_top_terms: Option<usize>,
+    app: AppHandle,
+    state: State<'_, BackendState>,
+    references: State<'_, ReferenceRegistry>,
+) -> AppResult<String> {
+    let sequence = REQUEST_SEQUENCE.fetch_add(1, Ordering::Relaxed);
+    let task_id = format!("task-{sequence}");
+    let request_id = format!("request-{sequence}");
+    let trace_id = format!("trace-{}-{sequence}", std::process::id());
+
+    let content = references.read_content(&document_id, &trace_id)?;
+
+    let client = {
+        let guard = state
+            .client
+            .lock()
+            .map_err(|_| AppError::internal(&trace_id))?;
+        guard
+            .as_ref()
+            .cloned()
+            .ok_or_else(|| AppError::unavailable(&trace_id))?
+    };
+
+    let thread_app = app.clone();
+    let thread_task_id = task_id.clone();
+    let thread_req_id = request_id.clone();
+    let thread_trace_id = trace_id.clone();
+    let thread_query = query.clone();
+
+    std::thread::spawn(move || {
+        let _ = client.analyze_document(
+            &content,
+            thread_query.as_deref(),
+            max_top_terms,
+            &thread_req_id,
+            &thread_trace_id,
+            &thread_task_id,
+            move |event| {
+                let _ = thread_app.emit("task-event", &event);
+            },
+        );
+    });
+
+    Ok(task_id)
+}
+
+#[tauri::command]
 fn cancel_task(task_id: String, state: State<'_, BackendState>) -> AppResult<AckEnvelope> {
     let sequence = REQUEST_SEQUENCE.fetch_add(1, Ordering::Relaxed);
     let request_id = format!("cancel-{sequence}");
@@ -346,6 +396,7 @@ pub fn run() {
             backend_status,
             echo_text,
             start_count_task,
+            start_document_analysis_task,
             cancel_task,
             get_task_snapshot,
             trigger_crash,

@@ -33,11 +33,12 @@
         { "const": "spike.count" },
         { "const": "spike.crash" },
         { "const": "spike.hang" },
-        { "const": "spike.largeRejected" }
+        { "const": "spike.largeRejected" },
+        { "const": "doc.analyze" }
       ],
       "items": false,
-      "minItems": 5,
-      "maxItems": 5
+      "minItems": 6,
+      "maxItems": 6
     }
   }
 }
