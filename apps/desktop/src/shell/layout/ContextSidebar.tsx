@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Button, makeStyles, tokens, Tooltip } from "@fluentui/react-components";
+import { Button, makeStyles, mergeClasses, tokens, Tooltip } from "@fluentui/react-components";
 import { Dismiss20Regular, PanelLeftContract20Regular } from "@fluentui/react-icons";
 import type { ResponsiveBand } from "../types";
 
@@ -118,7 +118,7 @@ export const ContextSidebar: React.FC<ContextSidebarProps> = ({
       )}
       <aside
         ref={sidebarRef}
-        className={`${styles.sidebar} ${isOverlay ? styles.overlay : ""}`}
+        className={mergeClasses(styles.sidebar, isOverlay && styles.overlay)}
         style={{ width: `${width}px` }}
         aria-label="Context Sidebar"
       >

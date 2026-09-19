@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, makeStyles, tokens, Tooltip } from "@fluentui/react-components";
+import { Button, makeStyles, mergeClasses, tokens, Tooltip } from "@fluentui/react-components";
 import {
   AppFolder24Filled,
   AppFolder24Regular,
@@ -87,7 +87,7 @@ export const NavigationRail: React.FC<NavigationRailProps> = ({
     <nav className={styles.rail} aria-label="Main Navigation">
       <div className={styles.section}>
         {onToggleSidebar && (
-          <Tooltip content="Toggle Sidebar (Ctrl+B)" relationship="label">
+          <Tooltip content="Toggle Sidebar (Ctrl+B)" relationship="label" positioning="after">
             <Button
               appearance="subtle"
               className={styles.railButton}
@@ -99,10 +99,10 @@ export const NavigationRail: React.FC<NavigationRailProps> = ({
         )}
 
         {/* Workspace Root */}
-        <Tooltip content="Workspace" relationship="label">
+        <Tooltip content="Workspace" relationship="label" positioning="after">
           <Button
             appearance="subtle"
-            className={`${styles.railButton} ${activeId === "workspace" ? styles.activeButton : ""}`}
+            className={mergeClasses(styles.railButton, activeId === "workspace" && styles.activeButton)}
             icon={activeId === "workspace" ? <AppFolder24Filled /> : <AppFolder24Regular />}
             onClick={() => onNavigate("workspace", "/")}
             aria-label="Workspace"
@@ -116,10 +116,10 @@ export const NavigationRail: React.FC<NavigationRailProps> = ({
           const isActive = activeId === item.id;
           const IconComponent = isActive ? item.iconFilled : item.iconRegular;
           return (
-            <Tooltip key={item.id} content={item.label} relationship="label">
+            <Tooltip key={item.id} content={item.label} relationship="label" positioning="after">
               <Button
                 appearance="subtle"
-                className={`${styles.railButton} ${isActive ? styles.activeButton : ""}`}
+                className={mergeClasses(styles.railButton, isActive && styles.activeButton)}
                 icon={<IconComponent />}
                 onClick={() => onNavigate(item.id, item.path)}
                 aria-label={item.ariaLabel || item.label}
@@ -131,10 +131,10 @@ export const NavigationRail: React.FC<NavigationRailProps> = ({
         })}
 
         {/* Settings */}
-        <Tooltip content="Settings (Ctrl+,)" relationship="label">
+        <Tooltip content="Settings (Ctrl+,)" relationship="label" positioning="after">
           <Button
             appearance="subtle"
-            className={`${styles.railButton} ${activeId === "settings" ? styles.activeButton : ""}`}
+            className={mergeClasses(styles.railButton, activeId === "settings" && styles.activeButton)}
             icon={activeId === "settings" ? <Settings24Filled /> : <Settings24Regular />}
             onClick={() => onNavigate("settings", "/settings")}
             aria-label="Settings"
@@ -146,7 +146,7 @@ export const NavigationRail: React.FC<NavigationRailProps> = ({
 
       <div className={styles.section}>
         {onOpenCommandPalette && (
-          <Tooltip content="Command Palette (Ctrl+K)" relationship="label">
+          <Tooltip content="Command Palette (Ctrl+K)" relationship="label" positioning="after">
             <Button
               appearance="subtle"
               className={styles.railButton}
@@ -158,7 +158,7 @@ export const NavigationRail: React.FC<NavigationRailProps> = ({
           </Tooltip>
         )}
 
-        <Tooltip content={`Theme: ${themeMode} (click to cycle)`} relationship="label">
+        <Tooltip content={`Theme: ${themeMode} (click to cycle)`} relationship="label" positioning="after">
           <Button
             appearance="subtle"
             className={styles.railButton}

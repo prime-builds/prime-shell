@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Button, makeStyles, tokens, Tooltip } from "@fluentui/react-components";
+import { Button, makeStyles, mergeClasses, tokens, Tooltip } from "@fluentui/react-components";
 import { Dismiss20Regular, PanelRightContract20Regular } from "@fluentui/react-icons";
 import type { ResponsiveBand } from "../types";
 
@@ -25,21 +25,14 @@ const useStyles = makeStyles({
     boxShadow: tokens.shadow16,
     borderLeft: `1px solid ${tokens.colorNeutralStroke1}`,
   },
-  backdrop: {
-    position: "absolute",
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.4)",
-    zIndex: 49,
-  },
   header: {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
     padding: "8px 12px",
     borderBottom: `1px solid ${tokens.colorNeutralStroke2}`,
+    height: "40px",
+    boxSizing: "border-box",
     flexShrink: 0,
   },
   headerTitle: {
@@ -50,45 +43,49 @@ const useStyles = makeStyles({
   content: {
     flexGrow: 1,
     overflowY: "auto",
-    padding: "12px",
+    padding: "16px",
+    boxSizing: "border-box",
+  },
+  backdrop: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
+    zIndex: 40,
   },
 });
 
 interface InspectorHostProps {
+  band: ResponsiveBand;
   width: number;
   isOpen: boolean;
   isDrawerOpen: boolean;
-  band: ResponsiveBand;
   onCloseDrawer: () => void;
   onToggleOpen: () => void;
   children?: React.ReactNode;
 }
 
 export const InspectorHost: React.FC<InspectorHostProps> = ({
+  band,
   width,
   isOpen,
   isDrawerOpen,
-  band,
   onCloseDrawer,
   onToggleOpen,
   children,
 }) => {
   const styles = useStyles();
+  const isDrawerMode = band === "compact" || band === "tablet";
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
-  const isDrawerMode = band === "compact" || band === "tablet";
-
-  // Focus management: when opened as a drawer, move focus into the close button
+  // Close drawer on Escape
   useEffect(() => {
-    if (isDrawerMode && isDrawerOpen) {
-      closeButtonRef.current?.focus();
-    }
-  }, [isDrawerMode, isDrawerOpen]);
-
-  // Handle Escape key to close drawer
-  useEffect(() => {
+    if (!isDrawerMode || !isDrawerOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isDrawerMode && isDrawerOpen) {
+      if (e.key === "Escape") {
+        e.preventDefault();
         onCloseDrawer();
       }
     };
@@ -96,15 +93,15 @@ export const InspectorHost: React.FC<InspectorHostProps> = ({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isDrawerMode, isDrawerOpen, onCloseDrawer]);
 
-  // If in drawer mode and not open, don't render
-  if (isDrawerMode && !isDrawerOpen) {
-    return null;
-  }
+  // Trap focus to close button when drawer opens
+  useEffect(() => {
+    if (isDrawerMode && isDrawerOpen) {
+      closeButtonRef.current?.focus();
+    }
+  }, [isDrawerMode, isDrawerOpen]);
 
-  // If in docked mode and not open, don't render
-  if (!isDrawerMode && !isOpen) {
-    return null;
-  }
+  if (isDrawerMode && !isDrawerOpen) return null;
+  if (!isDrawerMode && !isOpen) return null;
 
   return (
     <>
@@ -116,7 +113,7 @@ export const InspectorHost: React.FC<InspectorHostProps> = ({
         />
       )}
       <section
-        className={`${styles.inspector} ${isDrawerMode ? styles.drawer : ""}`}
+        className={mergeClasses(styles.inspector, isDrawerMode && styles.drawer)}
         style={{ width: `${width}px` }}
         aria-label="Inspector Panel"
       >

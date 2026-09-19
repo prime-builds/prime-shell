@@ -3,6 +3,7 @@ import {
   Badge,
   Input,
   makeStyles,
+  mergeClasses,
   Text,
   tokens,
 } from "@fluentui/react-components";
@@ -241,7 +242,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
                   role="option"
                   aria-selected={isHighlighted}
                   aria-disabled={!isEnabled}
-                  className={`${styles.item} ${isHighlighted ? styles.itemHighlighted : ""} ${!isEnabled ? styles.itemDisabled : ""}`}
+                  className={mergeClasses(
+                    styles.item,
+                    isHighlighted && styles.itemHighlighted,
+                    !isEnabled && styles.itemDisabled,
+                  )}
                   onClick={() => void executeCommand(cmd)}
                   onMouseEnter={() => setHighlightedIndex(index)}
                   data-testid={`command-item-${cmd.id}`}
