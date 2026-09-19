@@ -1,0 +1,17 @@
+{
+  "appId": "prime-shell",
+  "productName": "Prime Shell",
+  "bundleId": "com.primeshell.desktop",
+  "executable": "prime-shell",
+  "version": "0.1.0",
+  "features": ["diagnostics"],
+  "operations": ["spike.echo"],
+  "window": {
+    "title": "Prime Shell",
+    "width": 1024,
+    "height": 768,
+    "minWidth": 500,
+    "minHeight": 400
+  },
+  "stateNamespace": "com.primeshell.desktop"
+}

@@ -1,0 +1,28 @@
+{
+  "appId": "prime-text-studio",
+  "productName": "Prime Text Studio",
+  "bundleId": "com.primetextstudio.desktop",
+  "executable": "prime-text-studio",
+  "version": "0.1.0",
+  "brand": {
+    "accentColor": "#008272",
+    "publisher": "Prime Builds",
+    "description": "Focused Fluent text transformation and developer string manipulation studio"
+  },
+  "features": [
+    "text-utility",
+    "diagnostics"
+  ],
+  "operations": [
+    "spike.echo",
+    "spike.count"
+  ],
+  "window": {
+    "title": "Prime Text Studio",
+    "width": 960,
+    "height": 700,
+    "minWidth": 500,
+    "minHeight": 400
+  },
+  "stateNamespace": "com.primetextstudio.desktop"
+}

@@ -1,0 +1,1 @@
+{"main-capability":{"identifier":"main-capability","description":"Production capabilities exposed to the Prime Text Studio main window.","local":true,"windows":["main"],"permissions":["core:default","allow-backend-status","allow-echo-text","allow-task-lifecycle","allow-theme-state","allow-layout-preferences","allow-settings","allow-diagnostics","allow-update"]}}

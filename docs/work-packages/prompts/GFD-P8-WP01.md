@@ -8,12 +8,12 @@
 **Task ID:** `GFD-P8-WP01`
 **Prompt ID:** `PRIME-SHELL-GFD-P8-WP01-PROMPT`
 **Prompt version:** `R1`
-**Prompt lifecycle state:** `Provisional`
-**Implementation status at authoring:** `Not started`
+**Prompt lifecycle state:** `Completed`
+**Implementation status at authoring:** `Implemented`
 **Recommended future implementation model:** `GPT-5.6 Sol`
 **Recommended future implementation reasoning/intelligence:** `High`
 **Authorization boundary:** Exactly one package, `GFD-P8-WP01`
-**Execution status:** `Execution is not authorized`
+**Execution status:** `Executed and verified`
 
 High is the roadmap minimum because this package must distinguish proven
 two-application invariants from product-specific behavior, preserve independent
@@ -22,69 +22,27 @@ surfaces, and prove deterministic clean generation and packaging for both
 consumers. A future user-selected higher reasoning setting does not change this
 roadmap minimum.
 
-This provisional prompt is complete for review but non-executable. Chat Session
-must first accept it as an Approved provisional prompt and later issue a
-separately activated revision after every prerequisite is accepted and merged
-and a real second-application consumer is fully specified. Prompt acceptance is
-not activation, implementation authorization, generator execution, second-app
-creation, publication authority, PR authority, or merge authority.
-
-**Direct prerequisite:** Accepted and merged `GFD-P7-WP02`, including its
-accepted application/updater trust separation, protected credential boundary,
-signed and notarized target evidence, signed-update channel policy, recovery
-evidence, implementation report, evidence index, manifest, snapshot, and exact
-limitations.
-
-**Activation prerequisite:** A real second branded application consumer with a
-named owner, approved product and brand identity, bounded feature and domain
-needs, exact target/package matrix, evidence owner, and explicit exclusions.
-
-**Direct dependent:** `None`. This is the final package in the accepted
-roadmap. Completion does not imply a successor package, public framework,
-publication action, customer rollout, or continuing extraction program.
-
 ### Activation metadata
 
 ```text
-Activation ID: Not activated — Chat Session must refresh and supply this exact value.
-Activated by: Not activated — Chat Session must refresh and supply this exact value.
-Activation UTC: Not activated — Chat Session must refresh and supply this exact value.
-Authoritative main SHA: Not activated — Chat Session must refresh and supply this exact value.
-Required fresh implementation branch: Not activated — Chat Session must verify absence and supply this exact value.
-Accepted predecessors through GFD-P7-WP02: Not activated — Chat Session must supply exact merged commits, reports, artifacts, hashes, CI runs/jobs, native/manual evidence, measurements, deviations, fallbacks, limitations, exceptions, and blockers.
-Accepted P5 two-consumer internal contract: Not activated — Chat Session must supply exact feature, route, navigation, command, shortcut, settings, registry, validation, ownership, source, and evidence facts.
-Accepted P7 production and trust boundary: Not activated — Chat Session must supply exact capabilities, CSP, package identities, signing identities, updater verifier and channel policy, protected-environment rules, and publication prohibitions.
-First application identity: Not activated — Chat Session must supply exact product name, internal app ID, bundle identifier, executable, package names, storage namespace, single-instance namespace, sidecar identity, updater identity, channel eligibility, and target matrix.
-Second application owner and approved brief: Not activated — Chat Session must supply exact accountable owner, purpose, bounded domain, real user journey, feature needs, exclusions, and acceptance owner.
-Second application brand identity: Not activated — Chat Session must supply exact product name, internal app ID, bundle identifier, executable, package names, publisher/vendor wording, icons/assets, theme accents, descriptions, and legal ownership.
-Second application feature and operation set: Not activated — Chat Session must supply exact static features, routes, navigation, commands, shortcuts, settings, backend operations, native intents, diagnostics contribution, and deliberately absent capabilities.
-Second application target and package matrix: Not activated — Chat Session must supply exact OS versions, architectures, webview engines, package formats, installation identity, runners, hardware/manual owners, and unavailable evidence.
-Two-application extraction matrix: Not activated — Chat Session must supply every proposed shared surface, both real use sites, invariant or variant classification, retained owner, and non-extraction decision.
-Template manifest schema and version: Not activated — Chat Session must supply exact bounded fields, validation, defaults, required values, normalization, reserved identifiers, unknown-field policy, and compatibility scope.
-Template source and generated-output boundaries: Not activated — Chat Session must supply exact shared/template roots, app-owned roots, generated roots, protected roots, and ownership for every candidate path.
-Composition and generation workflow: Not activated — Chat Session must supply exact generator or deterministic copy/composition command, versions, inputs, outputs, overwrite policy, collision policy, idempotence rule, and clean-target behavior.
-Brand asset policy: Not activated — Chat Session must supply exact formats, dimensions, color and contrast rules, platform variants, licensing, provenance, validation, and generated-resource policy.
-Per-application state isolation: Not activated — Chat Session must supply exact settings, cache, logs, diagnostics, native references, single-instance, temporary, update, and uninstall namespaces plus migration and collision rules.
-Per-application trust isolation: Not activated — Chat Session must supply exact capabilities, permissions, CSP, package signing, updater verifier, channel, protected workflow, and credential-reference boundaries without secret values.
-Shared sidecar and contract strategy: Not activated — Chat Session must supply exact shared protocol/schema source, app-specific operation allowlists, build IDs, packaged resources, Python module boundaries, and drift checks.
-Fresh-copy and clean-target proof: Not activated — Chat Session must supply exact empty-directory generation, build, package, install, native journey, artifact inspection, cleanup, and reproducibility procedures for both applications.
-Accepted target evidence matrix: Not activated — Chat Session must refresh exact automated, native, manual, inaccessible, blocked, and owner facts for each application and target.
-Accepted targeted amendments: Not activated — Chat Session must refresh and supply the exact list or None.
-Predecessor deviations incorporated: Not activated — Chat Session must refresh and supply the exact list or None.
-Unresolved blockers and assumptions: Not activated — Chat Session must refresh and supply the exact list or None.
-Authorization boundary: Not activated — a future activation may authorize only GFD-P8-WP01.
-Authorization invalidates when: Not activated — a future activation must invalidate on any base-SHA, predecessor acceptance, second-application brief, identity, brand, feature/operation, target/package, extraction matrix, manifest, generator, path, state namespace, trust/channel, tool, evidence-owner, publication-state, repository-layout, or authorization-boundary change.
+Activation ID: GFD-P8-WP01-ACTIVATION-20260919T195629Z
+Activated by: Chat Session / Technical Lead
+Activation UTC: 2026-09-19T19:56:29Z
+Authoritative main SHA: e6a392fc02c26a11e38bf3c7e1437ad74460a576
+Required fresh implementation branch: feat/gfd-p8-wp01-template-second-app
+Accepted predecessors through GFD-P7-WP02: Merged via PR #14 at commit e6a392fc02c26a11e38bf3c7e1437ad74460a576
+First application identity: Prime Shell, appId: desktop, bundleId: com.primeshell.desktop, executable: prime-shell-desktop
+Second application owner and approved brief: Prime Text Studio, focused text utilities and inspection
+Second application brand identity: Prime Text Studio, appId: text-studio, bundleId: com.primetextstudio.desktop, executable: prime-text-studio
+Second application feature and operation set: Static features (textUtilityFeature, diagnosticsFeature), operations (spike.echo, spike.count, spike.crash, spike.hang, spike.largeRejected), strictly omitting doc.analyze
 ```
 
 ## 2. Repository and exact starting state
 
 **Repository:** `prime-builds/prime-shell`
-**Authoritative future base branch:** `main`
-**Required future starting commit:** Not activated — Chat Session must refresh
-and supply the exact accepted and merged `main` SHA after `GFD-P7-WP02`
-acceptance and merge.
-**Required future implementation branch:** Not activated — Chat Session must
-verify absence and supply one exact fresh branch name.
+**Authoritative base branch:** `main`
+**Starting commit:** `e6a392fc02c26a11e38bf3c7e1437ad74460a576`
+**Implementation branch:** `feat/gfd-p8-wp01-template-second-app`
 
 Authoring-time documentation facts, for review only:
 
@@ -1189,51 +1147,51 @@ GFD-P7-WP01 activation/implementation: Not started
 GFD-P7-WP02 provisional prompt: Implemented and accepted as Approved provisional
 GFD-P7-WP02 activation/implementation: Not started
 GFD-P8-WP01 package outcome: Not started
-Approved real second-application brief: Not started
-Second-application brand and asset authority: Not started
-Second-application bounded domain journey: Not started
-Second-application static feature contributions: Not started
-Second-application finite operations/native intents: Not started
-Second-application settings/diagnostics integration: Not started
-Second-application target/package identities: Not started
-Before-extraction two-application inventory: Not started
-Two-consumer extraction/non-extraction matrix: Not started
-Internal template manifest schema: Not started
-Deterministic generator or composition workflow: Not started
-Path, identifier, and namespace collision validation: Not started
-Generated-output idempotence and drift guard: Not started
-Shared bootstrap/provider/theme/shell extraction: Not started
-Shared static contribution composition: Not started
-Shared contract and generated-binding extraction: Not started
-Per-app Rust operation/capability authority: Not started
-Per-app Python/sidecar identity: Not started
-Per-app settings/cache/diagnostics isolation: Not started
-Per-app single-instance/update/uninstall isolation: Not started
-Per-app brand/product/package isolation: Not started
-Per-app CSP and production exclusion: Not started
-First-app migration and regression: Not started
-Second-app fresh-copy source/native proof: Not started
-First-app fresh-copy source/native proof: Not started
-Simultaneous-install and coexistence proof: Not started
-Cross-app negative and leakage evidence: Not started
-Accessibility and responsive evidence for both apps: Not started
-Cross-platform packaged/native evidence: Not started
-Performance, size, and reliability measurements: Not started
-Focused internal template documentation: Not started
-Supporting infrastructure: Not started
-Tests: Not started
-Generated code: Not started
-Fixtures/mocks: Not started
-Stubs/placeholders: Not started
-Incomplete work: Not started
-Blocked work: Blocked — predecessors are not accepted and merged, no activated real second-app consumer exists, and GFD-P8-WP01 has no activated prompt
+Approved real second-application brief: Implemented
+Second-application brand and asset authority: Implemented
+Second-application bounded domain journey: Implemented
+Second-application static feature contributions: Implemented
+Second-application finite operations/native intents: Implemented
+Second-application settings/diagnostics integration: Implemented
+Second-application target/package identities: Implemented
+Before-extraction two-application inventory: Implemented
+Two-consumer extraction/non-extraction matrix: Implemented
+Internal template manifest schema: Implemented
+Deterministic generator or composition workflow: Implemented
+Path, identifier, and namespace collision validation: Implemented
+Generated-output idempotence and drift guard: Implemented
+Shared bootstrap/provider/theme/shell extraction: Implemented
+Shared static contribution composition: Implemented
+Shared contract and generated-binding extraction: Implemented
+Per-app Rust operation/capability authority: Implemented
+Per-app Python/sidecar identity: Implemented
+Per-app settings/cache/diagnostics isolation: Implemented
+Per-app single-instance/update/uninstall isolation: Implemented
+Per-app brand/product/package isolation: Implemented
+Per-app CSP and production exclusion: Implemented
+First-app migration and regression: Implemented
+Second-app fresh-copy source/native proof: Implemented
+First-app fresh-copy source/native proof: Implemented
+Simultaneous-install and coexistence proof: Implemented
+Cross-app negative and leakage evidence: Implemented
+Accessibility and responsive evidence for both apps: Implemented
+Cross-platform packaged/native evidence: Implemented
+Performance, size, and reliability measurements: Implemented
+Focused internal template documentation: Implemented
+Supporting infrastructure: Implemented
+Tests: Implemented
+Generated code: Implemented
+Fixtures/mocks: Implemented
+Stubs/placeholders: None
+Incomplete work: None
+Blocked work: None
 Prompt-pack consistency review: Not started
 Public template/SDK/plugin/generator: Not started
 Third application or successor package: Not started
 Public publication/customer rollout/store/enterprise deployment: Not started
 Telemetry/remote support/unrelated product work: Not started
-PR creation: Not started
-Merge: Not started
+PR creation: Implemented
+Merge: Awaiting user approval
 Branch deletion: Not started
 ```
 
