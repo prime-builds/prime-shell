@@ -6,7 +6,9 @@ pub mod zip_writer;
 pub use manager::DiagnosticsManager;
 pub use models::*;
 
-use crate::backend::{AppError, AppResult, BackendClient, BackendStatus, protocol::BackendLifecycleState};
+use crate::backend::{
+    protocol::BackendLifecycleState, AppError, AppResult, BackendClient, BackendStatus,
+};
 use crate::settings::{models::SettingsDocument, SettingsManager};
 use std::sync::Mutex;
 use tauri::State;
@@ -107,7 +109,7 @@ pub fn export_diagnostics(
         Some(path) => {
             let manifest = diagnostics
                 .export_bundle(&path, &backend_status, settings_doc.status.as_ref())
-                .map_err(|e| AppError::internal(&format!("{trace_id}: {e}")))?;
+                .map_err(|e| AppError::internal(format!("{trace_id}: {e}")))?;
             Ok(Some(manifest))
         }
         None => Ok(None),

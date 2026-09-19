@@ -29,8 +29,12 @@ impl SettingsManager {
         temp_path: PathBuf,
         legacy_layout_path: PathBuf,
     ) -> Self {
-        let (initial_doc, is_read_only) =
-            Self::load_initial(&primary_path, &previous_path, &temp_path, &legacy_layout_path);
+        let (initial_doc, is_read_only) = Self::load_initial(
+            &primary_path,
+            &previous_path,
+            &temp_path,
+            &legacy_layout_path,
+        );
 
         Self {
             primary_path,
@@ -72,6 +76,7 @@ impl SettingsManager {
         }
     }
 
+    #[allow(clippy::single_match)]
     fn load_initial(
         primary_path: &Path,
         previous_path: &Path,
@@ -87,22 +92,36 @@ impl SettingsManager {
                     Ok(val) => match migrate_or_recover(val) {
                         Ok(MigrationOutcome::Current(doc)) => return (doc, false),
                         Ok(MigrationOutcome::Migrated(mut doc)) => {
-                            let _ = Self::write_atomic(primary_path, previous_path, temp_path, &mut doc);
+                            let _ = Self::write_atomic(
+                                primary_path,
+                                previous_path,
+                                temp_path,
+                                &mut doc,
+                            );
                             return (doc, false);
                         }
-                        Ok(MigrationOutcome::SectionRecovered { document: mut doc, .. }) => {
-                            let _ = Self::write_atomic(primary_path, previous_path, temp_path, &mut doc);
+                        Ok(MigrationOutcome::SectionRecovered {
+                            document: mut doc, ..
+                        }) => {
+                            let _ = Self::write_atomic(
+                                primary_path,
+                                previous_path,
+                                temp_path,
+                                &mut doc,
+                            );
                             return (doc, false);
                         }
                         Ok(MigrationOutcome::UnsupportedFutureVersion { version }) => {
-                            let mut doc = SettingsDocument::default();
-                            doc.status = Some(SettingsStatus {
-                                state: "unsupported_future_version".to_string(),
-                                recovered_section: None,
-                                message: Some(format!(
-                                    "Settings file is from future schema version {version} and is read-only."
-                                )),
-                            });
+                            let doc = SettingsDocument {
+                                status: Some(SettingsStatus {
+                                    state: "unsupported_future_version".to_string(),
+                                    recovered_section: None,
+                                    message: Some(format!(
+                                        "Settings file is from future schema version {version} and is read-only."
+                                    )),
+                                }),
+                                ..Default::default()
+                            };
                             return (doc, true);
                         }
                         Err(_) => {}
@@ -122,7 +141,9 @@ impl SettingsManager {
                             doc.status = Some(SettingsStatus {
                                 state: "recovered_from_previous_copy".to_string(),
                                 recovered_section: None,
-                                message: Some("Recovered settings from previous known-good copy.".to_string()),
+                                message: Some(
+                                    "Recovered settings from previous known-good copy.".to_string(),
+                                ),
                             });
                             return (doc, false);
                         }
@@ -131,12 +152,14 @@ impl SettingsManager {
             }
 
             // Both primary and previous copy failed: reset to defaults
-            let mut default_doc = SettingsDocument::default();
-            default_doc.status = Some(SettingsStatus {
-                state: "reset_to_defaults".to_string(),
-                recovered_section: None,
-                message: Some("Corrupt settings reset to defaults.".to_string()),
-            });
+            let default_doc = SettingsDocument {
+                status: Some(SettingsStatus {
+                    state: "reset_to_defaults".to_string(),
+                    recovered_section: None,
+                    message: Some("Corrupt settings reset to defaults.".to_string()),
+                }),
+                ..Default::default()
+            };
             return (default_doc, false);
         }
 
@@ -145,7 +168,8 @@ impl SettingsManager {
             if let Ok(legacy_content) = fs::read_to_string(legacy_layout_path) {
                 if let Ok(val) = serde_json::from_str::<serde_json::Value>(&legacy_content) {
                     if let Ok(MigrationOutcome::Migrated(mut doc)) = migrate_or_recover(val) {
-                        let _ = Self::write_atomic(primary_path, previous_path, temp_path, &mut doc);
+                        let _ =
+                            Self::write_atomic(primary_path, previous_path, temp_path, &mut doc);
                         return (doc, false);
                     }
                 }
@@ -223,7 +247,9 @@ impl SettingsManager {
         let mut guard = self.state.lock().unwrap();
 
         if guard.is_read_only {
-            return Err("Settings are in read-only mode due to unsupported future version.".to_string());
+            return Err(
+                "Settings are in read-only mode due to unsupported future version.".to_string(),
+            );
         }
 
         if expected_revision != guard.document.revision {
@@ -262,7 +288,9 @@ impl SettingsManager {
         match section {
             "appearance" => match key {
                 "themeMode" => doc.appearance.theme_mode = AppearanceSettings::default().theme_mode,
-                "accentMode" => doc.appearance.accent_mode = AppearanceSettings::default().accent_mode,
+                "accentMode" => {
+                    doc.appearance.accent_mode = AppearanceSettings::default().accent_mode
+                }
                 "density" => doc.appearance.density = AppearanceSettings::default().density,
                 "materialPreference" => {
                     doc.appearance.material_preference =
@@ -271,20 +299,26 @@ impl SettingsManager {
                 _ => return Err(format!("Unknown appearance setting key '{key}'")),
             },
             "layout" => match key {
-                "sidebarWidth" => doc.layout.sidebar_width = ShellLayoutPreferencesV1::default().sidebar_width,
+                "sidebarWidth" => {
+                    doc.layout.sidebar_width = ShellLayoutPreferencesV1::default().sidebar_width
+                }
                 "sidebarCollapsed" => {
-                    doc.layout.sidebar_collapsed = ShellLayoutPreferencesV1::default().sidebar_collapsed
+                    doc.layout.sidebar_collapsed =
+                        ShellLayoutPreferencesV1::default().sidebar_collapsed
                 }
                 "inspectorWidth" => {
                     doc.layout.inspector_width = ShellLayoutPreferencesV1::default().inspector_width
                 }
-                "inspectorOpen" => doc.layout.inspector_open = ShellLayoutPreferencesV1::default().inspector_open,
+                "inspectorOpen" => {
+                    doc.layout.inspector_open = ShellLayoutPreferencesV1::default().inspector_open
+                }
                 "bottomPanelHeightRatio" => {
                     doc.layout.bottom_panel_height_ratio =
                         ShellLayoutPreferencesV1::default().bottom_panel_height_ratio
                 }
                 "bottomPanelOpen" => {
-                    doc.layout.bottom_panel_open = ShellLayoutPreferencesV1::default().bottom_panel_open
+                    doc.layout.bottom_panel_open =
+                        ShellLayoutPreferencesV1::default().bottom_panel_open
                 }
                 _ => return Err(format!("Unknown layout setting key '{key}'")),
             },
@@ -363,13 +397,15 @@ impl SettingsManager {
             return Err("Settings are in read-only mode.".to_string());
         }
 
-        let mut doc = SettingsDocument::default();
-        doc.revision = guard.document.revision + 1;
-        doc.status = Some(SettingsStatus {
-            state: "healthy".to_string(),
-            recovered_section: None,
-            message: Some("Reset all settings to defaults.".to_string()),
-        });
+        let mut doc = SettingsDocument {
+            revision: guard.document.revision + 1,
+            status: Some(SettingsStatus {
+                state: "healthy".to_string(),
+                recovered_section: None,
+                message: Some("Reset all settings to defaults.".to_string()),
+            }),
+            ..Default::default()
+        };
 
         Self::write_atomic(
             &self.primary_path,

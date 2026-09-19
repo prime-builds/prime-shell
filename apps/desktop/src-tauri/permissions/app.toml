@@ -10,21 +10,32 @@ commands.allow = ["echo_text"]
 
 [[permission]]
 identifier = "allow-task-lifecycle"
-description = "Allows task lifecycle commands for WP02 spike testing."
+description = "Allows production task lifecycle commands."
 commands.allow = [
   "start_count_task",
   "cancel_task",
   "get_task_snapshot",
-  "trigger_crash",
-  "trigger_hang",
-  "trigger_large_rejected",
   "reset_backend"
 ]
 
 [[permission]]
+identifier = "allow-test-faults"
+description = "Allows test-only fault injection commands (excluded from production capabilities)."
+commands.allow = [
+  "trigger_crash",
+  "trigger_hang",
+  "trigger_large_rejected"
+]
+
+[[permission]]
 identifier = "allow-runtime-probe"
-description = "Allows the environment-gated native runtime verifier commands."
-commands.allow = ["runtime_probe_config", "write_runtime_evidence"]
+description = "Allows reading the native runtime verifier configuration."
+commands.allow = ["runtime_probe_config"]
+
+[[permission]]
+identifier = "allow-test-evidence-writer"
+description = "Allows test-only runtime evidence writer command (excluded from production capabilities)."
+commands.allow = ["write_runtime_evidence"]
 
 [[permission]]
 identifier = "allow-theme-state"

@@ -357,6 +357,7 @@ export const HomeWorkspaceView: React.FC = () => {
 
     void (async () => {
       try {
+        if (!import.meta.env.DEV) return;
         const probe = await getRuntimeProbeConfig();
         if (!probe.enabled || !probe.evidencePath) return;
 
@@ -949,17 +950,21 @@ export const HomeWorkspaceView: React.FC = () => {
 
         <Divider />
 
-        {/* Fault Operations */}
+        {/* Fault Operations & Circuit Reset */}
         <div className="fault-actions">
-          <Button appearance="secondary" onClick={() => void handleCrash()}>
-            Trigger Crash
-          </Button>
-          <Button appearance="secondary" onClick={() => void handleHang()}>
-            Trigger Hang (5s)
-          </Button>
-          <Button appearance="secondary" onClick={() => void handleLargeRejected()}>
-            Trigger 2 MB Payload
-          </Button>
+          {import.meta.env.DEV && (
+            <>
+              <Button appearance="secondary" onClick={() => void handleCrash()}>
+                Trigger Crash
+              </Button>
+              <Button appearance="secondary" onClick={() => void handleHang()}>
+                Trigger Hang (5s)
+              </Button>
+              <Button appearance="secondary" onClick={() => void handleLargeRejected()}>
+                Trigger 2 MB Payload
+              </Button>
+            </>
+          )}
           <Button appearance="subtle" onClick={() => void handleReset()}>
             Reset Backend
           </Button>

@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Prime Shell Echo Spike",
+  "productName": "Prime Shell",
   "version": "0.1.0",
-  "identifier": "com.primeshell.echo-spike",
+  "identifier": "com.primeshell.desktop",
   "build": {
     "beforeDevCommand": "pnpm dev",
     "devUrl": "http://localhost:1420",
@@ -13,7 +13,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "Prime Shell Echo Spike",
+        "title": "Prime Shell",
         "width": 760,
         "height": 560,
         "minWidth": 500,

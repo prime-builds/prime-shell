@@ -20,7 +20,10 @@ mod tests {
     impl TestDir {
         fn new(prefix: &str) -> Self {
             let count = TEST_COUNTER.fetch_add(1, Ordering::Relaxed);
-            let path = std::env::temp_dir().join(format!("prime-shell-test-{prefix}-{count}-{}", std::process::id()));
+            let path = std::env::temp_dir().join(format!(
+                "prime-shell-test-{prefix}-{count}-{}",
+                std::process::id()
+            ));
             let _ = fs::create_dir_all(&path);
             Self { path }
         }
@@ -176,7 +179,10 @@ mod tests {
             Some("recovered_from_previous_copy")
         );
         // Corruption evidence is preserved!
-        assert_eq!(fs::read_to_string(&primary).unwrap(), "{ this is not valid json!");
+        assert_eq!(
+            fs::read_to_string(&primary).unwrap(),
+            "{ this is not valid json!"
+        );
     }
 
     #[test]
@@ -230,7 +236,9 @@ mod tests {
             Some("section_recovered")
         );
         assert_eq!(
-            doc.status.as_ref().and_then(|s| s.recovered_section.as_deref()),
+            doc.status
+                .as_ref()
+                .and_then(|s| s.recovered_section.as_deref()),
             Some("documentAnalysis")
         );
     }
@@ -266,7 +274,9 @@ mod tests {
         assert!(res.unwrap_err().contains("read-only"));
 
         // File is NOT overwritten
-        assert!(fs::read_to_string(&primary).unwrap().contains("\"schemaVersion\": 99"));
+        assert!(fs::read_to_string(&primary)
+            .unwrap()
+            .contains("\"schemaVersion\": 99"));
     }
 
     #[test]
@@ -288,7 +298,9 @@ mod tests {
         let _ = manager.save_document(0, update).unwrap();
 
         // 1. Reset one setting: documentAnalysis.maxTopTerms
-        let after_single_reset = manager.reset_setting("documentAnalysis", "maxTopTerms").unwrap();
+        let after_single_reset = manager
+            .reset_setting("documentAnalysis", "maxTopTerms")
+            .unwrap();
         assert_eq!(after_single_reset.document_analysis.max_top_terms, 20); // reset
         assert_eq!(after_single_reset.layout.sidebar_width, 380.0); // preserved
 

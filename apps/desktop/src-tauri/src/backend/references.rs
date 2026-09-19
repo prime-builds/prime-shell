@@ -74,7 +74,10 @@ impl ReferenceRegistry {
 
     pub fn register_document(&self, path: &Path, trace_id: &str) -> AppResult<DocumentRef> {
         let canonical_path = fs::canonicalize(path).map_err(|_| {
-            AppError::validation("The selected file does not exist or is inaccessible.", trace_id)
+            AppError::validation(
+                "The selected file does not exist or is inaccessible.",
+                trace_id,
+            )
         })?;
 
         let metadata = fs::metadata(&canonical_path).map_err(|_| {
@@ -147,7 +150,10 @@ impl ReferenceRegistry {
         })?;
 
         let canonical_parent = fs::canonicalize(parent).map_err(|_| {
-            AppError::validation("Parent directory does not exist or is inaccessible.", trace_id)
+            AppError::validation(
+                "Parent directory does not exist or is inaccessible.",
+                trace_id,
+            )
         })?;
 
         let file_name = path
@@ -168,7 +174,9 @@ impl ReferenceRegistry {
         }
 
         let size = if canonical_target.exists() {
-            fs::metadata(&canonical_target).map(|m| m.len()).unwrap_or(0)
+            fs::metadata(&canonical_target)
+                .map(|m| m.len())
+                .unwrap_or(0)
         } else {
             0
         };
@@ -199,10 +207,9 @@ impl ReferenceRegistry {
                 .entries
                 .lock()
                 .map_err(|_| AppError::internal(trace_id))?;
-            guard
-                .get(id)
-                .cloned()
-                .ok_or_else(|| AppError::reference_not_found("Reference not found or expired.", trace_id))?
+            guard.get(id).cloned().ok_or_else(|| {
+                AppError::reference_not_found("Reference not found or expired.", trace_id)
+            })?
         };
 
         let metadata = fs::metadata(&entry.native_path).map_err(|_| AppError::io(trace_id))?;
@@ -211,9 +218,8 @@ impl ReferenceRegistry {
         }
 
         let bytes = fs::read(&entry.native_path).map_err(|_| AppError::io(trace_id))?;
-        String::from_utf8(bytes).map_err(|_| {
-            AppError::validation("File content is not valid UTF-8 text.", trace_id)
-        })
+        String::from_utf8(bytes)
+            .map_err(|_| AppError::validation("File content is not valid UTF-8 text.", trace_id))
     }
 
     pub fn write_content(&self, id: &str, content: &str, trace_id: &str) -> AppResult<()> {
@@ -226,10 +232,9 @@ impl ReferenceRegistry {
                 .entries
                 .lock()
                 .map_err(|_| AppError::internal(trace_id))?;
-            guard
-                .get(id)
-                .cloned()
-                .ok_or_else(|| AppError::reference_not_found("Reference not found or expired.", trace_id))?
+            guard.get(id).cloned().ok_or_else(|| {
+                AppError::reference_not_found("Reference not found or expired.", trace_id)
+            })?
         };
 
         if !entry.writable {
@@ -239,9 +244,10 @@ impl ReferenceRegistry {
             ));
         }
 
-        let parent = entry.native_path.parent().ok_or_else(|| {
-            AppError::internal(trace_id)
-        })?;
+        let parent = entry
+            .native_path
+            .parent()
+            .ok_or_else(|| AppError::internal(trace_id))?;
 
         let tmp_file_name = format!(
             ".tmp.{}.{}",

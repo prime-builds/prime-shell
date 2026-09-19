@@ -32,7 +32,9 @@ pub fn parse_launch_args(argv: &[String]) -> ParsedLaunchIntent {
 
     let total_bytes: usize = argv.iter().map(|a| a.len()).sum();
     if total_bytes > MAX_LAUNCH_ARGV_BYTES {
-        return ParsedLaunchIntent::Rejected("Total argument bytes exceed bound (max 1024)".to_string());
+        return ParsedLaunchIntent::Rejected(
+            "Total argument bytes exceed bound (max 1024)".to_string(),
+        );
     }
 
     // Skip executable path (argv[0]) if present
@@ -54,7 +56,9 @@ pub fn parse_launch_args(argv: &[String]) -> ParsedLaunchIntent {
             if let Some(&path_arg) = iter.next() {
                 open_target = Some(path_arg);
             } else {
-                return ParsedLaunchIntent::Rejected("--open requires a file path argument".to_string());
+                return ParsedLaunchIntent::Rejected(
+                    "--open requires a file path argument".to_string(),
+                );
             }
         } else if let Some(path_arg) = arg.strip_prefix("--open=") {
             open_target = Some(path_arg);
@@ -69,7 +73,9 @@ pub fn parse_launch_args(argv: &[String]) -> ParsedLaunchIntent {
 
     if let Some(target) = open_target {
         if target.len() > MAX_PATH_LENGTH {
-            return ParsedLaunchIntent::Rejected("File path exceeds maximum length (260)".to_string());
+            return ParsedLaunchIntent::Rejected(
+                "File path exceeds maximum length (260)".to_string(),
+            );
         }
         let path = PathBuf::from(target);
         if path.is_file() {
@@ -140,21 +146,26 @@ mod tests {
     fn test_parse_oversized_args_rejected() {
         let argv: Vec<String> = (0..20).map(|i| format!("arg{i}")).collect();
         match parse_launch_args(&argv) {
-            ParsedLaunchIntent::Rejected(msg) => assert!(msg.contains("Argument count exceeds bound")),
+            ParsedLaunchIntent::Rejected(msg) => {
+                assert!(msg.contains("Argument count exceeds bound"))
+            }
             _ => panic!("Expected rejection"),
         }
 
         let long_arg = "a".repeat(1100);
         let argv2 = vec!["prime-shell.exe".to_string(), long_arg];
         match parse_launch_args(&argv2) {
-            ParsedLaunchIntent::Rejected(msg) => assert!(msg.contains("Total argument bytes exceed bound")),
+            ParsedLaunchIntent::Rejected(msg) => {
+                assert!(msg.contains("Total argument bytes exceed bound"))
+            }
             _ => panic!("Expected rejection"),
         }
     }
 
     #[test]
     fn test_parse_open_document_intent() {
-        let temp_file = std::env::temp_dir().join(format!("test-launch-{}.txt", std::process::id()));
+        let temp_file =
+            std::env::temp_dir().join(format!("test-launch-{}.txt", std::process::id()));
         std::fs::write(&temp_file, "sample content").unwrap();
 
         let argv = vec![

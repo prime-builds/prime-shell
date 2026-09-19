@@ -8,13 +8,13 @@
     "pnpm": "11.7.0"
   },
   "devDependencies": {
-    "@wdio/cli": "^9.31.9",
-    "@wdio/local-runner": "^9.31.9",
-    "@wdio/mocha-framework": "^9.31.9",
-    "@wdio/spec-reporter": "^9.31.2",
-    "@wdio/tauri-service": "^1.4.0",
+    "@wdio/cli": "9.31.9",
+    "@wdio/local-runner": "9.31.9",
+    "@wdio/mocha-framework": "9.31.9",
+    "@wdio/spec-reporter": "9.31.2",
+    "@wdio/tauri-service": "1.4.0",
     "ajv": "8.20.0",
-    "expect-webdriverio": "^6.0.10"
+    "expect-webdriverio": "6.0.10"
   },
   "scripts": {
     "build": "pnpm --filter @prime-shell/desktop build",
@@ -25,7 +25,12 @@
     "tokens:test": "pnpm --filter @prime-shell/design-tokens test",
     "tokens:typecheck": "pnpm --filter @prime-shell/design-tokens typecheck",
     "typecheck": "pnpm --filter @prime-shell/desktop typecheck",
-    "verify:security": "node scripts/verify/security_baseline.mjs",
+    "verify:security": "node scripts/verify/security_baseline.mjs && node scripts/verify/secret_scan.mjs && node scripts/verify/release_hardening.mjs",
+    "verify:secrets": "node scripts/verify/secret_scan.mjs",
+    "verify:hardening": "node scripts/verify/release_hardening.mjs",
+    "verify:audit": "pnpm audit --audit-level high && cargo audit",
+    "sbom:generate": "node scripts/release/generate_sbom.mjs",
+    "licenses:generate": "node scripts/release/generate_licenses.mjs",
     "verify:baseline": "pnpm contract:test && pnpm contract:drift && pnpm verify:security && pnpm tokens:typecheck && pnpm tokens:test && pnpm typecheck && pnpm lint && pnpm test && pnpm build",
     "sidecar:build": "bash scripts/build-sidecar/build-sidecar.sh",
     "sidecar:test": "python3 -m unittest discover -s services/python-backend/tests -v",

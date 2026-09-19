@@ -54,9 +54,17 @@ const allowedPermissions = new Set([
   "allow-diagnostics",
 ]);
 
+const prohibitedCapabilities = new Set([
+  "allow-test-faults",
+  "allow-test-evidence-writer",
+]);
+
 for (const perm of capability.permissions || []) {
   if (!allowedPermissions.has(perm)) {
     throw new Error(`Capability violation: Unauthorized permission in main capability: ${perm}`);
+  }
+  if (prohibitedCapabilities.has(perm)) {
+    throw new Error(`Capability violation: Test-only permission leaked into main capability: ${perm}`);
   }
 }
 
@@ -75,10 +83,30 @@ for (const pattern of prohibitedPatterns) {
   }
 }
 
+// Validate that allow-task-lifecycle does NOT contain test fault injection commands
+const taskLifecycleMatch = permissionsContent.match(/identifier\s*=\s*"allow-task-lifecycle"[\s\S]*?commands\.allow\s*=\s*\[([\s\S]*?)\]/);
+if (taskLifecycleMatch) {
+  const taskCommands = taskLifecycleMatch[1];
+  for (const faultCmd of ["trigger_crash", "trigger_hang", "trigger_large_rejected"]) {
+    if (taskCommands.includes(`"${faultCmd}"`)) {
+      throw new Error(`Permission violation: Fault injector '${faultCmd}' must not be in allow-task-lifecycle`);
+    }
+  }
+}
+
+// Validate that allow-runtime-probe does NOT contain write_runtime_evidence
+const runtimeProbeMatch = permissionsContent.match(/identifier\s*=\s*"allow-runtime-probe"[\s\S]*?commands\.allow\s*=\s*\[([\s\S]*?)\]/);
+if (runtimeProbeMatch) {
+  if (runtimeProbeMatch[1].includes('"write_runtime_evidence"')) {
+    throw new Error("Permission violation: write_runtime_evidence must not be in allow-runtime-probe");
+  }
+}
+
 // 4. Validate WebDriver Feature Gating in Cargo.toml
 const cargoToml = fs.readFileSync(cargoTomlPath, "utf8");
-if (!cargoToml.includes('tauri-plugin-wdio-webdriver = { version = "1.4.0", optional = true }')) {
-  throw new Error("Cargo.toml violation: tauri-plugin-wdio-webdriver must be marked optional = true");
+if (!cargoToml.includes('tauri-plugin-wdio-webdriver = { version = "=1.4.0", optional = true }') &&
+    !cargoToml.includes('tauri-plugin-wdio-webdriver = { version = "1.4.0", optional = true }')) {
+  throw new Error("Cargo.toml violation: tauri-plugin-wdio-webdriver must be marked optional = true with pinned version");
 }
 const defaultFeatureMatch = cargoToml.match(/\[features\][\s\S]*?default\s*=\s*\[(.*?)\]/);
 if (defaultFeatureMatch && defaultFeatureMatch[1].includes("webdriver")) {
@@ -89,6 +117,7 @@ console.log("[security-baseline] Verification PASSED:", {
   cspStrict: true,
   unsafeInlineAbsent: true,
   leastPrivilegeCapabilities: capability.permissions.length,
+  testFaultsExcludedFromProduction: true,
   webDriverOptional: true,
   webDriverExcludedFromDefault: true,
 });
