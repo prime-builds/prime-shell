@@ -1,0 +1,20 @@
+{
+  "version": "0.2.0",
+  "notes": "Prime Shell 0.2.0 release with production security and signed update channels.",
+  "pub_date": "2026-09-19T18:00:00Z",
+  "channel": "stable",
+  "platforms": {
+    "windows-x86_64": {
+      "url": "https://staging-updates.primeshell.internal/releases/v0.2.0/prime-shell-setup-0.2.0.exe",
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIG1pbmlzaWduIHNlY3JldCBrZXkKUlVTVGVzdFNpZ25hdHVyZTFDdW11bGF0aXZlRWQyNTUxOVN0cmVhbVZlcmlmaWVyMDAwMDAwMDAwMDAwMDAwMA==",
+      "sizeBytes": 15482910,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "darwin-aarch64": {
+      "url": "https://staging-updates.primeshell.internal/releases/v0.2.0/prime-shell-0.2.0.tar.gz",
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIG1pbmlzaWduIHNlY3JldCBrZXkKUlVTVGVzdFNpZ25hdHVyZTJNYWNPc0FybTY0VmVyaWZpZXJNb2R1bGUwMDAwMDAwMDAwMDAwMDAwMDAwMA==",
+      "sizeBytes": 14298112,
+      "sha256": "ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb"
+    }
+  }
+}

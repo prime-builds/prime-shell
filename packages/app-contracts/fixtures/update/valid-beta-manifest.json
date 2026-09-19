@@ -1,0 +1,14 @@
+{
+  "version": "0.3.0-beta.1",
+  "notes": "Prime Shell 0.3.0-beta.1 pre-release preview for beta channel testers.",
+  "pub_date": "2026-09-19T18:30:00Z",
+  "channel": "beta",
+  "platforms": {
+    "windows-x86_64": {
+      "url": "https://staging-updates.primeshell.internal/releases/v0.3.0-beta.1/prime-shell-setup-0.3.0-beta.1.exe",
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIG1pbmlzaWduIHNlY3JldCBrZXkKUlVTVGVzdEJldGFTaWduYXR1cmUxQ3VtdWxhdGl2ZUVkMjU1MTlTdHJlYW1WZXJpZmllcjAwMDAwMDAwMDAwMA==",
+      "sizeBytes": 15510200,
+      "sha256": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a"
+    }
+  }
+}

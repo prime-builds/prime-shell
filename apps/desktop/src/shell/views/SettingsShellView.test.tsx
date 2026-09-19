@@ -40,6 +40,39 @@ vi.mock("@tauri-apps/api/core", () => ({
     if (cmd === "reset_all_settings") {
       return DEFAULT_SETTINGS;
     }
+    if (cmd === "get_update_status") {
+      return {
+        status: "idle",
+        currentVersion: "0.1.0",
+        availableVersion: null,
+        channel: "stable",
+        error: null,
+        downloadProgress: null,
+        checkedAt: null,
+      };
+    }
+    if (cmd === "check_for_updates") {
+      return {
+        status: "upToDate",
+        currentVersion: "0.1.0",
+        availableVersion: null,
+        channel: (args as { channel?: string } | undefined)?.channel ?? "stable",
+        error: null,
+        downloadProgress: null,
+        checkedAt: "2026-09-19T18:00:00Z",
+      };
+    }
+    if (cmd === "set_update_channel") {
+      return {
+        status: "idle",
+        currentVersion: "0.1.0",
+        availableVersion: null,
+        channel: (args as { channel?: string } | undefined)?.channel ?? "stable",
+        error: null,
+        downloadProgress: null,
+        checkedAt: null,
+      };
+    }
     return null;
   }),
 }));
@@ -155,5 +188,23 @@ describe("SettingsShellView", () => {
     expect(screen.getByTestId("settings-feedback-message").textContent).toContain(
       "All settings reset to default values",
     );
+  });
+
+  it("renders update release channel card in system tab and allows checking for updates", async () => {
+    renderSettingsView();
+
+    const systemTab = screen.getByTestId("tab-system");
+    fireEvent.click(systemTab);
+
+    expect(screen.getByTestId("updates-settings-card")).toBeDefined();
+    expect(screen.getByTestId("installed-version-display").textContent).toBe("0.1.0");
+
+    const betaBtn = screen.getByTestId("channel-beta-btn");
+    fireEvent.click(betaBtn);
+
+    const checkBtn = screen.getByTestId("check-for-updates-btn");
+    fireEvent.click(checkBtn);
+
+    expect(await screen.findByTestId("update-status-uptodate")).toBeDefined();
   });
 });

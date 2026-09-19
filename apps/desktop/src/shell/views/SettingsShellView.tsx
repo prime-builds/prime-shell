@@ -32,6 +32,7 @@ import { useShellStore } from "../state/useShellStore";
 import { useDocumentAnalysisStore } from "../state/useDocumentAnalysisStore";
 import { useTextUtilityStore } from "../../features/text-utility/state";
 import { useSettingsStore } from "../state/useSettingsStore";
+import { useUpdateStore } from "../state/useUpdateStore";
 import {
   BOTTOM_PANEL_MAX_RATIO,
   BOTTOM_PANEL_MIN_RATIO,
@@ -155,6 +156,15 @@ export const SettingsShellView: React.FC = () => {
   const searchQuery = useSettingsStore((s) => s.searchQuery);
   const setSearchQuery = useSettingsStore((s) => s.setSearchQuery);
   const resetSetting = useSettingsStore((s) => s.resetSetting);
+
+  const updateChannel = useUpdateStore((s) => s.channel);
+  const updateStatus = useUpdateStore((s) => s.status);
+  const currentVersion = useUpdateStore((s) => s.currentVersion);
+  const availableVersion = useUpdateStore((s) => s.availableVersion);
+  const updateError = useUpdateStore((s) => s.error);
+  const isChecking = useUpdateStore((s) => s.isChecking);
+  const checkForUpdates = useUpdateStore((s) => s.checkForUpdates);
+  const setChannel = useUpdateStore((s) => s.setChannel);
   const resetSection = useSettingsStore((s) => s.resetSection);
   const resetAll = useSettingsStore((s) => s.resetAll);
 
@@ -1009,6 +1019,75 @@ export const SettingsShellView: React.FC = () => {
                   <div>
                     <Text weight="semibold">Reduced Transparency: </Text>
                     <Text>{accessibilityPreferences.prefersReducedTransparency ? "Active" : "Inactive"}</Text>
+                  </div>
+                </div>
+              </Card>
+
+              <Card role="region" aria-label="Application Updates and Channels" data-testid="updates-settings-card">
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <Title2 as="h2">Updates &amp; Release Channels</Title2>
+                  <Badge appearance="tint" color={updateChannel === "stable" ? "brand" : "warning"}>
+                    {updateChannel.toUpperCase()} CHANNEL
+                  </Badge>
+                </div>
+                <Text size={300} style={{ marginBottom: "12px" }}>
+                  Configure your update release channel and verify application integrity.
+                </Text>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                  <div>
+                    <Text weight="semibold">Installed Version: </Text>
+                    <Text data-testid="installed-version-display">{currentVersion}</Text>
+                  </div>
+
+                  <div>
+                    <Text weight="semibold" style={{ display: "block", marginBottom: "6px" }}>Release Channel:</Text>
+                    <div style={{ display: "flex", gap: "8px" }} role="group" aria-label="Release Channel">
+                      <Button
+                        appearance={updateChannel === "stable" ? "primary" : "secondary"}
+                        onClick={() => void setChannel("stable")}
+                        aria-pressed={updateChannel === "stable"}
+                        data-testid="channel-stable-btn"
+                        size="small"
+                      >
+                        Stable (Production)
+                      </Button>
+                      <Button
+                        appearance={updateChannel === "beta" ? "primary" : "secondary"}
+                        onClick={() => void setChannel("beta")}
+                        aria-pressed={updateChannel === "beta"}
+                        data-testid="channel-beta-btn"
+                        size="small"
+                      >
+                        Beta (Pre-release)
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "4px" }}>
+                    <Button
+                      appearance="primary"
+                      onClick={() => void checkForUpdates()}
+                      disabled={isChecking}
+                      data-testid="check-for-updates-btn"
+                    >
+                      {isChecking ? "Checking for Updates..." : "Check for Updates"}
+                    </Button>
+                    {updateStatus === "upToDate" && (
+                      <Text data-testid="update-status-uptodate" style={{ color: "var(--colorPaletteGreenForeground1)" }}>
+                        ✓ Application is up to date.
+                      </Text>
+                    )}
+                    {updateStatus === "available" && availableVersion && (
+                      <Text data-testid="update-status-available" style={{ color: "var(--colorBrandForeground1)" }}>
+                        Update available: {availableVersion}
+                      </Text>
+                    )}
+                    {updateStatus === "error" && updateError && (
+                      <Text data-testid="update-status-error" style={{ color: "var(--colorPaletteRedForeground1)" }}>
+                        Check failed: {updateError}
+                      </Text>
+                    )}
                   </div>
                 </div>
               </Card>

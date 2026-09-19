@@ -22,6 +22,7 @@
 - Phase 6 WP01 is `Implemented` (executed and verified via branch `feat/gfd-p6-wp01-settings-persistence`).
 - Phase 6 WP02 is `Implemented` (executed and verified via branch `feat/gfd-p6-wp02-diagnostics-recovery`).
 - Phase 7 WP01 is `Implemented` (executed and verified via branch `feat/gfd-p7-wp01-production-security`).
+- Phase 7 WP02 is `Implemented` (executed and verified via branch `feat/gfd-p7-wp02-signing-notarization-updates`).
 - Future package prompts remain **provisional until activated** by Chat Session.
 
 Only these implementation-status labels are valid throughout the prompt pack:
@@ -44,7 +45,7 @@ Only these implementation-status labels are valid throughout the prompt pack:
 | `GFD-P6-WP01` | Phase 6 | Settings, Persistence, and Single-Instance Behavior | `Implemented` | GPT-5.6 Sol / High |
 | `GFD-P6-WP02` | Phase 6 | Diagnostics, Repair, and Recovery | `Implemented` | GPT-5.6 Sol / Extra High |
 | `GFD-P7-WP01` | Phase 7 | Production Security and Release Artifact Hardening | `Implemented` | GPT-5.6 Sol / Extra High |
-| `GFD-P7-WP02` | Phase 7 | Signing, Notarization, and Signed Update Channels | `Not started` | GPT-5.6 Sol / Extra High |
+| `GFD-P7-WP02` | Phase 7 | Signing, Notarization, and Signed Update Channels | `Implemented` | GPT-5.6 Sol / Extra High |
 | `GFD-P8-WP01` | Phase 8 | Template Extraction and Second Branded Application | `Not started` | GPT-5.6 Sol / High |
 
 The package IDs and order above must match
