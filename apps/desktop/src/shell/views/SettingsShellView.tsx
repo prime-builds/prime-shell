@@ -19,12 +19,14 @@ import {
   Desktop20Regular,
   DocumentSearch20Regular,
   Info20Regular,
+  TextQuote20Regular,
 } from "@fluentui/react-icons";
 import { useNavigate } from "react-router-dom";
 import { validateCustomSeed } from "@prime-shell/design-tokens";
 import { useThemeController } from "../../theme/ThemeContext";
 import { useShellStore } from "../state/useShellStore";
 import { useDocumentAnalysisStore } from "../state/useDocumentAnalysisStore";
+import { useTextUtilityStore } from "../../features/text-utility/state";
 import {
   BOTTOM_PANEL_MAX_RATIO,
   BOTTOM_PANEL_MIN_RATIO,
@@ -64,6 +66,9 @@ export const SettingsShellView: React.FC = () => {
 
   const maxTopTerms = useDocumentAnalysisStore((s) => s.maxTopTerms);
   const setMaxTopTerms = useDocumentAnalysisStore((s) => s.setMaxTopTerms);
+
+  const textUtilityDefaultMode = useTextUtilityStore((s) => s.defaultMode);
+  const setTextUtilityDefaultMode = useTextUtilityStore((s) => s.setDefaultMode);
 
   const [customSeedInput, setCustomSeedInput] = useState("#0078D4");
   const [seedError, setSeedError] = useState("");
@@ -139,6 +144,9 @@ export const SettingsShellView: React.FC = () => {
         </Tab>
         <Tab value="analysis" icon={<DocumentSearch20Regular />} data-testid="tab-analysis">
           Document Analysis
+        </Tab>
+        <Tab value="text-utility" icon={<TextQuote20Regular />} data-testid="tab-text-utility">
+          Text Utility
         </Tab>
         <Tab value="system" icon={<Info20Regular />} data-testid="tab-system">
           System Info
@@ -383,6 +391,87 @@ export const SettingsShellView: React.FC = () => {
                 data-testid="reset-analysis-settings-btn"
               >
                 Reset to Default (20)
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* TEXT UTILITY TAB */}
+      {selectedTab === "text-utility" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <Card role="region" aria-label="Text Utility Settings">
+            <Title2 as="h2">Text Utility Configuration</Title2>
+            <Text size={300} style={{ marginBottom: "16px" }}>
+              Configure defaults for the local text transformation and inspection utility.
+            </Text>
+
+            <div>
+              <Text weight="semibold" data-testid="text-utility-mode-display">
+                Default Mode: {textUtilityDefaultMode}
+              </Text>
+              <Text
+                size={200}
+                style={{
+                  display: "block",
+                  color: "var(--colorNeutralForeground3)",
+                  marginBottom: "8px",
+                }}
+              >
+                Initial transformation mode selected when opening the text utility.
+              </Text>
+              <div
+                style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}
+                role="group"
+                aria-label="Default Transformation Mode"
+              >
+                <Button
+                  appearance={textUtilityDefaultMode === "uppercase" ? "primary" : "secondary"}
+                  onClick={() => setTextUtilityDefaultMode("uppercase")}
+                  aria-pressed={textUtilityDefaultMode === "uppercase"}
+                  data-testid="text-mode-uppercase-btn"
+                >
+                  UPPERCASE (Default)
+                </Button>
+                <Button
+                  appearance={textUtilityDefaultMode === "lowercase" ? "primary" : "secondary"}
+                  onClick={() => setTextUtilityDefaultMode("lowercase")}
+                  aria-pressed={textUtilityDefaultMode === "lowercase"}
+                  data-testid="text-mode-lowercase-btn"
+                >
+                  lowercase
+                </Button>
+                <Button
+                  appearance={textUtilityDefaultMode === "titlecase" ? "primary" : "secondary"}
+                  onClick={() => setTextUtilityDefaultMode("titlecase")}
+                  aria-pressed={textUtilityDefaultMode === "titlecase"}
+                  data-testid="text-mode-titlecase-btn"
+                >
+                  Title Case
+                </Button>
+                <Button
+                  appearance={
+                    textUtilityDefaultMode === "normalize-whitespace" ? "primary" : "secondary"
+                  }
+                  onClick={() => setTextUtilityDefaultMode("normalize-whitespace")}
+                  aria-pressed={textUtilityDefaultMode === "normalize-whitespace"}
+                  data-testid="text-mode-whitespace-btn"
+                >
+                  Normalize Whitespace
+                </Button>
+              </div>
+            </div>
+
+            <Divider style={{ margin: "16px 0" }} />
+
+            <div>
+              <Button
+                appearance="secondary"
+                icon={<ArrowReset20Regular />}
+                onClick={() => setTextUtilityDefaultMode("uppercase")}
+                data-testid="reset-text-utility-settings-btn"
+              >
+                Reset to Default (UPPERCASE)
               </Button>
             </div>
           </Card>

@@ -4,14 +4,14 @@ import {
   AppFolder24Filled,
   AppFolder24Regular,
   DarkTheme24Regular,
-  DocumentSearch24Filled,
-  DocumentSearch24Regular,
   PanelLeftExpand20Regular,
+  Search24Regular,
   Settings24Filled,
   Settings24Regular,
 } from "@fluentui/react-icons";
 import { RAIL_WIDTH } from "../types";
 import { useThemeController } from "../../theme/ThemeContext";
+import { featureRegistry } from "../../features";
 
 const useStyles = makeStyles({
   rail: {
@@ -64,15 +64,18 @@ interface NavigationRailProps {
   activeId: string;
   onNavigate: (id: string, path: string) => void;
   onToggleSidebar?: () => void;
+  onOpenCommandPalette?: () => void;
 }
 
 export const NavigationRail: React.FC<NavigationRailProps> = ({
   activeId,
   onNavigate,
   onToggleSidebar,
+  onOpenCommandPalette,
 }) => {
   const styles = useStyles();
   const { themeMode, setThemeMode } = useThemeController();
+  const featureNavItems = featureRegistry.getNavigationItems();
 
   const handleCycleTheme = () => {
     if (themeMode === "system") setThemeMode("light");
@@ -95,18 +98,7 @@ export const NavigationRail: React.FC<NavigationRailProps> = ({
           </Tooltip>
         )}
 
-        <Tooltip content="Document Analysis" relationship="label">
-          <Button
-            appearance="subtle"
-            className={`${styles.railButton} ${activeId === "analysis" ? styles.activeButton : ""}`}
-            icon={activeId === "analysis" ? <DocumentSearch24Filled /> : <DocumentSearch24Regular />}
-            onClick={() => onNavigate("analysis", "/analysis")}
-            aria-label="Document Analysis"
-            aria-current={activeId === "analysis" ? "page" : undefined}
-            data-testid="nav-analysis-btn"
-          />
-        </Tooltip>
-
+        {/* Workspace Root */}
         <Tooltip content="Workspace" relationship="label">
           <Button
             appearance="subtle"
@@ -119,7 +111,27 @@ export const NavigationRail: React.FC<NavigationRailProps> = ({
           />
         </Tooltip>
 
-        <Tooltip content="Settings" relationship="label">
+        {/* Dynamic Feature Navigation Items */}
+        {featureNavItems.map((item) => {
+          const isActive = activeId === item.id;
+          const IconComponent = isActive ? item.iconFilled : item.iconRegular;
+          return (
+            <Tooltip key={item.id} content={item.label} relationship="label">
+              <Button
+                appearance="subtle"
+                className={`${styles.railButton} ${isActive ? styles.activeButton : ""}`}
+                icon={<IconComponent />}
+                onClick={() => onNavigate(item.id, item.path)}
+                aria-label={item.ariaLabel || item.label}
+                aria-current={isActive ? "page" : undefined}
+                data-testid={`nav-${item.id}-btn`}
+              />
+            </Tooltip>
+          );
+        })}
+
+        {/* Settings */}
+        <Tooltip content="Settings (Ctrl+,)" relationship="label">
           <Button
             appearance="subtle"
             className={`${styles.railButton} ${activeId === "settings" ? styles.activeButton : ""}`}
@@ -133,6 +145,19 @@ export const NavigationRail: React.FC<NavigationRailProps> = ({
       </div>
 
       <div className={styles.section}>
+        {onOpenCommandPalette && (
+          <Tooltip content="Command Palette (Ctrl+K)" relationship="label">
+            <Button
+              appearance="subtle"
+              className={styles.railButton}
+              icon={<Search24Regular />}
+              onClick={onOpenCommandPalette}
+              aria-label="Open Command Palette"
+              data-testid="nav-command-palette-btn"
+            />
+          </Tooltip>
+        )}
+
         <Tooltip content={`Theme: ${themeMode} (click to cycle)`} relationship="label">
           <Button
             appearance="subtle"
@@ -146,3 +171,4 @@ export const NavigationRail: React.FC<NavigationRailProps> = ({
     </nav>
   );
 };
+
