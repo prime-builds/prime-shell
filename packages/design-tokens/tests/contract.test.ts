@@ -29,8 +29,11 @@ describe("Design Tokens Contract & Drift Tests", () => {
     const lightPath = path.resolve(__dirname, "../snapshots/light.json");
     const darkPath = path.resolve(__dirname, "../snapshots/dark.json");
 
-    const lightHash = `sha256:${crypto.createHash("sha256").update(fs.readFileSync(lightPath)).digest("hex")}`;
-    const darkHash = `sha256:${crypto.createHash("sha256").update(fs.readFileSync(darkPath)).digest("hex")}`;
+    const lightContent = fs.readFileSync(lightPath, "utf8").replace(/\r\n/g, "\n");
+    const darkContent = fs.readFileSync(darkPath, "utf8").replace(/\r\n/g, "\n");
+
+    const lightHash = `sha256:${crypto.createHash("sha256").update(lightContent).digest("hex")}`;
+    const darkHash = `sha256:${crypto.createHash("sha256").update(darkContent).digest("hex")}`;
 
     expect(provenance.snapshotHashes["light.json"]).toBe(lightHash);
     expect(provenance.snapshotHashes["dark.json"]).toBe(darkHash);
