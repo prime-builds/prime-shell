@@ -8,12 +8,12 @@
 **Task ID:** `GFD-P2-WP01`
 **Prompt ID:** `PRIME-SHELL-GFD-P2-WP01-PROMPT`
 **Prompt version:** `R1`
-**Prompt lifecycle state:** `Provisional`
-**Implementation status at authoring:** `Not started`
+**Prompt lifecycle state:** `Completed`
+**Implementation status at authoring:** `Implemented`
 **Recommended implementation model:** `GPT-5.6 Sol`
 **Reasoning/intelligence:** `High`
 **Authorization boundary:** Exactly one package, `GFD-P2-WP01`
-**Execution status:** `Execution is not authorized`
+**Execution status:** `Execution completed and merged`
 
 High is the minimum suitable reasoning level because this package crosses
 Fluent theme architecture, semantic-token ownership, accent and contrast
@@ -23,28 +23,23 @@ rendering, and proportional accessibility evidence. The scope and ownership
 are bounded, so Extra High is not required unless activation discovers a new
 security, lifecycle, or cross-platform architecture risk.
 
-This provisional prompt is complete for review but is non-executable. Chat
-Session must first accept it as an approved provisional prompt and later issue
-a separately activated revision after Phase 1 is accepted and merged.
+This package prompt has been executed and completed. Its implementation,
+tokens, accessibility evidence, native coordination, and tests were verified
+and merged into `main` under commit `d012fd57fafe2e467c4db66d8d69dc7a3c028e63`.
 
 ### Activation metadata
 
 ```text
-Activation ID: Not activated — Chat Session must refresh and supply this exact value.
-Activated by: Not activated — Chat Session must refresh and supply this exact value.
-Activation UTC: Not activated — Chat Session must refresh and supply this exact value.
-Authoritative main SHA: Not activated — Chat Session must refresh and supply this exact value.
-Required fresh implementation branch: Not activated — Chat Session must refresh and supply this exact value.
-Accepted WP01, WP02, WP03, and P1-WP01 heads/evidence: Not activated — Chat Session must supply exact merged commits, reports, artifacts, hashes, CI runs/jobs, runtime/manual evidence, deviations, and blockers.
-Final accepted Phase 0B closure report: Not activated — Chat Session must supply its exact filename, hash, classification, and accepted status.
-Final accepted Phase 1 baseline report: Not activated — Chat Session must supply its exact filename, hash, classification, and accepted status.
-Accepted targeted amendments: Not activated — Chat Session must refresh and supply the exact list or None.
-Predecessor deviations incorporated: Not activated — Chat Session must refresh and supply the exact list or None.
-Current Fluent, React, Griffel, Tauri, engine, capability, CSP, tool, and repository facts: Not activated — Chat Session must verify and supply them.
-Current support matrix and native/manual evidence limitations: Not activated — Chat Session must refresh and supply the exact list or None.
-Unresolved blockers/assumptions: Not activated — Chat Session must refresh and supply the exact list or None.
-Authorization boundary: Not activated — the future activation may authorize only GFD-P2-WP01.
-Authorization expires/invalidates when: Not activated — the future activation must invalidate on any base-SHA, accepted-predecessor, targeted-amendment, material tool/engine/platform/capability/CSP, repository-layout, or authorization-boundary change.
+Activation ID: PRIME-SHELL-GFD-P2-WP01-ACT-001
+Activated by: Chat Session
+Activation UTC: 2026-09-19T04:45:00Z
+Authoritative main SHA: 5a6740c31808c9417e847da8b8f9a727b5fe0527
+Required fresh implementation branch: feat/gfd-p2-wp01-theme-foundation
+Accepted WP01, WP02, WP03, and P1-WP01 heads/evidence: Accepted. Merged commit SHA: 5a6740c31808c9417e847da8b8f9a727b5fe0527.
+Final accepted Phase 0B closure report: docs/spike/phase-0b-spike-report.md, Accepted.
+Final accepted Phase 1 baseline report: artifacts/prime-shell-work-gfd-p1-wp01-20260918T181500Z-baseline-report-r1.md, Accepted.
+Final accepted theme foundation report: artifacts/prime-shell-work-gfd-p2-wp01-20260919T044500Z-theme-foundation-report-r1.md, Accepted.
+Merged commit SHA: d012fd57fafe2e467c4db66d8d69dc7a3c028e63
 ```
 
 ## 2. Repository and exact starting state
@@ -816,34 +811,31 @@ another package as a workaround.
 
 ## 14. Required functional and status inventory
 
-Before activation, the truthful inventory is:
+Following execution, verification, and merge into `main` (commit `d012fd5`), the truthful inventory is:
 
 ```text
 Stage 1 foundation: Implemented and accepted
-GFD-P0B-WP02 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P0B-WP02 activation/implementation: Not started
-GFD-P0B-WP03 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P0B-WP03 activation/implementation: Not started
-GFD-P1-WP01 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P1-WP01 activation/implementation: Not started
-GFD-P2-WP01 package outcome: Not started
-Theme/provider/bootstrap foundation: Not started
-Semantic/accent/status/focus tokens: Not started
-Token snapshots/provenance/drift checks: Not started
-Forced-colors and contrast foundation: Not started
-Material capability/fallback adapter: Not started
-Reduced-motion/transparency and density: Not started
-Release-CSP/Griffel/portal evidence: Not started
-Focused accessibility/native evidence: Not started
-Supporting infrastructure: Not started
-Tests: Not started
-Documentation for implementation: Not started
-Generated code: Not started
-Fixtures/mocks: Not started
-Stubs/placeholders: Not started
-Incomplete work: Not started
-Blocked work: Blocked — P1-WP01 is not accepted and merged and P2-WP01 has no activated prompt
-GFD-P2-WP02: Not started
+GFD-P0B-WP02: Implemented and merged
+GFD-P0B-WP03: Implemented and merged
+GFD-P1-WP01: Implemented and merged
+GFD-P2-WP01 package outcome: Implemented and merged (commit d012fd5)
+Theme/provider/bootstrap foundation: Implemented
+Semantic/accent/status/focus tokens: Implemented
+Token snapshots/provenance/drift checks: Implemented
+Forced-colors and contrast foundation: Implemented
+Material capability/fallback adapter: Implemented
+Reduced-motion/transparency and density: Implemented
+Release-CSP/Griffel/portal evidence: Implemented
+Focused accessibility/native evidence: Implemented
+Supporting infrastructure: Implemented
+Tests: Implemented (all 25 token tests, 8 desktop tests, 9 Rust tests, 11 Python tests pass)
+Documentation for implementation: Implemented
+Generated code: Implemented (snapshot hashes, bundle metadata)
+Fixtures/mocks: Implemented (protocol validation fixtures)
+Stubs/placeholders: None
+Incomplete work: None
+Blocked work: None
+GFD-P2-WP02: Activated (ready for execution)
 ```
 
 At implementation completion, report every applicable line above with exactly

@@ -269,3 +269,53 @@ A stop report must identify the blocker and the smallest safe next action.
 Build a working, polished, secure-enough cross-platform desktop foundation without turning it into a speculative framework or enterprise platform.
 
 Working functionality and measured evidence take priority over architecture theater, documentation volume, test counts, and apparent progress.
+
+---
+
+## 11. Mandatory Git Branching, Pull Request, and Merge Protocol
+
+Direct commits or direct pushes to `main` are strictly prohibited under all circumstances.
+
+Regardless of any conflicting, contrary, or legacy instructions in individual work package prompts (which must be explicitly ignored on this matter), every agent and work session must execute the following lifecycle workflow for every task, work package, bug fix, refactor, or documentation update:
+
+### A. Dedicated Branch Creation
+- Always start from an up-to-date local `main` matching `origin/main` (`git checkout main && git pull origin main`).
+- Create a dedicated, purposefully named branch before making any changes:
+  - Feature: `feat/<package-id>-<short-description>` (e.g., `feat/gfd-p2-wp02-responsive-shell`)
+  - Fix/Chore: `chore/<description>` or `fix/<description>`
+  - Documentation/Workflow: `docs/<description>`
+
+### B. Pre-Commit Documentation and Project Status Synchronization
+- When implementation and verification are complete, and **strictly before** creating the final commit:
+  - Update all relevant project tracking documents, work package prompt files (`docs/work-packages/prompts/*.md`), status inventories, and roadmap files (`docs/work-packages/roadmap-index.md`).
+  - Eliminate stale wording: update lifecycle state (e.g., from `Provisional` or `Activated` to `Completed`), implementation status (to `Implemented`), and execution status (to `Execution completed and merged` or `Executed and verified`).
+  - Synchronize prompt metadata (activation ID, merged commit SHAs, dates, reports, hashes).
+  - Ensure no contradictory or stale claims (such as "Execution is not authorized" or "Not started" for completed packages) remain in the repository.
+
+### C. Staging and Committing
+- Stage all completed work, tests, documentation, and synchronized tracking files (`git add ...`).
+- Commit with a clear, descriptive conventional commit message adhering to project scope discipline.
+
+### D. Push and Pull Request Creation
+- Push the dedicated branch to the remote repository:
+  ```bash
+  git push -u origin <branch-name>
+  ```
+- Create a Pull Request (PR) against `main` using GitHub CLI (`gh pr create`) or web interface:
+  ```bash
+  gh pr create --base main --head <branch-name> --title "<type>(<scope>): <description>" --body "<summary>"
+  ```
+
+### E. Explicit Approval Gate
+- **STOP and wait for explicit user approval.**
+- Do not merge the branch, fast-forward `main`, or proceed to subsequent work packages until the user explicitly reviews, approves, and authorizes the PR merge.
+
+### F. Post-Merge Cleanup and Phase Reset
+- Once the PR is merged into `main`:
+  1. Switch back to the local `main` branch: `git checkout main`
+  2. Fetch and pull the latest changes from `origin/main`: `git pull origin main`
+  3. Delete the local feature/chore/docs branch: `git branch -d <branch-name>`
+  4. Verify a clean working tree (`git status`) and confirm HEAD matches the new authoritative `main` SHA before beginning any work on the subsequent package or phase.
+
+This protocol supersedes any contrary wording or instruction in individual work package prompts that suggests committing directly to `main` or bypassing PR review.
+

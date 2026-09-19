@@ -7,13 +7,13 @@
 **Title:** `Responsive Application Shell`
 **Task ID:** `GFD-P2-WP02`
 **Prompt ID:** `PRIME-SHELL-GFD-P2-WP02-PROMPT`
-**Prompt version:** `R1`
-**Prompt lifecycle state:** `Provisional`
+**Prompt version:** `R1 (ACTIVATED)`
+**Prompt lifecycle state:** `Activated`
 **Implementation status at authoring:** `Not started`
 **Recommended implementation model:** `GPT-5.6 Sol`
 **Reasoning/intelligence:** `High`
 **Authorization boundary:** Exactly one package, `GFD-P2-WP02`
-**Execution status:** `Execution is not authorized`
+**Execution status:** `Execution is AUTHORIZED`
 
 High is the minimum suitable reasoning level because this package crosses
 responsive shell composition, accessible pane resizing, focus restoration,
@@ -23,41 +23,36 @@ cross-engine evidence. The package is deliberately bounded to the reusable
 shell, so Extra High is not required unless activation exposes a new native
 window, persistence, security, or cross-platform architecture risk.
 
-This provisional prompt is complete for review but is non-executable. Chat
-Session must first accept it as an approved provisional prompt and later issue
-a separately activated revision after `GFD-P2-WP01` is accepted and merged.
+This prompt has been activated by Chat Session and is authorized for execution.
 
 ### Activation metadata
 
 ```text
-Activation ID: Not activated — Chat Session must refresh and supply this exact value.
-Activated by: Not activated — Chat Session must refresh and supply this exact value.
-Activation UTC: Not activated — Chat Session must refresh and supply this exact value.
-Authoritative main SHA: Not activated — Chat Session must refresh and supply this exact value.
-Required fresh implementation branch: Not activated — Chat Session must refresh and supply this exact value.
-Accepted WP01, WP02, WP03, P1-WP01, and P2-WP01 heads/evidence: Not activated — Chat Session must supply exact merged commits, reports, artifacts, hashes, CI runs/jobs, native/manual evidence, deviations, and blockers.
-Final accepted Phase 0B closure report: Not activated — Chat Session must supply its exact filename, hash, classification, and accepted status.
-Final accepted Phase 1 baseline report: Not activated — Chat Session must supply its exact filename, hash, classification, and accepted status.
-Final accepted P2-WP01 theme-foundation report: Not activated — Chat Session must supply its exact filename, hash, classification, and accepted status.
-Accepted targeted amendments: Not activated — Chat Session must refresh and supply the exact list or None.
-Predecessor deviations incorporated: Not activated — Chat Session must refresh and supply the exact list or None.
-Current Fluent, React, Griffel, Tauri, router, state, engine, capability, CSP, tool, and repository facts: Not activated — Chat Session must verify and supply them.
-Current support matrix and native/manual evidence limitations: Not activated — Chat Session must refresh and supply the exact list or None.
-Accepted title-bar result and per-platform fallback: Not activated — Chat Session must refresh and supply the exact result for Windows, macOS, and Linux.
-Unresolved blockers/assumptions: Not activated — Chat Session must refresh and supply the exact list or None.
-Authorization boundary: Not activated — the future activation may authorize only GFD-P2-WP02.
-Authorization expires/invalidates when: Not activated — the future activation must invalidate on any base-SHA, accepted-predecessor, targeted-amendment, material tool/engine/platform/title-bar/capability/CSP, repository-layout, or authorization-boundary change.
+Activation ID: PRIME-SHELL-GFD-P2-WP02-ACT-001
+Activated by: Chat Session (Antigravity)
+Activation UTC: 2026-09-19T08:24:00Z
+Authoritative main SHA: d012fd57fafe2e467c4db66d8d69dc7a3c028e63
+Required fresh implementation branch: feat/gfd-p2-wp02-responsive-shell
+Accepted WP01, WP02, WP03, P1-WP01, and P2-WP01 heads/evidence: Accepted. Merged commit SHA: d012fd57fafe2e467c4db66d8d69dc7a3c028e63.
+Final accepted Phase 0B closure report: docs/spike/phase-0b-spike-report.md, Accepted.
+Final accepted Phase 1 baseline report: artifacts/prime-shell-work-gfd-p1-wp01-20260918T181500Z-baseline-report-r1.md, Accepted.
+Final accepted P2-WP01 theme-foundation report: artifacts/prime-shell-work-gfd-p2-wp01-20260919T044500Z-theme-foundation-report-r1.md, SHA-256: 3fa9d671eb05382865f3af8603849bf754684a3068d7a38c0050f25b34b893d3, Accepted.
+Accepted targeted amendments: None.
+Predecessor deviations incorporated: None.
+Current Fluent, React, Griffel, Tauri, router, state, engine, capability, CSP, tool, and repository facts: Fluent UI React v9, React 18, Griffel, Tauri 2, Zustand, React Router.
+Current support matrix and native/manual evidence limitations: Windows 11 x64 (WebView2), macOS arm64 (WKWebView), Ubuntu 24.04 x64 (WebKitGTK). Manual UX checks required.
+Accepted title-bar result and per-platform fallback: Windows: Custom Fluent candidate (fallback to native); macOS: Native traffic lights; Linux: Native decorations.
+Unresolved blockers/assumptions: None.
+Authorization boundary: Exactly package GFD-P2-WP02.
+Authorization expires/invalidates when: Any base-SHA, accepted-predecessor, targeted-amendment, material tool/engine/platform/title-bar/capability/CSP, repository-layout, or authorization-boundary changes.
 ```
 
 ## 2. Repository and exact starting state
 
 **Repository:** `prime-builds/prime-shell`
 **Authoritative base branch:** `main`
-**Required starting commit:** Not activated — Chat Session must refresh and
-supply the exact current accepted and merged `main` SHA after P2-WP01
-acceptance and merge.
-**Required implementation branch:** Not activated — Chat Session must verify
-absence and supply one exact fresh branch name.
+**Required starting commit:** `d012fd57fafe2e467c4db66d8d69dc7a3c028e63`
+**Required implementation branch:** `feat/gfd-p2-wp02-responsive-shell`
 
 Authoring-time facts, for review only:
 
@@ -925,19 +920,15 @@ another package as a workaround.
 
 ## 14. Required functional and status inventory
 
-Before activation, the truthful inventory is:
+Following activation, the truthful inventory is:
 
 ```text
 Stage 1 foundation: Implemented and accepted
-GFD-P0B-WP02 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P0B-WP02 activation/implementation: Not started
-GFD-P0B-WP03 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P0B-WP03 activation/implementation: Not started
-GFD-P1-WP01 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P1-WP01 activation/implementation: Not started
-GFD-P2-WP01 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P2-WP01 activation/implementation: Not started
-GFD-P2-WP02 package outcome: Not started
+GFD-P0B-WP02: Implemented and merged
+GFD-P0B-WP03: Implemented and merged
+GFD-P1-WP01: Implemented and merged
+GFD-P2-WP01: Implemented and merged
+GFD-P2-WP02 package outcome: Activated (Not started)
 Application composition and routes: Not started
 App rail and context sidebar: Not started
 Workspace and inspector: Not started
