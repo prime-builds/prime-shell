@@ -111,12 +111,26 @@ export const artifactRefSchema = z.object({
 export const openDocumentIntentResponseSchema = documentRefSchema.nullable();
 export const saveDocumentIntentResponseSchema = documentRefSchema.nullable();
 
+export const taskSnapshotSchema = z.object({
+  taskId: z.string().min(1).max(128),
+  operation: z.string().min(1).max(128),
+  status: taskStateSchema,
+  current: z.number().int().min(0),
+  target: z.number().int().min(0),
+  error: z.string().max(256).nullable(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
+export const taskSnapshotResponseSchema = taskSnapshotSchema.nullable();
+
 export type AppError = z.infer<typeof appErrorSchema>;
 export type BackendLifecycleState = z.infer<typeof backendLifecycleStateSchema>;
 export type BackendStatus = z.infer<typeof backendStatusSchema>;
 export type TaskState = z.infer<typeof taskStateSchema>;
 export type TaskEventPayload = z.infer<typeof taskEventPayloadSchema>;
 export type TaskEvent = z.infer<typeof taskEventSchema>;
+export type TaskSnapshot = z.infer<typeof taskSnapshotSchema>;
 export type AckEnvelope = z.infer<typeof ackEnvelopeSchema>;
 export type EchoResponse = z.infer<typeof echoResponseSchema>;
 export type RuntimeProbeConfig = z.infer<typeof runtimeProbeConfigSchema>;
