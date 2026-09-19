@@ -3,6 +3,14 @@
   "identifier": "main-capability",
   "description": "Production capabilities exposed to the Prime Text Studio main window.",
   "windows": ["main"],
+  "remote": {
+    "urls": [
+      "http://localhost:1421",
+      "http://localhost:1421/*",
+      "http://127.0.0.1:1421",
+      "http://127.0.0.1:1421/*"
+    ]
+  },
   "permissions": [
     "core:default",
     "allow-backend-status",

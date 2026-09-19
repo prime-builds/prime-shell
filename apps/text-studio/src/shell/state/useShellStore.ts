@@ -62,6 +62,9 @@ import { invoke } from "@tauri-apps/api/core";
 let saveTimeout: ReturnType<typeof setTimeout> | null = null;
 
 async function invokeTauri<T>(cmd: string, args?: Record<string, unknown>): Promise<T | null> {
+  if (typeof window === "undefined" || !("__TAURI_INTERNALS__" in window)) {
+    return null;
+  }
   try {
     return args !== undefined ? await invoke<T>(cmd, args) : await invoke<T>(cmd);
   } catch (e) {
