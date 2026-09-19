@@ -9,6 +9,7 @@ import {
   runtimeProbeConfigSchema,
   saveDocumentIntentResponseSchema,
   taskEventSchema,
+  taskSnapshotResponseSchema,
   type AckEnvelope,
   type AppError,
   type BackendStatus,
@@ -16,6 +17,7 @@ import {
   type EchoResponse,
   type RuntimeProbeConfig,
   type TaskEvent,
+  type TaskSnapshot,
 } from "./contracts";
 
 export async function getBackendStatus(): Promise<BackendStatus> {
@@ -38,6 +40,11 @@ export async function cancelTask(taskId: string): Promise<AckEnvelope> {
   return ackEnvelopeSchema.parse(
     await invoke("cancel_task", { taskId }),
   );
+}
+
+export async function getTaskSnapshot(taskId?: string): Promise<TaskSnapshot | null> {
+  const result = await invoke("get_task_snapshot", { taskId });
+  return taskSnapshotResponseSchema.parse(result);
 }
 
 export async function triggerCrash(): Promise<void> {

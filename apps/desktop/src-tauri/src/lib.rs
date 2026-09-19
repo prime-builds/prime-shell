@@ -14,7 +14,7 @@ use backend::{
     pick_document_dialog, save_document_dialog,
     protocol::{AckEnvelope, BackendLifecycleState},
     AppError, AppResult, BackendClient, BackendStatus, DocumentRef, EchoResponse, LaunchSpec,
-    ReferenceRegistry,
+    ReferenceRegistry, TaskSnapshot,
 };
 use serde::Serialize;
 use tauri::{AppHandle, Emitter, Manager, State};
@@ -130,6 +130,29 @@ fn cancel_task(task_id: String, state: State<'_, BackendState>) -> AppResult<Ack
             .ok_or_else(|| AppError::unavailable(&trace_id))?
     };
     client.cancel_task(&task_id, &request_id, &trace_id)
+}
+
+#[tauri::command]
+fn get_task_snapshot(
+    task_id: Option<String>,
+    state: State<'_, BackendState>,
+) -> AppResult<Option<TaskSnapshot>> {
+    let client = {
+        let guard = state
+            .client
+            .lock()
+            .map_err(|_| AppError::internal("task-snapshot"))?;
+        guard.as_ref().cloned()
+    };
+    if let Some(client) = client {
+        if let Some(id) = task_id {
+            Ok(client.get_task_snapshot(&id))
+        } else {
+            Ok(client.get_latest_task_snapshot())
+        }
+    } else {
+        Ok(None)
+    }
 }
 
 #[tauri::command]
@@ -324,6 +347,7 @@ pub fn run() {
             echo_text,
             start_count_task,
             cancel_task,
+            get_task_snapshot,
             trigger_crash,
             trigger_hang,
             trigger_large_rejected,

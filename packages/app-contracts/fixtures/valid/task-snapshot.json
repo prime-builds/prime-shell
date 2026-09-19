@@ -1,0 +1,10 @@
+{
+  "taskId": "task-101",
+  "operation": "spike.count",
+  "status": "Running",
+  "current": 10,
+  "target": 50,
+  "error": null,
+  "createdAt": "2026-09-19T07:24:41Z",
+  "updatedAt": "2026-09-19T07:24:42Z"
+}

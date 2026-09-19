@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
 import { router } from "./shell/routes";
+import { useTaskStore } from "./shell/state/useTaskStore";
 
 const { invoke, listen } = vi.hoisted(() => ({
   invoke: vi.fn(),
@@ -13,6 +14,7 @@ vi.mock("@tauri-apps/api/core", () => ({ invoke }));
 vi.mock("@tauri-apps/api/event", () => ({ listen }));
 
 beforeEach(async () => {
+  useTaskStore.getState().reset();
   window.location.hash = "#/";
   await router.navigate("/");
   invoke.mockReset();
@@ -80,6 +82,9 @@ beforeEach(async () => {
         bottomPanelOpen: false,
         activeNavigationId: "workspace",
       });
+    }
+    if (command === "get_task_snapshot") {
+      return Promise.resolve(null);
     }
     return Promise.resolve();
   });
@@ -587,6 +592,167 @@ describe("Phase 2 — Responsive Application Shell (GFD-P2-WP02)", () => {
         "Error: The requested document is not accessible.",
       );
       expect(screen.queryByTestId("document-ref-details")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("Productized Task Runtime & Snapshot State (Phase 3 WP02)", () => {
+    it("restores active task state from Rust snapshot on mount", async () => {
+      invoke.mockImplementation((command: string) => {
+        if (command === "get_task_snapshot") {
+          return Promise.resolve({
+            taskId: "task-restored-99",
+            operation: "spike.count",
+            status: "Running",
+            current: 15,
+            target: 50,
+            error: null,
+            createdAt: "2026-09-19T07:24:41Z",
+            updatedAt: "2026-09-19T07:24:43Z",
+          });
+        }
+        if (command === "runtime_probe_config") {
+          return Promise.resolve({ enabled: false, evidencePath: null });
+        }
+        if (command === "backend_status") {
+          return Promise.resolve({
+            state: "busy",
+            ready: false,
+            backendVersion: "0.1.0",
+            circuitOpen: false,
+          });
+        }
+        if (command === "get_theme_state") {
+          return Promise.resolve({
+            systemTheme: "light",
+            systemAccent: null,
+            materialCapabilities: {
+              mica: true,
+              micaAlt: false,
+              transparencyEnabled: true,
+              forcedColors: false,
+              reducedTransparency: false,
+            },
+          });
+        }
+        if (command === "get_shell_layout_preferences") {
+          return Promise.resolve({
+            schemaVersion: 1,
+            sidebarWidth: 280,
+            sidebarCollapsed: false,
+            inspectorWidth: 340,
+            inspectorOpen: true,
+            bottomPanelHeightRatio: 0.3,
+            bottomPanelOpen: false,
+            activeNavigationId: "workspace",
+          });
+        }
+        return Promise.resolve();
+      });
+
+      render(<App />);
+
+      expect(await screen.findByText("Task ID: task-restored-99")).toBeInTheDocument();
+      expect(screen.getByText("Progress: 15 / 50")).toBeInTheDocument();
+      expect(screen.getByText("Running")).toBeInTheDocument();
+    });
+
+    it("handles task progress and completion events via task store", async () => {
+      let eventCallback: ((event: unknown) => void) | null = null;
+      listen.mockImplementation((name: string, cb: (event: unknown) => void) => {
+        if (name === "task-event") {
+          eventCallback = cb;
+        }
+        return Promise.resolve(() => {});
+      });
+
+      invoke.mockImplementation((command: string) => {
+        if (command === "runtime_probe_config") {
+          return Promise.resolve({ enabled: false, evidencePath: null });
+        }
+        if (command === "start_count_task") {
+          return Promise.resolve("task-runtime-1");
+        }
+        if (command === "get_task_snapshot") {
+          return Promise.resolve(null);
+        }
+        if (command === "backend_status") {
+          return Promise.resolve({
+            state: "ready",
+            ready: true,
+            backendVersion: "0.1.0",
+            circuitOpen: false,
+          });
+        }
+        if (command === "get_theme_state") {
+          return Promise.resolve({
+            systemTheme: "light",
+            systemAccent: null,
+            materialCapabilities: {
+              mica: true,
+              micaAlt: false,
+              transparencyEnabled: true,
+              forcedColors: false,
+              reducedTransparency: false,
+            },
+          });
+        }
+        if (command === "get_shell_layout_preferences") {
+          return Promise.resolve({
+            schemaVersion: 1,
+            sidebarWidth: 280,
+            sidebarCollapsed: false,
+            inspectorWidth: 340,
+            inspectorOpen: true,
+            bottomPanelHeightRatio: 0.3,
+            bottomPanelOpen: false,
+            activeNavigationId: "workspace",
+          });
+        }
+        return Promise.resolve();
+      });
+
+      render(<App />);
+
+      const startBtn = await screen.findByRole("button", { name: "Start Count Task" });
+      await userEvent.click(startBtn);
+
+      expect(await screen.findByText("Task ID: task-runtime-1")).toBeInTheDocument();
+
+      // Emit progress event
+      if (eventCallback) {
+        (eventCallback as (event: unknown) => void)({
+          payload: {
+            protocol: "generic-app",
+            kind: "event",
+            requestId: "req-1",
+            traceId: "trace-1",
+            taskId: "task-runtime-1",
+            sequence: 1,
+            event: "progress",
+            payload: { current: 10, target: 20 },
+          },
+        });
+      }
+
+      expect(await screen.findByText("Progress: 10 / 20")).toBeInTheDocument();
+
+      // Emit terminal event
+      if (eventCallback) {
+        (eventCallback as (event: unknown) => void)({
+          payload: {
+            protocol: "generic-app",
+            kind: "event",
+            requestId: "req-1",
+            traceId: "trace-1",
+            taskId: "task-runtime-1",
+            sequence: 2,
+            event: "terminal",
+            payload: { current: 20, target: 20, status: "Succeeded", completed: 20 },
+          },
+        });
+      }
+
+      expect(await screen.findByText("Task terminated with state: Succeeded")).toBeInTheDocument();
     });
   });
 });

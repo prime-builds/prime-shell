@@ -27,7 +27,6 @@ import {
 } from "@fluentui/react-components";
 import { validateCustomSeed } from "@prime-shell/design-tokens";
 import {
-  cancelTask,
   echoText,
   getBackendStatus,
   getRuntimeProbeConfig,
@@ -45,9 +44,10 @@ import {
   writeDocumentContent,
   writeRuntimeEvidence,
 } from "../../backend";
-import type { BackendStatus, DocumentRef, TaskEvent, TaskState } from "../../contracts";
+import type { BackendStatus, DocumentRef, TaskEvent } from "../../contracts";
 import { useThemeController } from "../../theme/ThemeContext";
 import { useShellStore } from "../state/useShellStore";
+import { useTaskStore } from "../state/useTaskStore";
 
 const RUNTIME_PROBE_TEXT = "Hello — مرحبا — こんにちは 👋";
 
@@ -91,17 +91,24 @@ export const HomeWorkspaceView: React.FC = () => {
   const [echoError, setEchoError] = useState("");
   const [echoBusy, setEchoBusy] = useState(false);
 
-  // Task Resilience (Phase 0B)
+  // Task Settings (Inputs)
   const [targetCount, setTargetCount] = useState("20");
   const [delayMs, setDelayMs] = useState("50");
-  const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
-  const [taskState, setTaskState] = useState<TaskState | null>(null);
-  const [currentProgress, setCurrentProgress] = useState(0);
-  const [taskCompleted, setTaskCompleted] = useState<number | null>(null);
-  const [taskMessage, setTaskMessage] = useState("");
-  const [taskError, setTaskError] = useState("");
-  const [taskStarting, setTaskStarting] = useState(false);
-  const [cancelling, setCancelling] = useState(false);
+
+  // Task Resilience Store (Phase 3 WP02)
+  const activeTaskId = useTaskStore((s) => s.activeTaskId);
+  const taskState = useTaskStore((s) => s.taskState);
+  const currentProgress = useTaskStore((s) => s.currentProgress);
+  const storeTargetCount = useTaskStore((s) => s.targetCount);
+  const taskCompleted = useTaskStore((s) => s.taskCompleted);
+  const taskMessage = useTaskStore((s) => s.taskMessage);
+  const taskError = useTaskStore((s) => s.taskError);
+  const isStarting = useTaskStore((s) => s.isStarting);
+  const isCancelling = useTaskStore((s) => s.isCancelling);
+  const startTaskAction = useTaskStore((s) => s.startTask);
+  const cancelTaskAction = useTaskStore((s) => s.cancelActiveTask);
+  const syncWithSnapshot = useTaskStore((s) => s.syncWithSnapshot);
+  const handleTaskEvent = useTaskStore((s) => s.handleTaskEvent);
 
   // Fault Operations (Phase 0B)
   const [faultAction, setFaultAction] = useState("");
@@ -117,8 +124,7 @@ export const HomeWorkspaceView: React.FC = () => {
   // Probe & CSP
   const runtimeProbeStarted = useRef(false);
   const cspViolations = useRef<string[]>([]);
-  const lastProgressAnnouncement = useRef(0);
-  const [liveAnnouncement, setLiveAnnouncement] = useState("");
+  const liveAnnouncement = useTaskStore((s) => s.liveAnnouncement);
 
   // Accessible Form state
   const [sampleFormField, setSampleFormField] = useState("Jane Doe");
@@ -155,33 +161,14 @@ export const HomeWorkspaceView: React.FC = () => {
     void refreshStatus();
   }, []);
 
-  // Listen to background task events from Rust
+  // Listen to background task events from Rust and sync snapshot on mount
   useEffect(() => {
+    void syncWithSnapshot();
+
     let unlisten: (() => void) | undefined;
     void listenToTaskEvents((event: TaskEvent) => {
-      if (event.event === "progress") {
-        if (typeof event.payload.current === "number") {
-          setCurrentProgress(event.payload.current);
-          setTaskState("Running");
-
-          const now = Date.now();
-          if (now - lastProgressAnnouncement.current >= 1000) {
-            lastProgressAnnouncement.current = now;
-            setLiveAnnouncement(
-              `Task progress: ${event.payload.current} of ${targetCount}`,
-            );
-          }
-        }
-      } else if (event.event === "terminal") {
-        const terminalState = event.payload.status ?? "Succeeded";
-        setTaskState(terminalState);
-        setCancelling(false);
-        if (typeof event.payload.completed === "number") {
-          setTaskCompleted(event.payload.completed);
-          setCurrentProgress(event.payload.completed);
-        }
-        setLiveAnnouncement(`Task ${terminalState}`);
-        setTaskMessage(`Task terminated with state: ${terminalState}`);
+      handleTaskEvent(event);
+      if (event.event === "terminal") {
         void refreshStatus();
       }
     }).then((fn) => {
@@ -189,11 +176,9 @@ export const HomeWorkspaceView: React.FC = () => {
     });
 
     return () => {
-      if (unlisten) {
-        unlisten();
-      }
+      unlisten?.();
     };
-  }, [targetCount]);
+  }, [syncWithSnapshot, handleTaskEvent]);
 
   async function handleEchoSubmit() {
     setEchoBusy(true);
@@ -213,49 +198,24 @@ export const HomeWorkspaceView: React.FC = () => {
     const target = parseInt(targetCount, 10);
     const delay = parseInt(delayMs, 10);
     if (isNaN(target) || target <= 0) {
-      setTaskError("Target count must be a positive integer.");
+      useTaskStore.setState({ taskError: "Target count must be a positive integer." });
       return;
     }
     if (isNaN(delay) || delay < 0) {
-      setTaskError("Delay must be a non-negative integer.");
+      useTaskStore.setState({ taskError: "Delay must be a non-negative integer." });
       return;
     }
 
-    setTaskStarting(true);
-    setTaskError("");
-    setTaskMessage("");
-    setTaskCompleted(null);
-    setCurrentProgress(0);
-    setTaskState("Queued");
-    setLiveAnnouncement("Task queued");
-
     try {
-      const taskId = await startCountTask(target, delay);
-      setActiveTaskId(taskId);
-      setTaskState("Running");
-      setLiveAnnouncement(`Task ${taskId} started`);
+      await startTaskAction(target, delay);
       void refreshStatus();
-    } catch (reason) {
-      const err = toSafeError(reason);
-      setTaskError(`${err.code}: ${err.message} [trace: ${err.traceId}]`);
-      setTaskState("Failed");
-      setLiveAnnouncement(`Task failed: ${err.message}`);
-    } finally {
-      setTaskStarting(false);
+    } catch {
+      // Error handled in store
     }
   }
 
   async function handleCancelTask() {
-    if (!activeTaskId) return;
-    setCancelling(true);
-    setLiveAnnouncement("Cancelling task");
-    try {
-      await cancelTask(activeTaskId);
-    } catch (reason) {
-      const err = toSafeError(reason);
-      setTaskError(`${err.code}: ${err.message} [trace: ${err.traceId}]`);
-      setCancelling(false);
-    }
+    await cancelTaskAction();
   }
 
   async function handleCrash() {
@@ -907,7 +867,7 @@ export const HomeWorkspaceView: React.FC = () => {
               type="number"
               value={targetCount}
               onChange={(_, data) => setTargetCount(data.value)}
-              disabled={taskStarting || taskState === "Running"}
+              disabled={isStarting || taskState === "Running" || taskState === "Queued"}
               aria-label="Target count"
             />
           </Field>
@@ -916,7 +876,7 @@ export const HomeWorkspaceView: React.FC = () => {
               type="number"
               value={delayMs}
               onChange={(_, data) => setDelayMs(data.value)}
-              disabled={taskStarting || taskState === "Running"}
+              disabled={isStarting || taskState === "Running" || taskState === "Queued"}
               aria-label="Delay per step in milliseconds"
             />
           </Field>
@@ -926,16 +886,16 @@ export const HomeWorkspaceView: React.FC = () => {
           <Button
             appearance="primary"
             onClick={() => void handleStartTask()}
-            disabled={taskStarting || taskState === "Running"}
+            disabled={isStarting || taskState === "Running" || taskState === "Queued"}
           >
-            {taskStarting ? "Starting..." : "Start Count Task"}
+            {isStarting ? "Starting..." : "Start Count Task"}
           </Button>
           <Button
             appearance="secondary"
             onClick={() => void handleCancelTask()}
-            disabled={taskState !== "Running" || cancelling}
+            disabled={taskState !== "Running" || isCancelling}
           >
-            {cancelling ? "Cancelling..." : "Cancel Task"}
+            {isCancelling ? "Cancelling..." : "Cancel Task"}
           </Button>
         </div>
 
@@ -946,7 +906,7 @@ export const HomeWorkspaceView: React.FC = () => {
                 Task ID: {activeTaskId}
               </Text>
               <Text size={200} weight="semibold">
-                Progress: {currentProgress} / {targetCount}
+                Progress: {currentProgress} / {storeTargetCount || targetCount}
               </Text>
             </div>
             <div
@@ -954,13 +914,13 @@ export const HomeWorkspaceView: React.FC = () => {
               role="progressbar"
               aria-valuenow={currentProgress}
               aria-valuemin={0}
-              aria-valuemax={parseInt(targetCount, 10) || 100}
+              aria-valuemax={storeTargetCount || parseInt(targetCount, 10) || 100}
             >
               <svg className="progress-svg" viewBox="0 0 100 6" preserveAspectRatio="none">
                 <rect
                   x="0"
                   y="0"
-                  width={`${Math.min(100, Math.max(0, (currentProgress / (parseInt(targetCount, 10) || 1)) * 100))}%`}
+                  width={`${Math.min(100, Math.max(0, (currentProgress / (storeTargetCount || parseInt(targetCount, 10) || 1)) * 100))}%`}
                   height="6"
                   fill="var(--colorBrandBackground, #0F6CBD)"
                 />

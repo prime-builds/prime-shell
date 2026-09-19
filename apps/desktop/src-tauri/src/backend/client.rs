@@ -1,6 +1,6 @@
 use std::{
     env, fs,
-    io::{BufRead, BufReader, Read, Write},
+    io::{BufRead, BufReader, Write},
     path::{Path, PathBuf},
     process::{Child, ChildStdin, Command, Stdio},
     sync::{
@@ -15,14 +15,16 @@ use serde::Serialize;
 use sha2::{Digest, Sha256};
 
 use super::{
+    containment::{shutdown_child_bounded, ProcessContainment},
     error::{AppError, AppResult},
     protocol::{
         validate_hello, AckEnvelope, BackendLifecycleState, BackendStatus, BundleManifest,
         CancelEnvelope, CountPayload, EchoPayload, EchoResponse, EmptyPayload,
         GenericIncomingFrame, Hello, RequestEnvelope, TaskEvent, TaskEventPayload, TaskState,
-        FRAME_MAX_BYTES, HANDSHAKE_MAX_BYTES, TEXT_MAX_CHARACTERS,
+        FRAME_MAX_BYTES, HANDSHAKE_MAX_BYTES, LOG_MAX_BYTES, TEXT_MAX_CHARACTERS,
     },
     registry::BackendOperation,
+    tasks::{TaskSnapshot, TaskStore},
 };
 
 const HANDSHAKE_TIMEOUT: Duration = Duration::from_secs(3);
@@ -73,6 +75,7 @@ struct BackendProcess {
     child: Mutex<Child>,
     stdin: Mutex<Option<ChildStdin>>,
     frames: Mutex<Receiver<Result<Vec<u8>, FrameReadError>>>,
+    containment: ProcessContainment,
 }
 
 impl BackendProcess {
@@ -114,6 +117,9 @@ impl BackendProcess {
         let stdout = child.stdout.take().ok_or_else(|| AppError::io(trace))?;
         let stderr = child.stderr.take().ok_or_else(|| AppError::io(trace))?;
 
+        let containment = ProcessContainment::new();
+        containment.assign(&child);
+
         let (sender, frames) = mpsc::sync_channel(256);
         thread::spawn(move || {
             let mut reader = BufReader::new(stdout);
@@ -135,11 +141,29 @@ impl BackendProcess {
 
         thread::spawn(move || {
             let mut reader = BufReader::new(stderr);
-            let mut chunk = [0_u8; 8192];
-            while let Ok(count) = reader.read(&mut chunk) {
-                if count == 0 {
+            let mut buffer = Vec::new();
+            while let Ok(n) = reader.read_until(b'\n', &mut buffer) {
+                if n == 0 {
                     break;
                 }
+                let mut line = &buffer[..];
+                if line.ends_with(b"\n") {
+                    line = &line[..line.len() - 1];
+                }
+                if line.ends_with(b"\r") {
+                    line = &line[..line.len() - 1];
+                }
+                let truncated = if line.len() > LOG_MAX_BYTES {
+                    let mut t = line[..LOG_MAX_BYTES].to_vec();
+                    t.extend_from_slice(b" [TRUNCATED]");
+                    t
+                } else {
+                    line.to_vec()
+                };
+                if let Ok(text) = std::str::from_utf8(&truncated) {
+                    eprintln!("[sidecar:stderr] {}", text);
+                }
+                buffer.clear();
             }
         });
 
@@ -156,6 +180,7 @@ impl BackendProcess {
                 child: Mutex::new(child),
                 stdin: Mutex::new(Some(stdin)),
                 frames: Mutex::new(frames),
+                containment,
             },
             hello.backend_version,
         ))
@@ -200,6 +225,7 @@ impl BackendProcess {
     }
 
     fn kill(&self) {
+        self.containment.terminate();
         if let Ok(mut guard) = self.child.lock() {
             let _ = guard.kill();
             let _ = guard.wait();
@@ -217,19 +243,8 @@ impl Drop for BackendProcess {
             stdin_guard.take();
         }
 
-        let deadline = Instant::now() + SHUTDOWN_TIMEOUT;
-        while Instant::now() < deadline {
-            if let Ok(mut child_guard) = self.child.lock() {
-                match child_guard.try_wait() {
-                    Ok(Some(_)) => return,
-                    Ok(None) => thread::sleep(Duration::from_millis(20)),
-                    Err(_) => break,
-                }
-            }
-        }
         if let Ok(mut child_guard) = self.child.lock() {
-            let _ = child_guard.kill();
-            let _ = child_guard.wait();
+            shutdown_child_bounded(&mut child_guard, SHUTDOWN_TIMEOUT, Some(&self.containment));
         }
     }
 }
@@ -245,6 +260,7 @@ pub struct BackendClient {
     circuit_open: Arc<RwLock<bool>>,
     active_task: Arc<RwLock<Option<String>>>,
     cancelling_task: Arc<RwLock<Option<(String, Instant)>>>,
+    task_store: Arc<TaskStore>,
 }
 
 impl BackendClient {
@@ -262,7 +278,20 @@ impl BackendClient {
             circuit_open: Arc::new(RwLock::new(false)),
             active_task: Arc::new(RwLock::new(None)),
             cancelling_task: Arc::new(RwLock::new(None)),
+            task_store: Arc::new(TaskStore::new()),
         })
+    }
+
+    pub fn task_store(&self) -> Arc<TaskStore> {
+        Arc::clone(&self.task_store)
+    }
+
+    pub fn get_task_snapshot(&self, task_id: &str) -> Option<TaskSnapshot> {
+        self.task_store.get_snapshot(task_id)
+    }
+
+    pub fn get_latest_task_snapshot(&self) -> Option<TaskSnapshot> {
+        self.task_store.get_latest_snapshot()
     }
 
     pub fn status(&self) -> BackendStatus {
@@ -362,6 +391,12 @@ impl BackendClient {
         }
 
         let operation = BackendOperation::authorize("spike.count", trace_id)?;
+        self.task_store.start_task(
+            task_id.to_owned(),
+            operation.name().to_owned(),
+            target,
+            trace_id,
+        )?;
         {
             let mut state_guard = self
                 .state
@@ -396,6 +431,11 @@ impl BackendClient {
             if let Err(err) = proc.write_frame(&request, trace_id) {
                 *self.state.write().unwrap() = BackendLifecycleState::Ready;
                 *self.active_task.write().unwrap() = None;
+                self.task_store.complete_task(
+                    task_id,
+                    TaskState::Failed,
+                    Some("Failed to send request to backend".to_owned()),
+                );
                 return Err(err);
             }
         }
@@ -407,6 +447,11 @@ impl BackendClient {
 
         loop {
             if start_time.elapsed() > max_timeout {
+                self.task_store.complete_task(
+                    task_id,
+                    TaskState::TimedOut,
+                    Some("Task execution timed out".to_owned()),
+                );
                 self.handle_failure(trace_id);
                 return Err(AppError::timed_out(trace_id));
             }
@@ -419,6 +464,11 @@ impl BackendClient {
                     if let Ok(proc) = self.process.read() {
                         proc.kill();
                     }
+                    self.task_store.complete_task(
+                        task_id,
+                        TaskState::Interrupted,
+                        Some("Cancellation deadline escalated to termination".to_owned()),
+                    );
                     self.handle_failure(trace_id);
                     on_event(TaskEvent {
                         protocol: "generic-app".to_owned(),
@@ -446,6 +496,11 @@ impl BackendClient {
                     .map_err(|_| AppError::internal(trace_id))?;
                 if !proc.is_alive() {
                     drop(proc);
+                    self.task_store.complete_task(
+                        task_id,
+                        TaskState::Interrupted,
+                        Some("Process terminated unexpectedly".to_owned()),
+                    );
                     self.handle_failure(trace_id);
                     on_event(TaskEvent {
                         protocol: "generic-app".to_owned(),
@@ -500,9 +555,16 @@ impl BackendClient {
 
                 if let Some(cur) = event_payload.current {
                     last_reported_count = cur;
+                    self.task_store.update_progress(task_id, cur, target);
                 }
                 if let Some(comp) = event_payload.completed {
                     last_reported_count = comp;
+                    self.task_store.update_progress(task_id, comp, target);
+                }
+                if is_terminal {
+                    if let Some(st) = event_payload.status {
+                        self.task_store.complete_task(task_id, st, None);
+                    }
                 }
 
                 let is_final_progress =
@@ -540,6 +602,7 @@ impl BackendClient {
                 *self.state.write().unwrap() = BackendLifecycleState::Ready;
                 *self.active_task.write().unwrap() = None;
                 *self.cancelling_task.write().unwrap() = None;
+                self.task_store.complete_task(task_id, TaskState::Succeeded, None);
                 let completed = incoming
                     .payload
                     .and_then(|p| p.get("completed").and_then(|v| v.as_u64()))
@@ -559,6 +622,12 @@ impl BackendClient {
                     .as_ref()
                     .map(|e| e.message.clone())
                     .unwrap_or_else(|| "Task error".to_owned());
+                let final_status = if code == "TASK_CANCELLED" {
+                    TaskState::Cancelled
+                } else {
+                    TaskState::Failed
+                };
+                self.task_store.complete_task(task_id, final_status, Some(msg.clone()));
                 if code == "TASK_CANCELLED" {
                     return Err(AppError::cancelled(trace_id));
                 }
@@ -589,6 +658,7 @@ impl BackendClient {
             });
         }
 
+        self.task_store.request_cancellation(task_id);
         *self.cancelling_task.write().unwrap() = Some((task_id.to_owned(), Instant::now()));
 
         let cancel = CancelEnvelope {

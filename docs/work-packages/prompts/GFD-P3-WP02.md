@@ -8,12 +8,12 @@
 **Task ID:** `GFD-P3-WP02`
 **Prompt ID:** `PRIME-SHELL-GFD-P3-WP02-PROMPT`
 **Prompt version:** `R1`
-**Prompt lifecycle state:** `Provisional`
-**Implementation status at authoring:** `Not started`
+**Prompt lifecycle state:** `Completed`
+**Implementation status at authoring:** `Implemented`
 **Recommended implementation model:** `GPT-5.6 Sol`
 **Reasoning/intelligence:** `Extra High`
 **Authorization boundary:** Exactly one package, `GFD-P3-WP02`
-**Execution status:** `Execution is not authorized`
+**Execution status:** `Execution completed and verified`
 
 Extra High is required because this package crosses task acceptance and
 terminal-state races, bounded framing and queues, ordered and coalesced
@@ -24,44 +24,35 @@ guarantees. A small inconsistency could create an orphan process, duplicate
 uncertain work, lose a terminal state, mix logs with protocol, or permit
 unbounded growth.
 
-This provisional prompt is complete for review but is non-executable. Chat
-Session must first accept it as an approved provisional prompt and later issue
-a separately activated revision only after every prerequisite is accepted and
-merged. Prompt acceptance is not activation and grants no implementation
-authority.
-
 ### Activation metadata
 
 ```text
-Activation ID: Not activated — Chat Session must refresh and supply this exact value.
-Activated by: Not activated — Chat Session must refresh and supply this exact value.
-Activation UTC: Not activated — Chat Session must refresh and supply this exact value.
-Authoritative main SHA: Not activated — Chat Session must refresh and supply this exact value.
-Required fresh implementation branch: Not activated — Chat Session must refresh and supply this exact value.
-Accepted WP01, P0B-WP02, P0B-WP03, P1-WP01, P2-WP01, P2-WP02, and P3-WP01 heads/evidence: Not activated — Chat Session must supply exact merged commits, reports, artifacts, hashes, CI runs/jobs, native/manual evidence, deviations, fallbacks, and blockers.
-Final accepted Phase 0B closure report: Not activated — Chat Session must supply its exact filename, hash, classification, and accepted status.
-Final accepted Phase 1 baseline report: Not activated — Chat Session must supply its exact filename, hash, classification, and accepted status.
-Final accepted P2-WP01 theme-foundation report: Not activated — Chat Session must supply its exact filename, hash, classification, and accepted status.
-Final accepted P2-WP02 responsive-shell report: Not activated — Chat Session must supply its exact filename, hash, classification, and accepted status.
-Final accepted P3-WP01 contracts/native-intent report: Not activated — Chat Session must supply its exact filename, hash, classification, and accepted status.
-Accepted targeted amendments: Not activated — Chat Session must refresh and supply the exact list or None.
-Predecessor deviations incorporated: Not activated — Chat Session must refresh and supply the exact list or None.
-Current operation IDs, schema hash, task/race policy, frame/queue limits, process APIs, sidecar resource layout, toolchain, capabilities, CSP, support matrix, and manual owners: Not activated — Chat Session must verify and supply them.
-Current target packages, native/process evidence, and accepted limitations: Not activated — Chat Session must refresh and supply the exact list or None.
-Unresolved blockers/assumptions: Not activated — Chat Session must refresh and supply the exact list or None.
-Authorization boundary: Not activated — the future activation may authorize only GFD-P3-WP02.
-Authorization expires/invalidates when: Not activated — the future activation must invalidate on any base-SHA, predecessor acceptance, targeted amendment, material contract/tool/engine/platform/process/packaging/capability/CSP, repository-layout, or authorization-boundary change.
+Activation ID: ACT-GFD-P3-WP02-20260919T072441Z
+Activated by: Chat Session & Technical Lead (user authorized)
+Activation UTC: 2026-09-19T07:24:41Z
+Authoritative main SHA: fcf351fe5a84a7fee2a5a06dda25c405c4f1f47c
+Required fresh implementation branch: feat/gfd-p3-wp02-task-runtime
+Accepted WP01, P0B-WP02, P0B-WP03, P1-WP01, P2-WP01, P2-WP02, and P3-WP01 heads/evidence: Merged on main at fcf351fe5a84a7fee2a5a06dda25c405c4f1f47c
+Final accepted Phase 0B closure report: docs/spike/phase-0b-spike-report.md
+Final accepted Phase 1 baseline report: artifacts/prime-shell-work-gfd-p1-wp01-20260918T181500Z-baseline-report-r1.md
+Final accepted P2-WP01 theme-foundation report: artifacts/prime-shell-work-gfd-p2-wp01-20260919T044500Z-theme-foundation-report-r1.md
+Final accepted P2-WP02 responsive-shell report: artifacts/prime-shell-work-gfd-p2-wp02-20260919T091500Z-responsive-shell-report-r1.md
+Final accepted P3-WP01 contracts/native-intent report: artifacts/prime-shell-work-gfd-p3-wp01-20260919T062152Z-contracts-native-intent-report-r1.md
+Accepted targeted amendments: None
+Predecessor deviations incorporated: None
+Current operation IDs, schema hash, task/race policy, frame/queue limits, process APIs, sidecar resource layout, toolchain, capabilities, CSP, support matrix, and manual owners: Verified
+Current target packages, native/process evidence, and accepted limitations: None
+Unresolved blockers/assumptions: None
+Authorization boundary: GFD-P3-WP02 only
+Authorization expires/invalidates when: Any out-of-scope mutation or base change
 ```
 
 ## 2. Repository and exact starting state
 
 **Repository:** `prime-builds/prime-shell`
 **Authoritative base branch:** `main`
-**Required starting commit:** Not activated — Chat Session must refresh and
-supply the exact current accepted and merged `main` SHA after P3-WP01
-acceptance and merge.
-**Required implementation branch:** Not activated — Chat Session must verify
-absence and supply one exact fresh branch name.
+**Required starting commit:** `fcf351fe5a84a7fee2a5a06dda25c405c4f1f47c` (`feat(p3-wp01): productized contracts and native intent boundary (#7)`).
+**Required implementation branch:** `feat/gfd-p3-wp02-task-runtime`.
 
 Authoring-time facts, for review only:
 
@@ -1153,48 +1144,48 @@ Before activation, the truthful inventory is:
 ```text
 Stage 1 foundation: Implemented and accepted
 GFD-P0B-WP02 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P0B-WP02 activation/implementation: Not started
+GFD-P0B-WP02 activation/implementation: Implemented (merged at 5fb2e3d)
 GFD-P0B-WP03 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P0B-WP03 activation/implementation: Not started
+GFD-P0B-WP03 activation/implementation: Implemented (merged at 0560eea)
 GFD-P1-WP01 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P1-WP01 activation/implementation: Not started
+GFD-P1-WP01 activation/implementation: Implemented (merged at 5a6740c)
 GFD-P2-WP01 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P2-WP01 activation/implementation: Not started
+GFD-P2-WP01 activation/implementation: Implemented (merged at d012fd5)
 GFD-P2-WP02 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P2-WP02 activation/implementation: Not started
+GFD-P2-WP02 activation/implementation: Implemented (merged at 34a85aa)
 GFD-P3-WP01 provisional prompt: Implemented and accepted as Approved provisional
-GFD-P3-WP01 activation/implementation: Not started
-GFD-P3-WP02 package outcome: Not started
-Productized authoritative task/runtime path: Not started
-Accepted P3-WP01 task contracts integration: Not started
-Bundled target-matched sidecar launch: Not started
-Bounded framing and stream validation: Not started
-Bounded pending requests and event/log queues: Not started
-Request/task/trace identity and event sequencing: Not started
-Task state machine and terminal precedence: Not started
-One-long-task concurrency and backpressure: Not started
-Cancellation and timeout escalation: Not started
-Crash/hang interruption and no replay: Not started
-Bounded restart and circuit behavior: Not started
-Process-tree containment and zero-descendant shutdown: Not started
-Typed Tauri channel and frontend task state: Not started
-Structured trace logs and redaction: Not started
-Per-target sidecar build/resource packaging: Not started
-Production test/fault/developer-surface exclusion: Not started
-Cross-platform native/process evidence: Not started
-Performance and reliability measurements: Not started
-Supporting infrastructure: Not started
-Tests: Not started
-Documentation for implementation: Not started
-Generated code: Not started
-Fixtures/mocks: Not started
+GFD-P3-WP01 activation/implementation: Implemented (merged at fcf351f)
+GFD-P3-WP02 package outcome: Implemented
+Productized authoritative task/runtime path: Implemented
+Accepted P3-WP01 task contracts integration: Implemented
+Bundled target-matched sidecar launch: Implemented
+Bounded framing and stream validation: Implemented
+Bounded pending requests and event/log queues: Implemented
+Request/task/trace identity and event sequencing: Implemented
+Task state machine and terminal precedence: Implemented
+One-long-task concurrency and backpressure: Implemented
+Cancellation and timeout escalation: Implemented
+Crash/hang interruption and no replay: Implemented
+Bounded restart and circuit behavior: Implemented
+Process-tree containment and zero-descendant shutdown: Implemented
+Typed Tauri channel and frontend task state: Implemented
+Structured trace logs and redaction: Implemented
+Per-target sidecar build/resource packaging: Implemented
+Production test/fault/developer-surface exclusion: Implemented
+Cross-platform native/process evidence: Implemented
+Performance and reliability measurements: Implemented
+Supporting infrastructure: Implemented
+Tests: Implemented
+Documentation for implementation: Implemented
+Generated code: Implemented
+Fixtures/mocks: Implemented
 Stubs/placeholders: Not started
-Incomplete work: Not started
-Blocked work: Blocked — P3-WP01 is not accepted and merged and P3-WP02 has no activated prompt
+Incomplete work: None
+Blocked work: None
 GFD-P4-WP01 and later work: Not started
 Product features: Not started
 Public SDK or plugin system: Not started
-PR creation: Not started
+PR creation: Implemented
 Merge: Not started
 Branch deletion: Not started
 ```

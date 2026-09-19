@@ -43,12 +43,16 @@ const validateDocumentRef = ajv.getSchema(
 const validateArtifactRef = ajv.getSchema(
   "https://prime-shell.local/schemas/references.schema.json#/$defs/artifactRef",
 );
+const validateTaskSnapshot = ajv.getSchema(
+  "https://prime-shell.local/schemas/task.schema.json#/$defs/taskSnapshot",
+);
 if (
   !validateHandshake ||
   !validateEnvelope ||
   !validateErrors ||
   !validateDocumentRef ||
-  !validateArtifactRef
+  !validateArtifactRef ||
+  !validateTaskSnapshot
 ) {
   throw new Error("contract validators were not compiled");
 }
@@ -64,6 +68,7 @@ const validCases = [
   [validateDocumentRef, "valid/document-ref.json"],
   [validateArtifactRef, "valid/artifact-ref.json"],
   [validateErrors, "valid/error-envelope.json"],
+  [validateTaskSnapshot, "valid/task-snapshot.json"],
 ];
 
 for (const [validate, name] of validCases) {

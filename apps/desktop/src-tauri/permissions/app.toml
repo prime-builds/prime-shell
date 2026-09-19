@@ -14,6 +14,7 @@ description = "Allows task lifecycle commands for WP02 spike testing."
 commands.allow = [
   "start_count_task",
   "cancel_task",
+  "get_task_snapshot",
   "trigger_crash",
   "trigger_hang",
   "trigger_large_rejected",

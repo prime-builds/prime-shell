@@ -15,7 +15,8 @@
 - Phase 1 WP01 is `Implemented` and merged via PR #3 (`5a6740c`).
 - Phase 2 WP01 is `Implemented` and merged (`d012fd5`).
 - Phase 2 WP02 is `Implemented` and merged via PR #6 (`34a85aa`).
-- Phase 3 WP01 is `Implemented` (executed and verified via branch `feat/gfd-p3-wp01-productized-contracts`).
+- Phase 3 WP01 is `Implemented` and merged via PR #7 (`fcf351f`).
+- Phase 3 WP02 is `Implemented` (executed and verified via branch `feat/gfd-p3-wp02-task-runtime`).
 - Future package prompts remain **provisional until activated** by Chat Session.
 
 Only these implementation-status labels are valid throughout the prompt pack:
@@ -32,7 +33,7 @@ Only these implementation-status labels are valid throughout the prompt pack:
 | `GFD-P2-WP01` | Phase 2 | Theme, Tokens, and Accessibility Foundation | `Implemented` | GPT-5.6 Sol / High |
 | `GFD-P2-WP02` | Phase 2 | Responsive Application Shell | `Implemented` | GPT-5.6 Sol / High |
 | `GFD-P3-WP01` | Phase 3 | Productized Contracts and Native Intent Boundary | `Implemented` | GPT-5.6 Sol / Extra High |
-| `GFD-P3-WP02` | Phase 3 | Productized Task Runtime and Sidecar Operations | `Not started` | GPT-5.6 Sol / Extra High |
+| `GFD-P3-WP02` | Phase 3 | Productized Task Runtime and Sidecar Operations | `Implemented` | GPT-5.6 Sol / Extra High |
 | `GFD-P4-WP01` | Phase 4 | Local Document-Analysis Reference Feature | `Not started` | GPT-5.6 Sol / High |
 | `GFD-P5-WP01` | Phase 5 | Second Consumer and Proven Feature Contracts | `Not started` | GPT-5.6 Sol / High |
 | `GFD-P6-WP01` | Phase 6 | Settings, Persistence, and Single-Instance Behavior | `Not started` | GPT-5.6 Sol / High |
