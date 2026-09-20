@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, makeStyles, tokens, Tooltip } from "@fluentui/react-components";
+import { Button, makeStyles, tokens } from "@fluentui/react-components";
 import {
   ChevronDown20Regular,
   ChevronUp20Regular,
@@ -76,14 +76,13 @@ export const BottomPanelHost: React.FC<BottomPanelHostProps> = ({
           <TaskListSquareDatabase20Regular style={{ color: tokens.colorCompoundBrandForeground1 }} />
           <span className={styles.headerTitle}>Tasks &amp; Output</span>
         </div>
-        <Tooltip content={isOpen ? "Collapse Panel" : "Expand Panel"} relationship="label">
-          <Button
-            appearance="subtle"
-            icon={isOpen ? <ChevronDown20Regular /> : <ChevronUp20Regular />}
-            onClick={onToggleOpen}
-            aria-label={isOpen ? "Collapse Bottom Panel" : "Expand Bottom Panel"}
-          />
-        </Tooltip>
+        <Button
+          appearance="subtle"
+          icon={isOpen ? <ChevronDown20Regular /> : <ChevronUp20Regular />}
+          onClick={onToggleOpen}
+          aria-label={isOpen ? "Collapse Bottom Panel" : "Expand Bottom Panel"}
+          title={isOpen ? "Collapse Panel" : "Expand Panel"}
+        />
       </div>
       <div className={styles.content}>{children}</div>
     </section>

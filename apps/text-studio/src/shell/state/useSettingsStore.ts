@@ -119,16 +119,57 @@ export const useSettingsStore = create<SettingsStoreState>((set, get) => {
   const triggerDebouncedSave = () => {
     if (saveTimeout) clearTimeout(saveTimeout);
     saveTimeout = setTimeout(async () => {
-      const { document } = get();
       set({ isSaving: true });
-      const saved = await invokeTauri<SettingsDocument>("save_settings", {
-        expectedRevision: document.revision,
-        document,
-      });
-      if (saved) {
-        set({ document: saved, isSaving: false });
-      } else {
-        set({ isSaving: false });
+      const maxRetries = 3;
+
+      for (let attempt = 0; attempt < maxRetries; attempt++) {
+        try {
+          if (typeof window === "undefined" || !("__TAURI_INTERNALS__" in window)) {
+            set({ isSaving: false });
+            return;
+          }
+
+          // Always fetch authoritative document from Rust first to get the latest revision
+          // and preserve any concurrent updates (such as layout preferences saved by shell).
+          const fresh = await invoke<SettingsDocument>("get_settings");
+          const currentDoc = get().document;
+          const docToSave: SettingsDocument = fresh
+            ? {
+                ...fresh,
+                appearance: currentDoc.appearance,
+                documentAnalysis: currentDoc.documentAnalysis,
+                textUtility: currentDoc.textUtility,
+              }
+            : currentDoc;
+          const expectedRevision = fresh ? fresh.revision : currentDoc.revision;
+
+          const saved = await invoke<SettingsDocument>("save_settings", {
+            expectedRevision,
+            document: docToSave,
+          });
+
+          set({ document: saved ?? docToSave, isSaving: false });
+          return;
+        } catch (e: unknown) {
+          const errMsg =
+            e && typeof e === "object" && "message" in e && typeof (e as { message: unknown }).message === "string"
+              ? (e as { message: string }).message
+              : typeof e === "string"
+              ? e
+              : "";
+
+          const isStaleRevision = errMsg.includes("Stale revision");
+
+          if (isStaleRevision && attempt < maxRetries - 1) {
+            // Wait briefly before retrying with freshly fetched revision
+            await new Promise((resolve) => setTimeout(resolve, 50));
+            continue;
+          }
+
+          console.warn("[SettingsStore] Tauri command save_settings failed:", e);
+          set({ isSaving: false });
+          return;
+        }
       }
     }, 300);
   };

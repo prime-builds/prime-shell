@@ -1,5 +1,5 @@
 import React from "react";
-import { Badge, Button, makeStyles, tokens, Tooltip } from "@fluentui/react-components";
+import { Button, makeStyles, tokens } from "@fluentui/react-components";
 import {
   CheckmarkCircle16Regular,
   ChevronDown16Regular,
@@ -9,7 +9,6 @@ import {
 } from "@fluentui/react-icons";
 import { STATUS_BAR_HEIGHT } from "../types";
 import { useShellStore } from "../state/useShellStore";
-import { useThemeController } from "../../theme/ThemeContext";
 
 const useStyles = makeStyles({
   statusBar: {
@@ -38,6 +37,17 @@ const useStyles = makeStyles({
     alignItems: "center",
     gap: "4px",
   },
+  bandButton: {
+    height: "22px",
+    padding: "0 6px",
+    fontSize: tokens.fontSizeBase100,
+  },
+  bandLabel: {
+    fontWeight: tokens.fontWeightSemibold,
+  },
+  resolutionLabel: {
+    color: tokens.colorNeutralForeground4,
+  },
   panelToggle: {
     height: "22px",
     padding: "0 6px",
@@ -57,7 +67,6 @@ export const StatusBar: React.FC<StatusBarProps> = ({ backendReady = true }) => 
   const isSaving = useShellStore((s) => s.isSaving);
   const isBottomPanelOpen = useShellStore((s) => s.isBottomPanelOpen);
   const toggleBottomPanel = useShellStore((s) => s.toggleBottomPanel);
-  const { density } = useThemeController();
 
   return (
     <footer className={styles.statusBar} aria-label="Status Bar">
@@ -85,15 +94,17 @@ export const StatusBar: React.FC<StatusBarProps> = ({ backendReady = true }) => 
       </div>
 
       <div className={styles.section}>
-        <Tooltip content="Current Responsive Band and Viewport Dimensions" relationship="label">
-          <Badge appearance="tint" color="brand" size="small">
-            {band.toUpperCase()} ({windowWidth}×{windowHeight})
-          </Badge>
-        </Tooltip>
-
-        <Badge appearance="outline" size="small">
-          {density}
-        </Badge>
+        <Button
+          appearance="subtle"
+          className={styles.bandButton}
+          aria-label={`Current Band: ${band}. Viewport: ${windowWidth} by ${windowHeight}`}
+          title="Current Responsive Band and Viewport Dimensions"
+        >
+          <span className={styles.bandLabel}>{band.toUpperCase()}</span>
+          <span className={styles.resolutionLabel}>
+            ({windowWidth}&times;{windowHeight})
+          </span>
+        </Button>
 
         <Button
           appearance="subtle"

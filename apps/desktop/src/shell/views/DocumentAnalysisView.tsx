@@ -10,7 +10,6 @@ import {
   Title2,
   Title3,
   tokens,
-  Tooltip,
 } from "@fluentui/react-components";
 import {
   ArrowClockwise20Regular,
@@ -361,28 +360,26 @@ export const DocumentAnalysisView: React.FC = () => {
         </div>
 
         <div className={styles.headerActions}>
-          <Tooltip content="Select and open a local text document" relationship="label">
-            <Button
-              appearance="primary"
-              icon={<DocumentAdd24Regular />}
-              onClick={() => void openDocument()}
-              disabled={isLoadingDocument || isAnalyzing}
-              data-testid="open-document-btn"
-            >
-              {selectedDocument ? "Open Different..." : "Open Document"}
-            </Button>
-          </Tooltip>
+          <Button
+            appearance="primary"
+            icon={<DocumentAdd24Regular />}
+            onClick={() => void openDocument()}
+            disabled={isLoadingDocument || isAnalyzing}
+            data-testid="open-document-btn"
+            title="Select and open a local text document"
+          >
+            {selectedDocument ? "Open Different..." : "Open Document"}
+          </Button>
 
           {selectedDocument && (
-            <Tooltip content="Close active document" relationship="label">
-              <Button
-                appearance="subtle"
-                icon={<Dismiss20Regular />}
-                onClick={() => void closeDocument()}
-                disabled={isAnalyzing}
-                aria-label="Close document"
-              />
-            </Tooltip>
+            <Button
+              appearance="subtle"
+              icon={<Dismiss20Regular />}
+              onClick={() => void closeDocument()}
+              disabled={isAnalyzing}
+              aria-label="Close document"
+              title="Close active document"
+            />
           )}
         </div>
       </header>
@@ -609,24 +606,22 @@ export const DocumentAnalysisView: React.FC = () => {
                   : `Match ${currentMatchIndex + 1} of ${matches.length}`}
               </Badge>
             )}
-            <Tooltip content="Previous Match (Shift+Enter)" relationship="label">
-              <Button
-                appearance="subtle"
-                icon={<ArrowLeft16Regular />}
-                onClick={handlePrevMatch}
-                disabled={matches.length === 0}
-                aria-label="Previous Match"
-              />
-            </Tooltip>
-            <Tooltip content="Next Match (Enter)" relationship="label">
-              <Button
-                appearance="subtle"
-                icon={<ArrowRight16Regular />}
-                onClick={handleNextMatch}
-                disabled={matches.length === 0}
-                aria-label="Next Match"
-              />
-            </Tooltip>
+            <Button
+              appearance="subtle"
+              icon={<ArrowLeft16Regular />}
+              onClick={handlePrevMatch}
+              disabled={matches.length === 0}
+              aria-label="Previous Match"
+              title="Previous Match (Shift+Enter)"
+            />
+            <Button
+              appearance="subtle"
+              icon={<ArrowRight16Regular />}
+              onClick={handleNextMatch}
+              disabled={matches.length === 0}
+              aria-label="Next Match"
+              title="Next Match (Enter)"
+            />
           </div>
 
           {/* Document Content Safe Preview */}

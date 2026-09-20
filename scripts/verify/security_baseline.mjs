@@ -42,6 +42,13 @@ if (csp.includes("http://*") || csp.includes("https://*") || csp.includes("ws://
 const capability = JSON.parse(fs.readFileSync(capabilityPath, "utf8"));
 const allowedPermissions = new Set([
   "core:default",
+  "core:window:allow-start-dragging",
+  "core:window:allow-minimize",
+  "core:window:allow-maximize",
+  "core:window:allow-unmaximize",
+  "core:window:allow-toggle-maximize",
+  "core:window:allow-is-maximized",
+  "core:window:allow-close",
   "allow-backend-status",
   "allow-echo-text",
   "allow-task-lifecycle",
@@ -52,6 +59,7 @@ const allowedPermissions = new Set([
   "allow-document-analysis",
   "allow-settings",
   "allow-diagnostics",
+  "allow-update",
 ]);
 
 const prohibitedCapabilities = new Set([

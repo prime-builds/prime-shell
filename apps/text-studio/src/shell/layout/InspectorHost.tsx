@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Button, makeStyles, tokens, Tooltip } from "@fluentui/react-components";
+import { Button, makeStyles, tokens } from "@fluentui/react-components";
 import { Dismiss20Regular, PanelRightContract20Regular } from "@fluentui/react-icons";
 import type { ResponsiveBand } from "../types";
 
@@ -123,24 +123,22 @@ export const InspectorHost: React.FC<InspectorHostProps> = ({
         <div className={styles.header}>
           <span className={styles.headerTitle}>Inspector</span>
           {isDrawerMode ? (
-            <Tooltip content="Close Inspector" relationship="label">
-              <Button
-                ref={closeButtonRef}
-                appearance="subtle"
-                icon={<Dismiss20Regular />}
-                onClick={onCloseDrawer}
-                aria-label="Close Inspector"
-              />
-            </Tooltip>
+            <Button
+              ref={closeButtonRef}
+              appearance="subtle"
+              icon={<Dismiss20Regular />}
+              onClick={onCloseDrawer}
+              aria-label="Close Inspector"
+              title="Close Inspector"
+            />
           ) : (
-            <Tooltip content="Collapse Inspector" relationship="label">
-              <Button
-                appearance="subtle"
-                icon={<PanelRightContract20Regular />}
-                onClick={onToggleOpen}
-                aria-label="Collapse Inspector"
-              />
-            </Tooltip>
+            <Button
+              appearance="subtle"
+              icon={<PanelRightContract20Regular />}
+              onClick={onToggleOpen}
+              aria-label="Collapse Inspector"
+              title="Collapse Inspector"
+            />
           )}
         </div>
         <div className={styles.content}>{children}</div>

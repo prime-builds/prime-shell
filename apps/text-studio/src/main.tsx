@@ -45,5 +45,5 @@ createRoot(document.getElementById("root")!).render(
     <RootErrorBoundary>
       <App />
     </RootErrorBoundary>
-  </StrictMode>,
+  </StrictMode>
 );

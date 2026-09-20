@@ -439,11 +439,45 @@ pub fn run() {
                         .and_then(|p| p.parent())
                         .map(std::path::Path::to_path_buf)
                     {
-                        return BackendClient::launch(LaunchSpec::from_paths(exec, target_root))
-                            .ok();
+                        return match BackendClient::launch(LaunchSpec::from_paths(exec, target_root)) {
+                            Ok(c) => Some(c),
+                            Err(e) => {
+                                eprintln!("[backend] Failed to launch from PRIME_SHELL_PACKAGED_SIDECAR: {e:?}");
+                                None
+                            }
+                        };
                     }
                 }
-                BackendClient::launch(LaunchSpec::from_resource_dir(&resource_dir)).ok()
+                let spec = LaunchSpec::from_resource_dir(&resource_dir);
+                match BackendClient::launch(spec) {
+                    Ok(c) => Some(c),
+                    Err(e) => {
+                        #[cfg(debug_assertions)]
+                        {
+                            eprintln!("[backend] Failed to launch from resource_dir ({resource_dir:?}): {e:?}");
+                            for fallback_rel in ["../../../services/python-backend/dist", "services/python-backend/dist"] {
+                                let fallback_path = std::path::Path::new(fallback_rel);
+                                if fallback_path.exists() {
+                                    let fallback_spec = LaunchSpec::from_resource_dir(fallback_path);
+                                    if fallback_spec.executable.exists() {
+                                        match BackendClient::launch(fallback_spec) {
+                                            Ok(c) => {
+                                                eprintln!("[backend] Successfully launched from dev fallback: {fallback_path:?}");
+                                                return Some(c);
+                                            }
+                                            Err(dev_err) => {
+                                                eprintln!("[backend] Failed to launch from dev fallback ({fallback_path:?}): {dev_err:?}");
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        #[cfg(not(debug_assertions))]
+                        let _ = e;
+                        None
+                    }
+                }
             });
             app.manage(BackendState {
                 client: Mutex::new(client),
