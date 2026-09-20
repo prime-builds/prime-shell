@@ -8,6 +8,19 @@ export default defineConfig({
     port: 1421,
     strictPort: true,
   },
+  optimizeDeps: {
+    include: [
+      "@fluentui/react-components",
+      "@fluentui/react-icons",
+      "@prime-shell/design-tokens",
+      "@tauri-apps/api",
+      "react",
+      "react-dom",
+      "react-router-dom",
+      "zod",
+      "zustand",
+    ],
+  },
   envPrefix: ["VITE_", "TAURI_"],
   build: {
     target: "es2022",
