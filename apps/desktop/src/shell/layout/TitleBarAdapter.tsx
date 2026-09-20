@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, makeStyles, tokens, Tooltip } from "@fluentui/react-components";
+import { Button, makeStyles, tokens } from "@fluentui/react-components";
 import {
   Dismiss20Regular,
   Square20Regular,
@@ -158,35 +158,32 @@ export const TitleBarAdapter: React.FC<TitleBarAdapterProps> = ({
       </div>
 
       <div className={styles.windowControls} role="toolbar" aria-label="Window Controls">
-        <Tooltip content="Minimize" relationship="label">
-          <Button
-            appearance="subtle"
-            className={styles.controlButton}
-            icon={<Subtract20Regular />}
-            onClick={handleMinimize}
-            aria-label="Minimize Window"
-          />
-        </Tooltip>
+        <Button
+          appearance="subtle"
+          className={styles.controlButton}
+          icon={<Subtract20Regular />}
+          onClick={handleMinimize}
+          aria-label="Minimize Window"
+          title="Minimize"
+        />
 
-        <Tooltip content={isMaximized ? "Restore" : "Maximize"} relationship="label">
-          <Button
-            appearance="subtle"
-            className={styles.controlButton}
-            icon={isMaximized ? <SquareMultiple20Regular /> : <Square20Regular />}
-            onClick={handleMaximizeToggle}
-            aria-label={isMaximized ? "Restore Window" : "Maximize Window"}
-          />
-        </Tooltip>
+        <Button
+          appearance="subtle"
+          className={styles.controlButton}
+          icon={isMaximized ? <SquareMultiple20Regular /> : <Square20Regular />}
+          onClick={handleMaximizeToggle}
+          aria-label={isMaximized ? "Restore Window" : "Maximize Window"}
+          title={isMaximized ? "Restore" : "Maximize"}
+        />
 
-        <Tooltip content="Close" relationship="label">
-          <Button
-            appearance="subtle"
-            className={styles.closeButton}
-            icon={<Dismiss20Regular />}
-            onClick={handleClose}
-            aria-label="Close Window"
-          />
-        </Tooltip>
+        <Button
+          appearance="subtle"
+          className={styles.closeButton}
+          icon={<Dismiss20Regular />}
+          onClick={handleClose}
+          aria-label="Close Window"
+          title="Close"
+        />
       </div>
     </header>
   );

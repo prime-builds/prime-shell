@@ -23,7 +23,6 @@ import {
   Title1,
   Title2,
   Title3,
-  Tooltip,
 } from "@fluentui/react-components";
 import { validateCustomSeed } from "@prime-shell/design-tokens";
 import {
@@ -787,9 +786,12 @@ export const HomeWorkspaceView: React.FC = () => {
             </Menu>
 
             {/* Tooltip Portal */}
-            <Tooltip content="Themed tooltip rendered inside portal container" relationship="label">
-              <Button data-testid="tooltip-portal-trigger">Hover for Themed Tooltip</Button>
-            </Tooltip>
+            <Button
+              data-testid="tooltip-portal-trigger"
+              title="Themed tooltip rendered inside portal container"
+            >
+              Hover for Themed Tooltip
+            </Button>
 
             {/* Dialog Modal Portal */}
             <Dialog>

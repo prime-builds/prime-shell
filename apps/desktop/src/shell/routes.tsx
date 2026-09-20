@@ -10,10 +10,31 @@ const featureRoutes = featureRegistry.getRoutes().map((route) => ({
   element: route.element,
 }));
 
+import { useRouteError } from "react-router-dom";
+
+function RootError() {
+  const error = useRouteError();
+  const errorMessage =
+    error instanceof Error
+      ? error.stack || error.message
+      : typeof error === "object" && error !== null && "statusText" in error
+        ? String((error as { statusText: unknown }).statusText)
+        : String(error);
+  return (
+    <div style={{ padding: "32px", color: "#FF6B6B", background: "#1F1F1F", height: "100vh", boxSizing: "border-box", fontFamily: "sans-serif" }}>
+      <h2>Router Caught Error</h2>
+      <pre style={{ whiteSpace: "pre-wrap", background: "#2A2A2A", padding: "16px", borderRadius: "6px" }}>
+        {errorMessage}
+      </pre>
+    </div>
+  );
+}
+
 export const router = createHashRouter([
   {
     path: "/",
     element: <AppShell />,
+    errorElement: <RootError />,
     children: [
       {
         index: true,

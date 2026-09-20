@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Button, makeStyles, tokens, Tooltip } from "@fluentui/react-components";
+import { Button, makeStyles, mergeClasses, tokens } from "@fluentui/react-components";
 import { Dismiss20Regular, PanelLeftContract20Regular } from "@fluentui/react-icons";
 import type { ResponsiveBand } from "../types";
 
@@ -118,31 +118,29 @@ export const ContextSidebar: React.FC<ContextSidebarProps> = ({
       )}
       <aside
         ref={sidebarRef}
-        className={`${styles.sidebar} ${isOverlay ? styles.overlay : ""}`}
+        className={mergeClasses(styles.sidebar, isOverlay && styles.overlay)}
         style={{ width: `${width}px` }}
         aria-label="Context Sidebar"
       >
         <div className={styles.header}>
           <span className={styles.headerTitle}>Context Sidebar</span>
           {isOverlay ? (
-            <Tooltip content="Close Sidebar" relationship="label">
-              <Button
-                ref={closeButtonRef}
-                appearance="subtle"
-                icon={<Dismiss20Regular />}
-                onClick={onCloseOverlay}
-                aria-label="Close Context Sidebar"
-              />
-            </Tooltip>
+            <Button
+              ref={closeButtonRef}
+              appearance="subtle"
+              icon={<Dismiss20Regular />}
+              onClick={onCloseOverlay}
+              aria-label="Close Context Sidebar"
+              title="Close Sidebar"
+            />
           ) : (
-            <Tooltip content="Collapse Sidebar" relationship="label">
-              <Button
-                appearance="subtle"
-                icon={<PanelLeftContract20Regular />}
-                onClick={onToggleCollapse}
-                aria-label="Collapse Context Sidebar"
-              />
-            </Tooltip>
+            <Button
+              appearance="subtle"
+              icon={<PanelLeftContract20Regular />}
+              onClick={onToggleCollapse}
+              aria-label="Collapse Context Sidebar"
+              title="Collapse Sidebar"
+            />
           )}
         </div>
         <div className={styles.content}>{children}</div>

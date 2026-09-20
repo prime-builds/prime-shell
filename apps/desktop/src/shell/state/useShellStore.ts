@@ -62,6 +62,9 @@ import { invoke } from "@tauri-apps/api/core";
 let saveTimeout: ReturnType<typeof setTimeout> | null = null;
 
 async function invokeTauri<T>(cmd: string, args?: Record<string, unknown>): Promise<T | null> {
+  if (typeof window === "undefined" || !("__TAURI_INTERNALS__" in window)) {
+    return null;
+  }
   try {
     return args !== undefined ? await invoke<T>(cmd, args) : await invoke<T>(cmd);
   } catch (e) {
@@ -104,6 +107,9 @@ export const useShellStore = create<ShellState>((set, get) => {
     setWindowDimensions: (width, height) => {
       const band = getResponsiveBand(width);
       set((state) => {
+        if (state.windowWidth === width && state.windowHeight === height) {
+          return state;
+        }
         // Automatically close overlay/drawer if resized into a wider band
         const isSidebarOverlayOpen = band === "compact" ? state.isSidebarOverlayOpen : false;
         const isInspectorDrawerOpen = band === "compact" || band === "tablet" ? state.isInspectorDrawerOpen : false;

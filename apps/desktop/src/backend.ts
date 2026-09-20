@@ -79,6 +79,12 @@ export async function resetBackend(): Promise<BackendStatus> {
 export async function listenToTaskEvents(
   callback: (event: TaskEvent) => void,
 ): Promise<UnlistenFn> {
+  if (
+    typeof window === "undefined" ||
+    (!("__TAURI_INTERNALS__" in window) && import.meta.env.MODE !== "test")
+  ) {
+    return () => {};
+  }
   return listen<unknown>("task-event", (tauriEvent) => {
     const parsed = taskEventSchema.safeParse(tauriEvent.payload);
     if (parsed.success) {

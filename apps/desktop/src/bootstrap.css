@@ -10,7 +10,12 @@ body {
   padding: 0;
   height: 100%;
   width: 100%;
+  overflow: hidden;
   box-sizing: border-box;
+}
+
+.fui-Tooltip {
+  pointer-events: none !important;
 }
 
 *,

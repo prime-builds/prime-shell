@@ -11,7 +11,6 @@ import {
   Title1,
   Title2,
   tokens,
-  Tooltip,
 } from "@fluentui/react-components";
 import {
   Copy20Regular,
@@ -270,16 +269,15 @@ export const TextUtilityView: React.FC = () => {
                   {copyFeedback}
                 </Text>
               )}
-              <Tooltip content="Copy Result to Clipboard" relationship="label">
-                <Button
-                  appearance="subtle"
-                  icon={<Copy20Regular />}
-                  onClick={handleCopy}
-                  disabled={!resultText || copying}
-                  aria-label="Copy Result"
-                  data-testid="text-utility-copy-btn"
-                />
-              </Tooltip>
+              <Button
+                appearance="subtle"
+                icon={<Copy20Regular />}
+                onClick={handleCopy}
+                disabled={!resultText || copying}
+                aria-label="Copy Result"
+                title="Copy Result to Clipboard"
+                data-testid="text-utility-copy-btn"
+              />
             </div>
           </div>
 

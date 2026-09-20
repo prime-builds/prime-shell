@@ -125,6 +125,9 @@ export const ThemeProviderContext: React.FC<{ children: React.ReactNode }> = ({
   // Fetch host system theme & material state from Rust
   useEffect(() => {
     let mounted = true;
+    if (typeof window === "undefined" || !("__TAURI_INTERNALS__" in window)) {
+      return;
+    }
     invoke<{
       systemTheme: string;
       systemAccent: string | null;
@@ -183,6 +186,9 @@ export const ThemeProviderContext: React.FC<{ children: React.ReactNode }> = ({
 
   // Synchronize native window background with effective theme
   useEffect(() => {
+    if (typeof window === "undefined" || !("__TAURI_INTERNALS__" in window)) {
+      return;
+    }
     const bgHex = tokens.surfaces.appShell;
     invoke("sync_native_window_theme", {
       effectiveTheme,

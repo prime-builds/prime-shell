@@ -201,12 +201,14 @@ export const SettingsShellView: React.FC = () => {
 
   const handleResetAnalysis = async () => {
     await resetSection("documentAnalysis");
+    setMaxTopTerms(20);
     setResetFeedback("Document analysis settings reset to default values.");
     setTimeout(() => setResetFeedback(""), 3000);
   };
 
   const handleResetTextUtility = async () => {
     await resetSection("textUtility");
+    setTextUtilityDefaultMode("uppercase");
     setResetFeedback("Text utility settings reset to default values.");
     setTimeout(() => setResetFeedback(""), 3000);
   };

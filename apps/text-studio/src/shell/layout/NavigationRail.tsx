@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, makeStyles, tokens, Tooltip } from "@fluentui/react-components";
+import { Button, makeStyles, mergeClasses, tokens } from "@fluentui/react-components";
 import {
   AppFolder24Filled,
   AppFolder24Regular,
@@ -87,86 +87,81 @@ export const NavigationRail: React.FC<NavigationRailProps> = ({
     <nav className={styles.rail} aria-label="Main Navigation">
       <div className={styles.section}>
         {onToggleSidebar && (
-          <Tooltip content="Toggle Sidebar (Ctrl+B)" relationship="label">
-            <Button
-              appearance="subtle"
-              className={styles.railButton}
-              icon={<PanelLeftExpand20Regular />}
-              onClick={onToggleSidebar}
-              aria-label="Toggle Sidebar"
-            />
-          </Tooltip>
+          <Button
+            appearance="subtle"
+            className={styles.railButton}
+            icon={<PanelLeftExpand20Regular />}
+            onClick={onToggleSidebar}
+            aria-label="Toggle Sidebar"
+            title="Toggle Sidebar (Ctrl+B)"
+          />
         )}
 
         {/* Workspace Root */}
-        <Tooltip content="Workspace" relationship="label">
-          <Button
-            appearance="subtle"
-            className={`${styles.railButton} ${activeId === "workspace" ? styles.activeButton : ""}`}
-            icon={activeId === "workspace" ? <AppFolder24Filled /> : <AppFolder24Regular />}
-            onClick={() => onNavigate("workspace", "/")}
-            aria-label="Workspace"
-            aria-current={activeId === "workspace" ? "page" : undefined}
-            data-testid="nav-workspace-btn"
-          />
-        </Tooltip>
+        <Button
+          appearance="subtle"
+          className={mergeClasses(styles.railButton, activeId === "workspace" && styles.activeButton)}
+          icon={activeId === "workspace" ? <AppFolder24Filled /> : <AppFolder24Regular />}
+          onClick={() => onNavigate("workspace", "/")}
+          aria-label="Workspace"
+          aria-current={activeId === "workspace" ? "page" : undefined}
+          data-testid="nav-workspace-btn"
+          title="Workspace"
+        />
 
         {/* Dynamic Feature Navigation Items */}
         {featureNavItems.map((item) => {
           const isActive = activeId === item.id;
           const IconComponent = isActive ? item.iconFilled : item.iconRegular;
           return (
-            <Tooltip key={item.id} content={item.label} relationship="label">
-              <Button
-                appearance="subtle"
-                className={`${styles.railButton} ${isActive ? styles.activeButton : ""}`}
-                icon={<IconComponent />}
-                onClick={() => onNavigate(item.id, item.path)}
-                aria-label={item.ariaLabel || item.label}
-                aria-current={isActive ? "page" : undefined}
-                data-testid={`nav-${item.id}-btn`}
-              />
-            </Tooltip>
+            <Button
+              key={item.id}
+              appearance="subtle"
+              className={mergeClasses(styles.railButton, isActive && styles.activeButton)}
+              icon={<IconComponent />}
+              onClick={() => onNavigate(item.id, item.path)}
+              aria-label={item.ariaLabel || item.label}
+              aria-current={isActive ? "page" : undefined}
+              data-testid={`nav-${item.id}-btn`}
+              title={item.label}
+            />
           );
         })}
 
         {/* Settings */}
-        <Tooltip content="Settings (Ctrl+,)" relationship="label">
-          <Button
-            appearance="subtle"
-            className={`${styles.railButton} ${activeId === "settings" ? styles.activeButton : ""}`}
-            icon={activeId === "settings" ? <Settings24Filled /> : <Settings24Regular />}
-            onClick={() => onNavigate("settings", "/settings")}
-            aria-label="Settings"
-            aria-current={activeId === "settings" ? "page" : undefined}
-            data-testid="nav-settings-btn"
-          />
-        </Tooltip>
+        <Button
+          appearance="subtle"
+          className={mergeClasses(styles.railButton, activeId === "settings" && styles.activeButton)}
+          icon={activeId === "settings" ? <Settings24Filled /> : <Settings24Regular />}
+          onClick={() => onNavigate("settings", "/settings")}
+          aria-label="Settings"
+          aria-current={activeId === "settings" ? "page" : undefined}
+          data-testid="nav-settings-btn"
+          title="Settings (Ctrl+,)"
+        />
       </div>
 
       <div className={styles.section}>
         {onOpenCommandPalette && (
-          <Tooltip content="Command Palette (Ctrl+K)" relationship="label">
-            <Button
-              appearance="subtle"
-              className={styles.railButton}
-              icon={<Search24Regular />}
-              onClick={onOpenCommandPalette}
-              aria-label="Open Command Palette"
-              data-testid="nav-command-palette-btn"
-            />
-          </Tooltip>
-        )}
-
-        <Tooltip content={`Theme: ${themeMode} (click to cycle)`} relationship="label">
           <Button
             appearance="subtle"
             className={styles.railButton}
-            icon={<DarkTheme24Regular />}
-            onClick={handleCycleTheme}
-            aria-label={`Current Theme: ${themeMode}. Click to cycle.`}
+            icon={<Search24Regular />}
+            onClick={onOpenCommandPalette}
+            aria-label="Open Command Palette"
+            data-testid="nav-command-palette-btn"
+            title="Command Palette (Ctrl+K)"
           />
-        </Tooltip>
+        )}
+
+        <Button
+          appearance="subtle"
+          className={styles.railButton}
+          icon={<DarkTheme24Regular />}
+          onClick={handleCycleTheme}
+          aria-label={`Current Theme: ${themeMode}. Click to cycle.`}
+          title={`Theme: ${themeMode} (click to cycle)`}
+        />
       </div>
     </nav>
   );

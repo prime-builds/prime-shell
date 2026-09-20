@@ -7,6 +7,22 @@ export default defineConfig({
   server: {
     port: 1420,
     strictPort: true,
+    watch: {
+      ignored: ["**/src-tauri/**"],
+    },
+  },
+  optimizeDeps: {
+    include: [
+      "@fluentui/react-components",
+      "@fluentui/react-icons",
+      "@prime-shell/design-tokens",
+      "@tauri-apps/api",
+      "react",
+      "react-dom",
+      "react-router-dom",
+      "zod",
+      "zustand",
+    ],
   },
   envPrefix: ["VITE_", "TAURI_"],
   build: {
