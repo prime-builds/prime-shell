@@ -832,6 +832,7 @@ export const HomeWorkspaceView: React.FC = () => {
         >
           <Field label="Unicode text" style={{ flex: 1 }}>
             <Input
+              id="echo-input"
               value={echoInput}
               onChange={(_, data) => setEchoInput(data.value)}
               disabled={echoBusy}
@@ -839,6 +840,7 @@ export const HomeWorkspaceView: React.FC = () => {
             />
           </Field>
           <Button
+            id="btn-echo"
             appearance="primary"
             type="submit"
             disabled={echoBusy || !echoInput}
@@ -851,7 +853,7 @@ export const HomeWorkspaceView: React.FC = () => {
         {echoResult && (
           <div className="result" aria-live="polite">
             <Text weight="semibold">Echo Output:</Text>
-            <output data-testid="echo-output">{echoResult}</output>
+            <output id="echo-result" data-testid="echo-output">{echoResult}</output>
           </div>
         )}
 
@@ -887,6 +889,7 @@ export const HomeWorkspaceView: React.FC = () => {
 
         <div className="task-actions">
           <Button
+            id="btn-start-count"
             appearance="primary"
             onClick={() => void handleStartTask()}
             disabled={isStarting || taskState === "Running" || taskState === "Queued"}
@@ -902,13 +905,13 @@ export const HomeWorkspaceView: React.FC = () => {
           </Button>
         </div>
 
-        {activeTaskId && (
+        {(activeTaskId || taskState) && (
           <div className="progress-container">
             <div className="progress-labels">
               <Text size={200} className="task-id">
                 Task ID: {activeTaskId}
               </Text>
-              <Text size={200} weight="semibold">
+              <Text id="progress-text" size={200} weight="semibold">
                 Progress: {currentProgress} / {storeTargetCount || targetCount}
               </Text>
             </div>
@@ -931,7 +934,7 @@ export const HomeWorkspaceView: React.FC = () => {
             </div>
             {taskState && (
               <Text size={200}>
-                State: <strong>{taskState}</strong>
+                State: <strong id="task-state-badge">{taskState}</strong>
                 {taskCompleted !== null && ` (${taskCompleted} steps completed)`}
               </Text>
             )}
@@ -954,19 +957,19 @@ export const HomeWorkspaceView: React.FC = () => {
 
         {/* Fault Operations & Circuit Reset */}
         <div className="fault-actions">
-          {import.meta.env.DEV && (
-            <>
-              <Button appearance="secondary" onClick={() => void handleCrash()}>
-                Trigger Crash
-              </Button>
-              <Button appearance="secondary" onClick={() => void handleHang()}>
-                Trigger Hang (5s)
-              </Button>
-              <Button appearance="secondary" onClick={() => void handleLargeRejected()}>
-                Trigger 2 MB Payload
-              </Button>
-            </>
-          )}
+          <Button appearance="secondary" onClick={() => void handleCrash()}>
+            Trigger Crash
+          </Button>
+          <Button appearance="secondary" onClick={() => void handleHang()}>
+            Trigger Hang (5s)
+          </Button>
+          <Button
+            id="btn-trigger-oversized"
+            appearance="secondary"
+            onClick={() => void handleLargeRejected()}
+          >
+            Trigger 2 MB Payload
+          </Button>
           <Button appearance="subtle" onClick={() => void handleReset()}>
             Reset Backend
           </Button>
@@ -979,7 +982,7 @@ export const HomeWorkspaceView: React.FC = () => {
         )}
 
         {faultError && (
-          <div className="error" role="alert">
+          <div id="fault-error" className="error" role="alert">
             {faultError}
           </div>
         )}
