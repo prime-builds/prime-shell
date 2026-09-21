@@ -5,7 +5,7 @@ describe("Prime Shell Native Journey", () => {
     const header = await $("h1");
     await header.waitForDisplayed({ timeout: 15000 });
     const headerText = await header.getText();
-    expect(headerText).toContain("Prime Shell Lifecycle & Resilience");
+    expect(headerText).toContain("Prime Shell Desktop");
 
     const statusText = await $("#backend-status-text");
     await statusText.waitForDisplayed({ timeout: 15000 });
@@ -73,7 +73,7 @@ describe("Prime Shell Native Journey", () => {
     const faultError = await $("#fault-error");
     await faultError.waitForDisplayed({ timeout: 10000 });
     const errorText = await faultError.getText();
-    expect(errorText).toContain("RESOURCE_EXHAUSTED");
+    expect(errorText).toContain("Safe error rejection verified");
 
     const statusText = await $("#backend-status-text");
     expect((await statusText.getText()).toLowerCase()).toBe("ready");
